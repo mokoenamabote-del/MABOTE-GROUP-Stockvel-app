@@ -1,0 +1,990 @@
+/* =========================================================
+   MABOTE GROUP STOCKVEL APP
+   MAIN APPLICATION STYLES
+   ROYAL BLUE & GOLD
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f9;
+  color: #172554;
+}
+
+/* =========================================================
+   GLOBAL ELEMENTS
+   ========================================================= */
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+}
+
+/* =========================================================
+   APP SHELL
+   ========================================================= */
+
+.app-shell {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* =========================================================
+   MAIN HEADER
+   ========================================================= */
+
+.app-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+
+  background: #071a52;
+  color: #ffffff;
+
+  padding: 25px 20px;
+
+  border-bottom: 5px solid #d4af37;
+  border-radius: 12px 12px 0 0;
+
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+}
+
+.app-header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+.app-header p {
+  margin: 0;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 10px 14px;
+
+  text-decoration: none;
+
+  background: #ffffff;
+  color: #071a52;
+
+  border: 2px solid #d4af37;
+  border-radius: 7px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nav-button:hover {
+  background: #d4af37;
+  color: #071a52;
+  transform: translateY(-1px);
+}
+
+.nav-button.active {
+  background: #d4af37;
+  color: #071a52;
+  border-color: #ffffff;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.app-main {
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* =========================================================
+   GENERAL PAGE CONTAINERS
+   ========================================================= */
+
+.admin-page,
+.home-page,
+.plans-page,
+.login-page,
+.member-page,
+.register-page,
+.claims-page {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #d4af37;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================================
+   ADMIN HEADER
+   ========================================================= */
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+
+  margin-bottom: 25px;
+
+  padding: 20px;
+
+  background: #071a52;
+  color: #ffffff;
+
+  border-bottom: 4px solid #d4af37;
+  border-radius: 10px;
+}
+
+.admin-header h2 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 1.8rem;
+}
+
+.admin-header p {
+  margin: 0;
+  color: #e5e7eb;
+}
+
+/* =========================================================
+   DASHBOARD GRID
+   ========================================================= */
+
+.dashboard-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 20px;
+
+  width: 100%;
+
+  margin-top: 20px;
+}
+
+/* =========================================================
+   DASHBOARD CARDS
+   ========================================================= */
+
+.dashboard-card {
+  min-width: 0;
+
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  padding: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card h3 {
+  margin: 0 0 10px;
+
+  color: #071a52;
+
+  font-size: 1.05rem;
+}
+
+.dashboard-card p {
+  line-height: 1.5;
+}
+
+.dashboard-card--wide {
+  grid-column: 1 / -1;
+}
+
+/* =========================================================
+   DASHBOARD METRICS
+   ========================================================= */
+
+.metric-value {
+  margin: 10px 0 6px;
+
+  font-size: 2rem;
+
+  font-weight: 700;
+
+  color: #071a52;
+}
+
+.metric-detail {
+  margin: 0;
+
+  color: #555555;
+
+  font-size: 0.95rem;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.primary-button {
+  background: #071a52;
+  color: #ffffff;
+
+  border: 2px solid #d4af37;
+  border-radius: 7px;
+
+  padding: 12px 20px;
+
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.primary-button:hover {
+  background: #d4af37;
+  color: #071a52;
+}
+
+.secondary-button {
+  background: #ffffff;
+  color: #071a52;
+
+  border: 2px solid #d4af37;
+  border-radius: 7px;
+
+  padding: 10px 16px;
+
+  font-weight: 700;
+}
+
+.secondary-button:hover {
+  background: #d4af37;
+}
+
+/* =========================================================
+   SUMMARY TABLE
+   ========================================================= */
+
+.summary-table {
+  display: grid;
+
+  gap: 8px;
+
+  margin-top: 18px;
+
+  width: 100%;
+}
+
+.summary-row {
+  display: grid;
+
+  grid-template-columns:
+    1.3fr 1fr 1fr 1fr;
+
+  gap: 12px;
+
+  align-items: center;
+
+  padding: 13px;
+
+  border: 1px solid #dddddd;
+  border-radius: 7px;
+
+  background: #ffffff;
+}
+
+.summary-row--header {
+  background: #071a52;
+  color: #ffffff;
+
+  border-color: #d4af37;
+
+  font-weight: 700;
+}
+
+/* =========================================================
+   REPORTS
+   ========================================================= */
+
+.report-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-top: 20px;
+}
+
+.report-card {
+  padding: 18px;
+
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  background: #fffdf5;
+}
+
+.report-card h4 {
+  margin: 0 0 10px;
+
+  color: #071a52;
+}
+
+.report-value {
+  margin: 0 0 6px;
+
+  font-size: 1.3rem;
+
+  font-weight: 700;
+
+  color: #071a52;
+}
+
+.report-note {
+  margin: 0;
+
+  color: #555555;
+}
+
+/* =========================================================
+   COLLECTION FORM
+   ========================================================= */
+
+.collection-form {
+  display: grid;
+
+  gap: 20px;
+
+  margin-top: 20px;
+}
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+.form-grid label,
+.collection-form label {
+  display: grid;
+
+  gap: 8px;
+
+  font-weight: 700;
+
+  color: #172554;
+}
+
+.form-grid input,
+.form-grid select,
+.collection-form input,
+.collection-form select,
+.collection-form textarea {
+  width: 100%;
+
+  padding: 12px 14px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+
+  font-size: 1rem;
+
+  background: #ffffff;
+}
+
+/* =========================================================
+   COLLECTION LIST
+   ========================================================= */
+
+.collection-list {
+  display: grid;
+
+  gap: 14px;
+
+  margin-top: 25px;
+}
+
+.collection-card {
+  padding: 18px;
+
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  background: #fffdf5;
+}
+
+.collection-card p {
+  margin: 7px 0;
+
+  color: #333333;
+}
+
+/* =========================================================
+   PLANS
+   ========================================================= */
+
+.plans-list,
+.payment-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin-top: 20px;
+}
+
+.plan-card,
+.payment-card {
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  padding: 20px;
+
+  background: #fffdf5;
+}
+
+.plan-card h3,
+.payment-card h3 {
+  color: #071a52;
+}
+
+/* =========================================================
+   MEMBER MANAGEMENT
+   ========================================================= */
+
+.member-management {
+  display: grid;
+
+  grid-template-columns:
+    1.5fr 1fr;
+
+  gap: 20px;
+
+  margin-top: 24px;
+}
+
+.member-section {
+  padding: 20px;
+
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.member-table {
+  display: grid;
+
+  gap: 10px;
+
+  margin-top: 16px;
+}
+
+.member-row {
+  display: grid;
+
+  grid-template-columns:
+    1.2fr 1.6fr 1fr 0.9fr 0.7fr;
+
+  gap: 12px;
+
+  align-items: center;
+
+  padding: 12px;
+
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+
+  background: #ffffff;
+}
+
+.member-row--header {
+  background: #071a52;
+  color: #ffffff;
+
+  font-weight: 700;
+
+  border-color: #d4af37;
+}
+
+/* =========================================================
+   CLAIMS
+   ========================================================= */
+
+.claims-grid {
+  display: grid;
+
+  grid-template-columns: 1fr;
+
+  gap: 18px;
+
+  margin-top: 20px;
+}
+
+.claim-card {
+  padding: 20px;
+
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  background: #fffdf5;
+}
+
+.claim-form {
+  margin-top: 20px;
+}
+
+/* =========================================================
+   MEMBER DASHBOARD
+   ========================================================= */
+
+.member-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 16px;
+
+  margin-bottom: 24px;
+
+  padding: 20px;
+
+  background: #071a52;
+  color: #ffffff;
+
+  border-bottom: 4px solid #d4af37;
+  border-radius: 10px;
+}
+
+.member-header h2,
+.member-header h3 {
+  color: #ffffff;
+}
+
+.policy-list {
+  display: grid;
+
+  gap: 16px;
+
+  margin-top: 18px;
+}
+
+.policy-card {
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+
+  padding: 20px;
+
+  background: #fffdf5;
+}
+
+/* =========================================================
+   REGISTRATION WIZARD
+   ========================================================= */
+
+.wizard-panel {
+  margin-top: 24px;
+
+  border: 1px solid #d4af37;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  padding: 24px;
+}
+
+.wizard-steps {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-bottom: 22px;
+}
+
+.wizard-step {
+  padding: 10px 16px;
+
+  border-radius: 999px;
+
+  border: 1px solid #d4af37;
+
+  background: #fffdf5;
+
+  color: #071a52;
+
+  font-weight: 700;
+}
+
+.wizard-step.active {
+  background: #071a52;
+
+  color: #ffffff;
+
+  border-color: #d4af37;
+}
+
+.wizard-card {
+  display: grid;
+
+  gap: 16px;
+}
+
+.wizard-card label {
+  display: grid;
+
+  gap: 8px;
+}
+
+.wizard-card input,
+.wizard-card select,
+.wizard-card textarea {
+  width: 100%;
+
+  padding: 12px 14px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+
+  font-size: 1rem;
+}
+
+/* =========================================================
+   LOGIN / REGISTER
+   ========================================================= */
+
+.login-container {
+  min-height: calc(100vh - 180px);
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  padding: 30px 15px;
+
+  background: #f4f6f9;
+}
+
+.login-box {
+  width: 100%;
+
+  max-width: 500px;
+
+  padding: 35px;
+
+  background: #ffffff;
+
+  border: 2px solid #d4af37;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.12);
+
+  text-align: center;
+}
+
+.login-box h1 {
+  margin: 0;
+
+  color: #071a52;
+
+  font-size: 2rem;
+
+  letter-spacing: 1px;
+}
+
+.login-box h2 {
+  color: #d4af37;
+
+  margin: 10px 0 25px;
+}
+
+.login-box form {
+  display: grid;
+
+  gap: 8px;
+
+  text-align: left;
+}
+
+.login-box label {
+  margin-top: 8px;
+
+  color: #172554;
+
+  font-weight: 700;
+}
+
+.login-box input {
+  width: 100%;
+
+  padding: 13px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 7px;
+
+  font-size: 1rem;
+}
+
+.login-box button {
+  width: 100%;
+
+  padding: 13px;
+
+  margin-top: 12px;
+
+  border: 2px solid #d4af37;
+
+  border-radius: 7px;
+
+  background: #071a52;
+
+  color: #ffffff;
+
+  font-weight: 700;
+}
+
+.login-box button:hover {
+  background: #d4af37;
+
+  color: #071a52;
+}
+
+.login-box p {
+  color: #555555;
+
+  margin-top: 25px;
+}
+
+/* =========================================================
+   MEMBERS PAGE
+   ========================================================= */
+
+.members-page {
+  width: 100%;
+}
+
+.members-page table {
+  width: 100%;
+}
+
+.members-page th,
+.members-page td {
+  vertical-align: middle;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .report-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .plans-list,
+  .payment-list {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    padding: 10px;
+  }
+
+  .app-header {
+    padding: 20px 12px;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .app-main {
+    margin-top: 12px;
+  }
+
+  .admin-page,
+  .home-page,
+  .plans-page,
+  .login-page,
+  .member-page,
+  .register-page,
+  .claims-page {
+    padding: 15px;
+  }
+
+  .admin-header,
+  .member-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .dashboard-grid,
+  .plans-list,
+  .payment-list,
+  .member-management,
+  .form-grid,
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-card--wide {
+    grid-column: auto;
+  }
+
+  .summary-row,
+  .member-row {
+    grid-template-columns: 1fr;
+  }
+
+  .app-nav {
+    justify-content: stretch;
+  }
+
+  .nav-button {
+    width: 100%;
+  }
+
+  .login-box {
+    padding: 25px 18px;
+  }
+
+  .login-container {
+    padding: 15px 5px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .app-shell {
+    padding: 5px;
+  }
+
+  .app-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .dashboard-card {
+    padding: 15px;
+  }
+
+  .metric-value {
+    font-size: 1.6rem;
+  }
+
+  .login-box {
+    border-radius: 8px;
+  }
+}
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .app-header,
+  .app-nav,
+  .primary-button,
+  .secondary-button {
+    display: none !important;
+  }
+
+  .app-shell {
+    max-width: none;
+    padding: 0;
+  }
+
+  .app-main {
+    margin: 0;
+  }
+}
