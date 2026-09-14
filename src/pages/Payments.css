@@ -1,0 +1,30 @@
+.payments-page { min-height: 100vh; background: #f5f7fa; color: #10233f; font-family: "Trebuchet MS", "Segoe UI", sans-serif; }
+.payments-container { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+.payments-header { background: white; border-bottom: 1px solid #e2e7ee; }
+.payments-nav { min-height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.payments-logo { color: #092d68; font: 900 22px Georgia, serif; letter-spacing: 1.5px; text-decoration: none; }
+.payments-logo span { color: #c99a2e; font-size: 17px; }
+.payments-nav nav { display: flex; gap: 22px; }
+.payments-nav nav a { color: #26384f; font-size: 13px; font-weight: 700; text-decoration: none; }
+.payments-join, .payment-action { border: 0; border-radius: 5px; background: #092d68; color: white; cursor: pointer; font-weight: 800; padding: 13px 18px; text-decoration: none; }
+.payments-intro { max-width: 760px; padding: 78px 0 42px; }
+.payments-eyebrow { color: #b08020; font-size: 12px; font-weight: 800; letter-spacing: 2px; }
+.payments-intro h1 { color: #092d68; font: 48px/1.12 Georgia, serif; margin: 15px 0; }
+.payments-intro > p:last-child { color: #69778a; font-size: 17px; line-height: 1.7; }
+.payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding-bottom: 50px; }
+.payment-panel { background: white; border: 1px solid #e1e6ed; border-radius: 8px; padding: 28px; min-height: 330px; box-shadow: 0 10px 24px rgba(9, 45, 104, .05); }
+.payment-number { color: #b08020; font: 800 12px Arial, sans-serif; letter-spacing: 2px; }
+.payment-panel h2 { color: #092d68; font: 28px Georgia, serif; margin: 16px 0 10px; }
+.payment-panel p { color: #69778a; line-height: 1.6; }
+.eft-details { border-top: 1px solid #e1e6ed; margin-top: 22px; }
+.eft-details div { display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid #edf0f3; font-size: 12px; }
+.eft-details span { color: #69778a; }.eft-details strong { text-align: right; }
+.payment-note { font-size: 12px; }.payment-action { display: inline-block; margin-top: 16px; }.disabled-payment { background: #aeb8c4; cursor: not-allowed; }.payment-contact { display: block; color: #092d68; font-size: 13px; font-weight: 800; margin-top: 22px; }
+.debit-order-document { max-width: 900px; margin: 0 auto 60px; padding: 50px 58px; background: white; box-shadow: 0 4px 20px rgba(16, 35, 63, .12); box-sizing: border-box; }
+.debit-order-heading { display: flex; justify-content: space-between; gap: 24px; border-bottom: 4px solid #b58a24; padding-bottom: 22px; }.debit-order-heading h2 { color: #102f57; font: 30px Georgia, serif; margin: 5px 0; }.debit-order-heading p:last-child { color: #69778a; margin: 0; }
+.mandate-reference { border: 1px solid #c8d0d9; padding: 12px; font: 12px Arial, sans-serif; }.mandate-reference span { display: block; width: 150px; height: 22px; border-bottom: 1px solid #7d8792; margin-top: 6px; }
+.mandate-section { margin-top: 24px; break-inside: avoid; }.mandate-section h3 { border-bottom: 1px solid #d9dee4; color: #102f57; font-size: 17px; margin: 0 0 14px; padding-bottom: 7px; }.mandate-section p { color: #4b5969; font: 12px/1.6 Arial, sans-serif; }
+.mandate-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 28px; }.mandate-fields label { color: #4b5969; display: flex; flex-direction: column; font: 12px Arial, sans-serif; gap: 5px; }.mandate-fields label span { border-bottom: 1px solid #7d8792; height: 18px; }.mandate-note { color: #9b6811 !important; font-size: 11px !important; }.amount-fields { grid-template-columns: 1fr 1fr; }
+.mandate-signatures { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; margin-top: 38px; font: 12px Arial, sans-serif; }.mandate-signatures div { display: flex; justify-content: space-between; gap: 12px; }.mandate-signatures span { flex: 1; border-bottom: 1px solid #7d8792; }.mandate-footer { border-top: 1px solid #d9dee4; color: #69778a; font: 11px Arial, sans-serif; margin-top: 32px; padding-top: 12px; }
+@media (max-width: 800px) { .payments-nav nav { display: none; }.payment-grid { grid-template-columns: 1fr; }.payments-intro h1 { font-size: 39px; }.debit-order-document { padding: 28px 22px; }.debit-order-heading { display: block; }.mandate-reference { margin-top: 18px; } }
+@media print { @page { size: A4; margin: 0; }.screen-payment-only { display: none !important; }.payments-page { background: white; }.payments-container { width: 100%; }.printable-payment-document { display: block; margin: 0; box-shadow: none; min-height: 0; }.debit-order-document { padding: 42px 50px; } }

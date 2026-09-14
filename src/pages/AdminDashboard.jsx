@@ -4,573 +4,557 @@ import { useNavigate } from "react-router-dom";
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  const [collectionRecords, setCollectionRecords] = useState([]);
-
-  /*
-   * LOAD COLLECTION RECORDS
-   */
-  const loadCollections = () => {
-    try {
-      const savedRecords = localStorage.getItem(
-        "maboteCollections"
-      );
-
-      const records = savedRecords
-        ? JSON.parse(savedRecords)
-        : [];
-
-      setCollectionRecords(
-        Array.isArray(records) ? records : []
-      );
-    } catch (error) {
-      console.error(
-        "Unable to load collection records:",
-        error
-      );
-
-      setCollectionRecords([]);
-    }
-  };
+  const [collections, setCollections] = useState([]);
+  const [memberCount, setMemberCount] = useState(0);
 
   useEffect(() => {
-    loadCollections();
-
-    const handleStorageChange = () => {
-      loadCollections();
-    };
-
-    window.addEventListener(
-      "storage",
-      handleStorageChange
-    );
-
-    return () => {
-      window.removeEventListener(
-        "storage",
-        handleStorageChange
-      );
-    };
+    loadDashboardData();
   }, []);
 
-  /*
-   * DASHBOARD COUNTS
-   */
-
-  const totalCollections =
-    collectionRecords.length;
-
-  const collectedCount =
-    collectionRecords.filter(
-      (record) =>
-        String(record.status || "").toLowerCase() ===
-        "collected"
-    ).length;
-
-  const outstandingCount =
-    collectionRecords.filter((record) => {
-      const status = String(
-        record.status || ""
-      ).toLowerCase();
-
-      return (
-        status === "outstanding" ||
-        status === "pending"
-      );
-    }).length;
-
-  /*
-   * TOTAL MEMBERS
-   *
-   * Reads the existing member storage if available.
-   */
-  const [totalMembers, setTotalMembers] =
-    useState(0);
-
-  useEffect(() => {
+  const loadDashboardData = () => {
+    // Load collections
     try {
-      const possibleKeys = [
+      const savedCollections =
+        localStorage.getItem("maboteCollections");
+
+      if (savedCollections) {
+        const parsedCollections = JSON.parse(savedCollections);
+
+        if (Array.isArray(parsedCollections)) {
+          setCollections(parsedCollections);
+        }
+      }
+    } catch (error) {
+      console.error("Could not load collections:", error);
+      setCollections([]);
+    }
+
+    // Load members from available storage
+    try {
+      const possibleMemberKeys = [
         "maboteMembers",
         "members",
         "maboteApplications",
       ];
 
-      let membersFound = [];
+      let foundMembers = [];
 
-      for (const key of possibleKeys) {
-        const saved = localStorage.getItem(key);
+      for (const key of possibleMemberKeys) {
+        const savedMembers = localStorage.getItem(key);
 
-        if (saved) {
-          const parsed = JSON.parse(saved);
+        if (savedMembers) {
+          try {
+            const parsedMembers = JSON.parse(savedMembers);
 
-          if (Array.isArray(parsed)) {
-            membersFound = parsed;
-            break;
+            if (Array.isArray(parsedMembers)) {
+              foundMembers = parsedMembers;
+              break;
+            }
+          } catch (error) {
+            console.error(`Could not read ${key}:`, error);
           }
         }
       }
 
-      setTotalMembers(membersFound.length);
+      setMemberCount(foundMembers.length);
     } catch (error) {
-      console.error(
-        "Unable to load member count:",
-        error
-      );
-
-      setTotalMembers(0);
+      console.error("Could not load members:", error);
+      setMemberCount(0);
     }
-  }, []);
+  };
 
-  /*
-   * QUICK ACTIONS
-   */
+  const totalCollections = collections.length;
+
+  const collectedAmount = collections.reduce((total, item) => {
+    const amount = Number(
+      item.amount ||
+      item.collectionAmount ||
+      item.paidAmount ||
+      0
+    );
+
+    return total + amount;
+  }, 0);
+
+  const pendingCollections = collections.filter((item) => {
+    const status = String(item.status || "").toLowerCase();
+
+    return (
+      status === "pending" ||
+      status === "outstanding" ||
+      status === "unpaid"
+    );
+  }).length;
+
+  const formatCurrency = (amount) => {
+    return `R${Number(amount).toLocaleString("en-ZA", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("maboteAuthToken");
+    navigate("/login");
+  };
+
   const quickActions = [
     {
       title: "Members",
-      description:
-        "View and manage registered members.",
-      icon: "👥",
+      description: "Manage MABOTE GROUP members.",
+      button: "OPEN MEMBERS",
       path: "/members",
     },
     {
       title: "Grocery Packages",
-      description:
-        "Manage funeral grocery packages.",
-      icon: "📦",
+      description: "View and manage funeral grocery packages.",
+      button: "VIEW PACKAGES",
       path: "/packages",
     },
     {
       title: "Member Collections",
-      description:
-        "Record and review member collections.",
-      icon: "💰",
+      description: "Record and monitor member contributions.",
+      button: "VIEW COLLECTIONS",
       path: "/collections",
     },
     {
       title: "Policy Status",
-      description:
-        "Check active, pending and lapsed policies.",
-      icon: "📋",
+      description: "Check member policy information.",
+      button: "VIEW POLICIES",
       path: "/policy-status",
     },
     {
       title: "Claims",
-      description:
-        "Review and manage member claims.",
-      icon: "📝",
+      description: "Manage and review member claims.",
+      button: "VIEW CLAIMS",
       path: "/claims",
     },
     {
       title: "Reports",
-      description:
-        "View operational and financial reports.",
-      icon: "📊",
+      description: "View financial and membership reports.",
+      button: "VIEW REPORTS",
       path: "/reports",
     },
     {
       title: "Settings",
-      description:
-        "Manage application settings.",
-      icon: "⚙️",
+      description: "Manage application settings.",
+      button: "OPEN SETTINGS",
       path: "/settings",
+    },
+    {
+      title: "Member Application",
+      description: "Register a new MABOTE GROUP member.",
+      button: "NEW APPLICATION",
+      path: "/member-registration",
+    },
+    {
+      title: "Print Materials",
+      description: "Print the application form or promotional flyer.",
+      button: "OPEN PRINT CENTRE",
+      path: "/admin/print-materials",
+    },
+    {
+      title: "Payment Materials",
+      description: "Review payment instructions and print the debit-order form.",
+      button: "OPEN PAYMENT MATERIALS",
+      path: "/admin/payments",
     },
   ];
 
-  /*
-   * RECENT COLLECTIONS
-   */
-  const recentCollections =
-    collectionRecords.slice(0, 5);
-
-  /*
-   * LOGOUT
-   */
-  const handleLogout = () => {
-    localStorage.removeItem(
-      "maboteLoggedIn"
-    );
-
-    navigate("/login");
-  };
-
   return (
-    <section className="admin-page">
-
-      {/* =========================================
-          HEADER
-      ========================================== */}
-
-      <div className="admin-header">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f5f7fb",
+        padding: "30px",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Dashboard Header */}
+      <div
+        style={{
+          background: "#0b2a5b",
+          color: "white",
+          borderRadius: "16px",
+          padding: "28px",
+          marginBottom: "25px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "20px",
+          flexWrap: "wrap",
+        }}
+      >
         <div>
-          <h2>Admin Dashboard</h2>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "30px",
+            }}
+          >
+            MABOTE GROUP
+          </h1>
 
-          <p>
-            Welcome to the MABOTE GROUP Stockvel
-            administration centre.
+          <p
+            style={{
+              margin: "8px 0 0",
+              opacity: 0.9,
+            }}
+          >
+            Admin Dashboard
           </p>
         </div>
 
         <button
-          type="button"
-          className="primary-button"
           onClick={handleLogout}
+          style={{
+            background: "#d4af37",
+            color: "#111",
+            border: "none",
+            padding: "12px 22px",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
         >
           LOGOUT
         </button>
       </div>
 
-      {/* =========================================
-          SUMMARY CARDS
-      ========================================== */}
+      {/* Welcome */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: "16px",
+          padding: "25px",
+          marginBottom: "25px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+        }}
+      >
+        <h2
+          style={{
+            marginTop: 0,
+            color: "#0b2a5b",
+          }}
+        >
+          Welcome to the MABOTE GROUP Dashboard
+        </h2>
 
-      <div className="dashboard-grid">
-
-        <article className="dashboard-card">
-          <h3>Total Members</h3>
-
-          <p className="metric-value">
-            {totalMembers}
-          </p>
-
-          <p className="metric-detail">
-            Registered members
-          </p>
-        </article>
-
-        <article className="dashboard-card">
-          <h3>Grocery Packages</h3>
-
-          <p className="metric-value">
-            248
-          </p>
-
-          <p className="metric-detail">
-            Packages in the current cycle
-          </p>
-        </article>
-
-        <article className="dashboard-card">
-          <h3>Member Collections</h3>
-
-          <p className="metric-value">
-            {totalCollections}
-          </p>
-
-          <p className="metric-detail">
-            Collection records
-          </p>
-        </article>
-
-        <article className="dashboard-card">
-          <h3>Collected</h3>
-
-          <p className="metric-value">
-            {collectedCount}
-          </p>
-
-          <p className="metric-detail">
-            Completed collections
-          </p>
-        </article>
-
-        <article className="dashboard-card">
-          <h3>Outstanding</h3>
-
-          <p className="metric-value">
-            {outstandingCount}
-          </p>
-
-          <p className="metric-detail">
-            Pending or outstanding collections
-          </p>
-        </article>
-
-        <article className="dashboard-card">
-          <h3>Available Stock</h3>
-
-          <p className="metric-value">
-            82
-          </p>
-
-          <p className="metric-detail">
-            Grocery units currently available
-          </p>
-        </article>
-
+        <p style={{ marginBottom: 0 }}>
+          Manage members, contributions, grocery packages,
+          policies, claims and reports from one place.
+        </p>
       </div>
 
-      {/* =========================================
-          QUICK ACTIONS
-      ========================================== */}
-
-      <article className="dashboard-card dashboard-card--wide">
-
-        <h3>Quick Actions</h3>
-
-        <p>
-          Select an area below to manage the
-          MABOTE GROUP Stockvel.
-        </p>
-
-        <div className="report-grid">
-
-          {quickActions.map((action) => (
-            <button
-              key={action.path}
-              type="button"
-              className="report-card"
-              onClick={() =>
-                navigate(action.path)
-              }
-            >
-              <div
-                style={{
-                  fontSize: "32px",
-                  marginBottom: "8px",
-                }}
-              >
-                {action.icon}
-              </div>
-
-              <h4>{action.title}</h4>
-
-              <p className="report-note">
-                {action.description}
-              </p>
-            </button>
-          ))}
-
-        </div>
-
-      </article>
-
-      {/* =========================================
-          MONTHLY SUMMARY
-      ========================================== */}
-
-      <article className="dashboard-card dashboard-card--wide">
-
-        <h3>
-          Monthly Distribution Summary
-        </h3>
-
-        <p>
-          Overview of grocery package
-          distribution and collections.
-        </p>
-
+      {/* Statistics */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(210px, 1fr))",
+          gap: "20px",
+          marginBottom: "30px",
+        }}
+      >
         <div
-          className="summary-table"
-          role="table"
-          aria-label="Monthly distribution summary"
+          style={{
+            background: "white",
+            padding: "22px",
+            borderRadius: "14px",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          }}
         >
+          <p style={{ margin: 0, color: "#666" }}>
+            Total Members
+          </p>
 
-          <div
-            className="summary-row summary-row--header"
-            role="row"
+          <h2
+            style={{
+              margin: "10px 0 0",
+              color: "#0b2a5b",
+            }}
           >
-            <span role="columnheader">
-              Month
-            </span>
-
-            <span role="columnheader">
-              Distributed
-            </span>
-
-            <span role="columnheader">
-              Collected
-            </span>
-
-            <span role="columnheader">
-              Outstanding
-            </span>
-          </div>
-
-          <div
-            className="summary-row"
-            role="row"
-          >
-            <span role="cell">
-              January
-            </span>
-
-            <span role="cell">
-              42
-            </span>
-
-            <span role="cell">
-              39
-            </span>
-
-            <span role="cell">
-              3
-            </span>
-          </div>
-
-          <div
-            className="summary-row"
-            role="row"
-          >
-            <span role="cell">
-              February
-            </span>
-
-            <span role="cell">
-              48
-            </span>
-
-            <span role="cell">
-              46
-            </span>
-
-            <span role="cell">
-              2
-            </span>
-          </div>
-
-          <div
-            className="summary-row"
-            role="row"
-          >
-            <span role="cell">
-              March
-            </span>
-
-            <span role="cell">
-              51
-            </span>
-
-            <span role="cell">
-              49
-            </span>
-
-            <span role="cell">
-              2
-            </span>
-          </div>
-
+            {memberCount}
+          </h2>
         </div>
-
-      </article>
-
-      {/* =========================================
-          RECENT COLLECTIONS
-      ========================================== */}
-
-      <article className="dashboard-card dashboard-card--wide">
 
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "15px",
-            flexWrap: "wrap",
+            background: "white",
+            padding: "22px",
+            borderRadius: "14px",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
           }}
         >
+          <p style={{ margin: 0, color: "#666" }}>
+            Total Collections
+          </p>
 
-          <div>
-            <h3>
-              Recent Collections
+          <h2
+            style={{
+              margin: "10px 0 0",
+              color: "#0b2a5b",
+            }}
+          >
+            {totalCollections}
+          </h2>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            padding: "22px",
+            borderRadius: "14px",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          }}
+        >
+          <p style={{ margin: 0, color: "#666" }}>
+            Collected Amount
+          </p>
+
+          <h2
+            style={{
+              margin: "10px 0 0",
+              color: "#0b2a5b",
+            }}
+          >
+            {formatCurrency(collectedAmount)}
+          </h2>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            padding: "22px",
+            borderRadius: "14px",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          }}
+        >
+          <p style={{ margin: 0, color: "#666" }}>
+            Pending Collections
+          </p>
+
+          <h2
+            style={{
+              margin: "10px 0 0",
+              color: "#0b2a5b",
+            }}
+          >
+            {pendingCollections}
+          </h2>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <h2
+        style={{
+          color: "#0b2a5b",
+          marginBottom: "18px",
+        }}
+      >
+        Quick Actions
+      </h2>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "20px",
+          marginBottom: "30px",
+        }}
+      >
+        {quickActions.map((action) => (
+          <div
+            key={action.path}
+            style={{
+              background: "white",
+              borderRadius: "14px",
+              padding: "22px",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+            }}
+          >
+            <h3
+              style={{
+                marginTop: 0,
+                color: "#0b2a5b",
+              }}
+            >
+              {action.title}
             </h3>
 
-            <p>
-              Latest member collection records.
+            <p
+              style={{
+                color: "#666",
+                minHeight: "45px",
+              }}
+            >
+              {action.description}
             </p>
+
+            <button
+              onClick={() => navigate(action.path)}
+              style={{
+                background: "#0b2a5b",
+                color: "white",
+                border: "none",
+                padding: "11px 16px",
+                borderRadius: "7px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              {action.button}
+            </button>
           </div>
+        ))}
+      </div>
 
-          <button
-            type="button"
-            className="primary-button"
-            onClick={() =>
-              navigate("/collections")
-            }
-          >
-            VIEW ALL COLLECTIONS
-          </button>
-
-        </div>
-
-        <div className="collection-list">
-
-          {recentCollections.length === 0 ? (
-            <article className="collection-card">
-
-              <p>
-                No collection records have been
-                recorded yet.
-              </p>
-
-            </article>
-          ) : (
-            recentCollections.map(
-              (record) => (
-                <article
-                  key={record.id}
-                  className="collection-card"
-                >
-
-                  <p>
-                    <strong>
-                      {record.memberName ||
-                        "Member"}
-                    </strong>
-                  </p>
-
-                  <p>
-                    Reference:{" "}
-                    {record.membershipNumber ||
-                      record.applicationNumber ||
-                      record.idNumber ||
-                      "Not provided"}
-                  </p>
-
-                  <p>
-                    Package:{" "}
-                    {record.packageMonth ||
-                      "Not provided"}
-                  </p>
-
-                  <p>
-                    Collection Date:{" "}
-                    {record.collectionDate ||
-                      record.paymentDate ||
-                      "Not provided"}
-                  </p>
-
-                  <p>
-                    Status:{" "}
-                    {record.status ||
-                      "Not provided"}
-                  </p>
-
-                </article>
-              )
-            )
-          )}
-
-        </div>
-
-      </article>
-
-      {/* =========================================
-          SYSTEM INFORMATION
-      ========================================== */}
-
-      <article className="dashboard-card dashboard-card--wide">
-
-        <h3>
-          MABOTE GROUP Administration
-        </h3>
+      {/* Monthly Summary */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: "16px",
+          padding: "25px",
+          marginBottom: "25px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+        }}
+      >
+        <h2
+          style={{
+            marginTop: 0,
+            color: "#0b2a5b",
+          }}
+        >
+          Monthly Summary
+        </h2>
 
         <p>
-          Use the navigation menu or Quick Actions
-          above to manage members, grocery packages,
-          collections, policies, claims, reports
-          and system settings.
+          MABOTE GROUP is currently managing{" "}
+          <strong>{memberCount}</strong> members with{" "}
+          <strong>{totalCollections}</strong> recorded
+          collections.
         </p>
 
-      </article>
+        <p>
+          Total recorded contributions:{" "}
+          <strong>{formatCurrency(collectedAmount)}</strong>
+        </p>
 
-    </section>
+        <p>
+          Pending collections:{" "}
+          <strong>{pendingCollections}</strong>
+        </p>
+      </div>
+
+      {/* Recent Collections */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: "16px",
+          padding: "25px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+        }}
+      >
+        <h2
+          style={{
+            marginTop: 0,
+            color: "#0b2a5b",
+          }}
+        >
+          Recent Collections
+        </h2>
+
+        {collections.length === 0 ? (
+          <p style={{ color: "#666" }}>
+            No collections have been recorded yet.
+          </p>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    Member
+                  </th>
+
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    Amount
+                  </th>
+
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {collections.slice(-5).reverse().map((item, index) => (
+                  <tr key={item.id || index}>
+                    <td
+                      style={{
+                        padding: "12px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      {item.memberName ||
+                        item.name ||
+                        item.member ||
+                        "Member"}
+                    </td>
+
+                    <td
+                      style={{
+                        padding: "12px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      {formatCurrency(
+                        item.amount ||
+                          item.collectionAmount ||
+                          item.paidAmount ||
+                          0
+                      )}
+                    </td>
+
+                    <td
+                      style={{
+                        padding: "12px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      {item.status || "Recorded"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

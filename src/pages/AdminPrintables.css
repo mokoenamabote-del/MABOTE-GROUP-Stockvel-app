@@ -1,0 +1,98 @@
+.printables-page {
+  min-height: 100vh;
+  background: #eef2f5;
+  color: #10233f;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.printables-toolbar {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 34px 24px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+}
+
+.printables-toolbar h1 { margin: 4px 0 8px; font-size: 32px; }
+.printables-toolbar p { margin: 0; color: #647083; }
+.eyebrow, .brand-kicker, .flyer-label { color: #a47a1b; font: 700 12px/1.2 Arial, sans-serif; letter-spacing: 2px; }
+.toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.primary-button, .secondary-button, .document-tabs button { cursor: pointer; font: 700 13px Arial, sans-serif; }
+.primary-button, .secondary-button { padding: 12px 18px; border-radius: 5px; }
+.primary-button { color: white; border: 1px solid #102f57; background: #102f57; }
+.secondary-button { color: #102f57; border: 1px solid #b9c4d0; background: white; }
+.document-tabs { max-width: 1120px; margin: 0 auto 20px; padding: 0 24px; display: flex; gap: 5px; }
+.document-tabs button { padding: 12px 18px; border: 0; border-bottom: 3px solid transparent; color: #647083; background: transparent; }
+.document-tabs button.active { color: #102f57; border-bottom-color: #b58a24; }
+
+.printable-document { max-width: 900px; min-height: 1120px; margin: 0 auto 40px; background: white; box-sizing: border-box; box-shadow: 0 4px 20px rgba(16, 35, 63, .12); }
+.application-document { padding: 46px 54px; }
+.document-heading { display: flex; justify-content: space-between; gap: 30px; align-items: start; padding-bottom: 24px; border-bottom: 4px solid #b58a24; }
+.document-heading h2 { margin: 4px 0; font-size: 30px; color: #102f57; }
+.document-heading p { margin: 0; color: #647083; }
+.brand-kicker { margin: 0; }
+.reference-box { min-width: 180px; padding: 12px; border: 1px solid #c8d0d9; font: 700 12px Arial, sans-serif; }
+.blank-line { display: inline-block; min-width: 145px; height: 18px; border-bottom: 1px solid #7d8792; vertical-align: bottom; }
+.reference-box .blank-line { display: block; min-width: 100%; margin-top: 8px; }
+.form-section { margin-top: 24px; break-inside: avoid; }
+.form-section h3 { margin: 0 0 13px; padding-bottom: 7px; border-bottom: 1px solid #d9dee4; color: #102f57; font-size: 17px; }
+.field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 28px; }
+.form-field { display: flex; flex-direction: column; gap: 5px; font: 12px Arial, sans-serif; color: #4b5969; }
+.form-field .blank-line { width: 100%; box-sizing: border-box; }
+.form-note { margin: 14px 0 0; color: #647083; font: 11px Arial, sans-serif; }
+.beneficiary-table { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr; border: 1px solid #c8d0d9; font: 11px Arial, sans-serif; }
+.beneficiary-table > div { min-height: 27px; padding: 8px; border-right: 1px solid #c8d0d9; border-bottom: 1px solid #c8d0d9; }
+.beneficiary-table > div:nth-child(4n) { border-right: 0; }
+.beneficiary-table > div:nth-last-child(-n+4) { border-bottom: 0; }
+.declaration-section p { font: 12px/1.6 Arial, sans-serif; color: #4b5969; }
+.checkbox-line { color: #102f57 !important; font-weight: 700; }
+.signature-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 28px; font: 12px Arial, sans-serif; }
+.signature-grid > div { display: flex; justify-content: space-between; gap: 14px; }
+.signature-grid .blank-line { flex: 1; }
+.document-footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #d9dee4; font: 11px Arial, sans-serif; color: #647083; }
+.document-contact { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 24px; padding: 14px 16px; border: 1px solid #d9dee4; background: #f7f9fb; font: 12px Arial, sans-serif; }
+.document-contact div { display: flex; flex-direction: column; gap: 8px; }
+.document-contact a, .flyer-contact a { color: #102f57; font-weight: 700; }
+.document-contact img { width: 76px; height: 76px; }
+
+.flyer-document { display: flex; flex-direction: column; min-height: 1120px; background: #102f57; color: white; overflow: hidden; }
+.flyer-topline, .flyer-bottomline { padding: 24px 54px; background: #b58a24; color: #102f57; font: 700 14px Arial, sans-serif; letter-spacing: 3px; }
+.flyer-bottomline { margin-top: auto; text-align: right; }
+.flyer-content { padding: 100px 90px 60px; background: linear-gradient(145deg, #102f57 0%, #173f6d 58%, #285873 100%); flex: 1; }
+.flyer-content h2 { margin: 22px 0; max-width: 660px; font-size: 64px; line-height: 1.03; font-weight: 400; }
+.flyer-content h2 span { color: #e5c46a; }
+.flyer-copy { max-width: 570px; font: 19px/1.6 Arial, sans-serif; color: #e7edf2; }
+.flyer-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 58px 0 42px; }
+.flyer-features div { padding-top: 14px; border-top: 1px solid #e5c46a; display: flex; flex-direction: column; gap: 10px; font: 14px Arial, sans-serif; }
+.flyer-features strong { color: #e5c46a; font: 700 14px Arial, sans-serif; }
+.flyer-callout { display: flex; flex-direction: column; gap: 8px; max-width: 520px; padding: 22px 25px; border-left: 5px solid #e5c46a; background: rgba(0, 0, 0, .16); font-family: Arial, sans-serif; }
+.flyer-callout strong { font-size: 20px; }
+.flyer-callout span { color: #d7e0e7; }
+.flyer-contact { display: flex; flex-direction: column; gap: 10px; margin-top: 58px; font: 12px Arial, sans-serif; letter-spacing: 1px; }
+.flyer-contact img { width: 92px; height: 92px; margin-top: 8px; padding: 6px; background: white; }
+.flyer-contact a { color: #e5c46a; text-decoration: none; }
+
+@media (max-width: 700px) {
+  .printables-toolbar { display: block; }
+  .toolbar-actions { margin-top: 18px; }
+  .printable-document { margin: 0 12px 24px; }
+  .application-document { padding: 28px 22px; }
+  .document-heading { display: block; }
+  .reference-box { margin-top: 18px; }
+  .field-grid, .flyer-features { grid-template-columns: 1fr; }
+  .flyer-content { padding: 60px 34px 40px; }
+  .flyer-content h2 { font-size: 44px; }
+  .flyer-topline, .flyer-bottomline { padding: 20px 30px; }
+}
+
+@media print {
+  @page { size: A4; margin: 0; }
+  body { background: white; }
+  .screen-only, .printable-document:not(.active-document) { display: none !important; }
+  .printables-page, .printable-document { margin: 0; min-height: 0; box-shadow: none; }
+  .active-document { display: flex !important; }
+  .application-document.active-document { display: block !important; }
+  .flyer-document.active-document { min-height: 297mm; }
+}

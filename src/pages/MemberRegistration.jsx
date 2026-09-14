@@ -9,6 +9,22 @@ const createEmptyBeneficiary = () => ({
   percentage: "",
 });
 
+const southAfricanBanks = [
+  "ABSA",
+  "African Bank",
+  "Bidvest Bank",
+  "Capitec Bank",
+  "Discovery Bank",
+  "FNB",
+  "Investec Bank",
+  "Nedbank",
+  "Old Mutual Bank",
+  "Postbank",
+  "Standard Bank",
+  "TymeBank",
+  "Other",
+];
+
 const initialFormData = {
   fullName: "",
   surname: "",
@@ -799,9 +815,8 @@ export default function MemberRegistration() {
                   Bank Name
                 </label>
 
-                <input
+                <select
                   style={inputStyle}
-                  type="text"
                   name="bankName"
                   value={
                     formData.bankName
@@ -809,7 +824,17 @@ export default function MemberRegistration() {
                   onChange={
                     handleChange
                   }
-                />
+                >
+                  <option value="">
+                    Select South African Bank
+                  </option>
+
+                  {southAfricanBanks.map((bank) => (
+                    <option key={bank} value={bank}>
+                      {bank}
+                    </option>
+                  ))}
+                </select>
 
                 <label style={labelStyle}>
                   Account Holder

@@ -52,6 +52,17 @@ const createGroceryItems = () => [
   ...FULL_GROCERY.cleanup,
 ];
 
+const PACKAGE_WATERMARKS = {
+  basic: ["VEGETABLES", "MEAT CUTTER", "CATERING EQUIPMENT"],
+  enhanced: [
+    "COW",
+    "VEGETABLES",
+    "MOBILE TOILET",
+    "MEAT CUTTER",
+    "CATERING EQUIPMENT",
+  ],
+};
+
 const packages = [
   {
     name: "Plan A - Full Grocery",
@@ -78,6 +89,7 @@ const packages = [
       },
     ],
     extras: [],
+    watermarkItems: PACKAGE_WATERMARKS.basic,
   },
 
   {
@@ -108,6 +120,7 @@ const packages = [
       "1 × Cow",
       "1 × Mobile Toilet",
     ],
+    watermarkItems: PACKAGE_WATERMARKS.enhanced,
   },
 
   {
@@ -139,6 +152,7 @@ const packages = [
       "1 × Mobile Toilet",
       "Additional Catering Items",
     ],
+    watermarkItems: PACKAGE_WATERMARKS.enhanced,
   },
 ];
 
@@ -187,9 +201,18 @@ export default function GroceryPackages() {
       <div className="dashboard-grid">
         {packages.map((pkg) => (
           <article
-            className="dashboard-card"
+            className="dashboard-card package-card"
             key={pkg.name}
           >
+            <div
+              className="package-watermark"
+              aria-hidden="true"
+            >
+              {pkg.watermarkItems.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+
             <div
               style={{
                 display: "flex",

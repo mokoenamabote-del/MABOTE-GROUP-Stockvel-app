@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiRequest } from "../lib/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
 
-  const handleRegister = (event) => {
+  const handleRegister = async (event) => {
     event.preventDefault();
 
     const cleanFullName = fullName.trim();
@@ -34,8 +35,8 @@ export default function Register() {
       return;
     }
 
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters.");
       return;
     }
 
@@ -44,42 +45,22 @@ export default function Register() {
       return;
     }
 
-    const existingAccount =
-      localStorage.getItem("maboteAccount");
+    try {
+      await apiRequest("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: cleanFullName,
+          surname: cleanSurname,
+          email: cleanEmail,
+          password,
+        }),
+      });
 
-    if (existingAccount) {
-      alert(
-        "A MABOTE GROUP account already exists.\n\n" +
-          "Please use Login instead."
-      );
-
+      alert("MABOTE GROUP account created successfully. You can now log in.");
       navigate("/login");
-      return;
+    } catch (error) {
+      alert(error.message);
     }
-
-    const account = {
-      fullName: cleanFullName,
-      surname: cleanSurname,
-      email: cleanEmail,
-      password: password,
-    };
-
-    localStorage.setItem(
-      "maboteAccount",
-      JSON.stringify(account)
-    );
-
-    localStorage.setItem(
-      "maboteLoggedIn",
-      "false"
-    );
-
-    alert(
-      "MABOTE GROUP account created successfully!\n\n" +
-        "You can now login with your email and password."
-    );
-
-    navigate("/login");
   };
 
   return (

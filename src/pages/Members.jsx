@@ -1,96 +1,144 @@
 import React, { useEffect, useState } from "react";
 
+const BLUE = "#062A63";
+const DARK_BLUE = "#041D45";
+const GOLD = "#D4AF37";
+const LIGHT = "#F5F7FB";
+
 export default function Members() {
   const [applications, setApplications] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [search, setSearch] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
-
-  const loadApplications = () => {
-    try {
-      const savedApplications = JSON.parse(
-        localStorage.getItem("maboteApplications") || "[]"
-      );
-
-      const safeApplications = Array.isArray(savedApplications)
-        ? savedApplications
-        : [];
-
-      setApplications(safeApplications);
-    } catch (error) {
-      console.error("Unable to load member applications:", error);
-      setApplications([]);
-    }
-  };
 
   useEffect(() => {
     loadApplications();
   }, []);
 
-  const totalMembers = applications.length;
+  const loadApplications = () => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("maboteApplications") || "[]"
+      );
 
-  const pendingMembers = applications.filter(
-    (member) => !member.status || member.status === "Pending"
-  ).length;
-
-  const approvedMembers = applications.filter(
-    (member) => member.status === "Approved"
-  ).length;
-
-  const rejectedMembers = applications.filter(
-    (member) => member.status === "Rejected"
-  ).length;
-
-  const activePolicies = applications.filter(
-    (member) => member.policyStatus === "Active"
-  ).length;
-
-  const lapsedPolicies = applications.filter(
-    (member) => member.policyStatus === "Lapsed"
-  ).length;
-
-  const updateApplication = (
-    applicationNumber,
-    changes
-  ) => {
-    const updatedApplications = applications.map(
-      (application) =>
-        application.applicationNumber === applicationNumber
-          ? {
-              ...application,
-              ...changes,
-            }
-          : application
-    );
-
-    localStorage.setItem(
-      "maboteApplications",
-      JSON.stringify(updatedApplications)
-    );
-
-    setApplications(updatedApplications);
-
-    if (
-      selectedMember &&
-      selectedMember.applicationNumber === applicationNumber
-    ) {
-      setSelectedMember({
-        ...selectedMember,
-        ...changes,
-      });
+      setApplications(Array.isArray(saved) ? saved : []);
+    } catch (error) {
+      setApplications([]);
     }
   };
 
-  const updateStatus = (
-    applicationNumber,
-    newStatus
-  ) => {
+  const updateApplication = (applicationNumber, changes) => {
+    const updated = applications.map((application) =>
+      application.applicationNumber === applicationNumber
+        ? { ...application, ...changes }
+        : application
+    );
+
+    setApplications(updated);
+
+    localStorage.setItem(
+      "maboteApplications",
+      JSON.stringify(updated)
+    );
+  };
+
+  const updateStatus = (applicationNumber, newStatus) => {
     const member = applications.find(
       (application) =>
         application.applicationNumber === applicationNumber
     );
 
-    if (!member) {
-      return;
+    if (!member) return;
+
+    const fullName =
+      `${member.fullName || ""} ${member.surname || ""}`.trim();
+
+    /*
+     * APPROVE MEMBER
+     */
+    if (newStatus === "Approved") {
+      let savedMembers = [];
+
+      try {
+        savedMembers = JSON.parse(
+          localStorage.getItem("maboteMembers") || "[]"
+        );
+
+        if (!Array.isArray(savedMembers)) {
+          savedMembers = [];
+        }
+      } catch (error) {
+        savedMembers = [];
+      }
+
+      const existingMember = savedMembers.find(
+        (savedMember) =>
+          savedMember.applicationNumber ===
+          member.applicationNumber
+      );
+
+      const approvedMember = {
+        ...member,
+        status: "Approved",
+        policyStatus: member.policyStatus || "Active",
+        memberNumber:
+          existingMember?.memberNumber ||
+          `MAB-M-${Date.now().toString().slice(-6)}`,
+        approvedDate:
+          existingMember?.approvedDate ||
+          new Date().toISOString(),
+      };
+
+      let updatedMembers;
+
+      if (existingMember) {
+        updatedMembers = savedMembers.map((savedMember) =>
+          savedMember.applicationNumber ===
+          member.applicationNumber
+            ? approvedMember
+            : savedMember
+        );
+      } else {
+        updatedMembers = [
+          ...savedMembers,
+          approvedMember,
+        ];
+      }
+
+      localStorage.setItem(
+        "maboteMembers",
+        JSON.stringify(updatedMembers)
+      );
+    }
+
+    /*
+     * REJECT MEMBER
+     */
+    if (newStatus === "Rejected") {
+      let savedMembers = [];
+
+      try {
+        savedMembers = JSON.parse(
+          localStorage.getItem("maboteMembers") || "[]"
+        );
+
+        if (!Array.isArray(savedMembers)) {
+          savedMembers = [];
+        }
+      } catch (error) {
+        savedMembers = [];
+      }
+
+      const updatedMembers = savedMembers.filter(
+        (savedMember) =>
+          savedMember.applicationNumber !==
+          member.applicationNumber
+      );
+
+      localStorage.setItem(
+        "maboteMembers",
+        JSON.stringify(updatedMembers)
+      );
     }
 
     const changes = {
@@ -111,707 +159,603 @@ export default function Members() {
       changes
     );
 
-    const fullName =
-      `${member.fullName || ""} ${
-        member.surname || ""
-      }`.trim();
-
     if (newStatus === "Approved") {
       setResponseMessage(
-        `Dear ${
-          fullName || "Member"
-        }, your MABOTE GROUP membership application has been approved. Your application reference is ${applicationNumber}. Your policy is now active. Welcome to MABOTE GROUP.`
+        `Dear ${fullName || "Member"}, your MABOTE GROUP membership application has been approved. Your application reference is ${applicationNumber}. Your policy is now active. Welcome to MABOTE GROUP.`
       );
     }
 
     if (newStatus === "Rejected") {
       setResponseMessage(
-        `Dear ${
-          fullName || "Member"
-        }, we regret to inform you that your MABOTE GROUP membership application has not been approved at this time. Your application reference is ${applicationNumber}. Please contact MABOTE GROUP for further information.`
+        `Dear ${fullName || "Member"}, we regret to inform you that your MABOTE GROUP membership application has not been approved at this time. Your application reference is ${applicationNumber}. Please contact MABOTE GROUP for further information.`
       );
     }
+
+    setSelectedMember(null);
   };
 
   const updatePolicyStatus = (
     applicationNumber,
-    newPolicyStatus
+    policyStatus
   ) => {
-    const member = applications.find(
-      (application) =>
-        application.applicationNumber === applicationNumber
-    );
-
-    if (!member) {
-      return;
-    }
-
     updateApplication(
       applicationNumber,
-      {
-        policyStatus: newPolicyStatus,
-      }
+      { policyStatus }
     );
 
-    const fullName =
-      `${member.fullName || ""} ${
-        member.surname || ""
-      }`.trim();
-
-    if (newPolicyStatus === "Active") {
-      setResponseMessage(
-        `Dear ${
-          fullName || "Member"
-        }, your MABOTE GROUP policy ${
-          member.policyNumber || ""
-        } is now marked as ACTIVE.`
+    try {
+      const savedMembers = JSON.parse(
+        localStorage.getItem("maboteMembers") || "[]"
       );
+
+      const updatedMembers = savedMembers.map(
+        (member) =>
+          member.applicationNumber === applicationNumber
+            ? {
+                ...member,
+                policyStatus,
+              }
+            : member
+      );
+
+      localStorage.setItem(
+        "maboteMembers",
+        JSON.stringify(updatedMembers)
+      );
+    } catch (error) {
+      console.error("Unable to update policy status", error);
     }
 
-    if (newPolicyStatus === "Lapsed") {
-      setResponseMessage(
-        `Dear ${
-          fullName || "Member"
-        }, your MABOTE GROUP policy ${
-          member.policyNumber || ""
-        } has been marked as LAPSED. Please contact MABOTE GROUP regarding your policy status.`
-      );
-    }
+    setSelectedMember(null);
   };
 
-  const deleteMember = (
-    applicationNumber
-  ) => {
-    const member = applications.find(
+  const deleteApplication = (applicationNumber) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this application?"
+    );
+
+    if (!confirmDelete) return;
+
+    const updated = applications.filter(
       (application) =>
-        application.applicationNumber === applicationNumber
+        application.applicationNumber !== applicationNumber
     );
 
-    if (!member) {
-      return;
-    }
-
-    const fullName =
-      `${member.fullName || ""} ${
-        member.surname || ""
-      }`.trim();
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${
-        fullName || "this member"
-      }?\n\nApplication: ${applicationNumber}\n\nThis action cannot be undone.`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    const updatedApplications =
-      applications.filter(
-        (application) =>
-          application.applicationNumber !==
-          applicationNumber
-      );
+    setApplications(updated);
 
     localStorage.setItem(
       "maboteApplications",
-      JSON.stringify(updatedApplications)
+      JSON.stringify(updated)
     );
 
-    setApplications(updatedApplications);
-    setSelectedMember(null);
-    setResponseMessage("");
-  };
-
-  const closeDetails = () => {
-    setSelectedMember(null);
-    setResponseMessage("");
-  };
-
-  const copyResponse = async () => {
-    if (!responseMessage) {
-      return;
-    }
-
     try {
-      await navigator.clipboard.writeText(
-        responseMessage
+      const savedMembers = JSON.parse(
+        localStorage.getItem("maboteMembers") || "[]"
       );
 
-      alert("Response copied successfully.");
-    } catch (error) {
-      alert(
-        "Please select and copy the response manually."
+      const updatedMembers = savedMembers.filter(
+        (member) =>
+          member.applicationNumber !== applicationNumber
       );
+
+      localStorage.setItem(
+        "maboteMembers",
+        JSON.stringify(updatedMembers)
+      );
+    } catch (error) {
+      console.error("Unable to update members", error);
     }
+
+    setSelectedMember(null);
   };
+
+  const filteredApplications = applications.filter(
+    (application) => {
+      const text = `
+        ${application.fullName || ""}
+        ${application.surname || ""}
+        ${application.applicationNumber || ""}
+        ${application.policyNumber || ""}
+        ${application.idNumber || ""}
+        ${application.email || ""}
+        ${application.cellphone || ""}
+        ${application.plan || ""}
+        ${application.status || ""}
+      `.toLowerCase();
+
+      return text.includes(search.toLowerCase());
+    }
+  );
+
+  const totalApplications = applications.length;
+
+  const pendingMembers = applications.filter(
+    (member) =>
+      (member.status || "Pending") === "Pending"
+  ).length;
+
+  const approvedMembers = applications.filter(
+    (member) =>
+      member.status === "Approved"
+  ).length;
+
+  const rejectedMembers = applications.filter(
+    (member) =>
+      member.status === "Rejected"
+  ).length;
+
+  const activePolicies = applications.filter(
+    (member) =>
+      member.status === "Approved" &&
+      (member.policyStatus || "Active") === "Active"
+  ).length;
+
+  const lapsedPolicies = applications.filter(
+    (member) =>
+      member.status === "Approved" &&
+      member.policyStatus === "Lapsed"
+  ).length;
 
   return (
-    <section className="members-page">
-
+    <div
+      style={{
+        minHeight: "100vh",
+        background: LIGHT,
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       {/* HEADER */}
-
-      <div
+      <header
         style={{
-          background: "#071a52",
-          color: "#ffffff",
-          padding: "25px",
-          borderBottom: "5px solid #d4af37",
-          borderRadius: "10px 10px 0 0",
+          background: BLUE,
+          color: "white",
+          padding: "20px 30px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "15px",
         }}
       >
-        <h1 style={{ margin: 0 }}>
-          MABOTE GROUP
-        </h1>
-
-        <p style={{ marginBottom: 0 }}>
-          Member & Policy Management
-        </p>
-      </div>
-
-      {/* SUMMARY */}
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(190px, 1fr))",
-          gap: "16px",
-          marginTop: "25px",
-        }}
-      >
-        <SummaryCard
-          title="Total Members"
-          value={totalMembers}
-          description="All member applications"
-        />
-
-        <SummaryCard
-          title="Pending"
-          value={pendingMembers}
-          description="Awaiting decision"
-        />
-
-        <SummaryCard
-          title="Approved"
-          value={approvedMembers}
-          description="Approved memberships"
-        />
-
-        <SummaryCard
-          title="Rejected"
-          value={rejectedMembers}
-          description="Not approved"
-        />
-
-        <SummaryCard
-          title="Active Policies"
-          value={activePolicies}
-          description="Currently active"
-        />
-
-        <SummaryCard
-          title="Lapsed Policies"
-          value={lapsedPolicies}
-          description="Policies requiring attention"
-        />
-      </div>
-
-      {/* AUTOMATIC RESPONSE */}
-
-      {responseMessage && (
-        <div
-          style={{
-            marginTop: "25px",
-            padding: "20px",
-            background: "#fffdf5",
-            border: "2px solid #d4af37",
-            borderRadius: "8px",
-          }}
-        >
-          <h3
-            style={{
-              color: "#071a52",
-              marginTop: 0,
-            }}
-          >
-            Automatic Client Response
-          </h3>
+        <div>
+          <h1 style={{ margin: 0 }}>
+            MABOTE GROUP
+          </h1>
 
           <p
             style={{
-              lineHeight: "1.6",
-              whiteSpace: "pre-wrap",
+              margin: "5px 0 0",
+              color: "#E8D27A",
             }}
           >
-            {responseMessage}
+            Member Management
           </p>
-
-          <button
-            type="button"
-            onClick={copyResponse}
-            style={{
-              padding: "10px 18px",
-              background: "#071a52",
-              color: "#ffffff",
-              border: "2px solid #d4af37",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              marginRight: "10px",
-            }}
-          >
-            Copy Response
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              setResponseMessage("")
-            }
-            style={{
-              padding: "10px 18px",
-              background: "#777777",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            Close
-          </button>
         </div>
-      )}
 
-      {/* MEMBER LIST */}
-
-      {!selectedMember && (
-        <div
+        <a
+          href="/admin"
           style={{
-            marginTop: "25px",
-            padding: "20px",
-            background: "#ffffff",
-            borderRadius: "10px",
-            boxShadow:
-              "0 3px 12px rgba(0,0,0,0.10)",
+            color: "white",
+            textDecoration: "none",
+            border: "1px solid white",
+            padding: "10px 18px",
+            borderRadius: "6px",
           }}
         >
+          ← Dashboard
+        </a>
+      </header>
+
+      {/* CONTENT */}
+      <main
+        style={{
+          maxWidth: "1400px",
+          margin: "0 auto",
+          padding: "30px",
+        }}
+      >
+        {/* SUMMARY CARDS */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "18px",
+            marginBottom: "30px",
+          }}
+        >
+          <SummaryCard
+            title="Applications"
+            value={totalApplications}
+          />
+
+          <SummaryCard
+            title="Pending"
+            value={pendingMembers}
+          />
+
+          <SummaryCard
+            title="Approved"
+            value={approvedMembers}
+          />
+
+          <SummaryCard
+            title="Rejected"
+            value={rejectedMembers}
+          />
+
+          <SummaryCard
+            title="Active Policies"
+            value={activePolicies}
+          />
+
+          <SummaryCard
+            title="Lapsed Policies"
+            value={lapsedPolicies}
+          />
+        </div>
+
+        {/* RESPONSE MESSAGE */}
+        {responseMessage && (
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px",
+              background: "#EAF7EA",
+              border: "1px solid #8BC48B",
+              padding: "15px",
+              borderRadius: "8px",
+              marginBottom: "20px",
             }}
           >
-            <div>
-              <h2
-                style={{
-                  color: "#071a52",
-                  marginBottom: "5px",
-                }}
-              >
-                Member Applications
-              </h2>
+            <strong>Member Response</strong>
 
-              <p
-                style={{
-                  marginTop: 0,
-                  color: "#555555",
-                }}
-              >
-                Review and manage members,
-                applications and policies.
-              </p>
-            </div>
+            <p style={{ marginBottom: "10px" }}>
+              {responseMessage}
+            </p>
 
             <button
-              type="button"
-              onClick={loadApplications}
-              style={{
-                padding: "10px 18px",
-                background: "#071a52",
-                color: "#ffffff",
-                border: "2px solid #d4af37",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
+              onClick={() => setResponseMessage("")}
+              style={buttonStyle}
             >
-              Refresh
+              Close
             </button>
           </div>
+        )}
 
-          {applications.length === 0 ? (
-            <div
-              style={{
-                padding: "30px",
-                marginTop: "20px",
-                background: "#f5f5f5",
-                borderRadius: "8px",
-                textAlign: "center",
-              }}
-            >
-              <h3>
-                No member applications yet
-              </h3>
-
-              <p>
-                Applications submitted through
-                Member Application will appear here.
-              </p>
-            </div>
-          ) : (
-            <div
-              style={{
-                overflowX: "auto",
-                marginTop: "20px",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  minWidth: "1100px",
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      background: "#071a52",
-                      color: "#ffffff",
-                    }}
-                  >
-                    <th style={cellStyle}>
-                      Application No.
-                    </th>
-
-                    <th style={cellStyle}>
-                      Member
-                    </th>
-
-                    <th style={cellStyle}>
-                      ID Number
-                    </th>
-
-                    <th style={cellStyle}>
-                      Cellphone
-                    </th>
-
-                    <th style={cellStyle}>
-                      Plan
-                    </th>
-
-                    <th style={cellStyle}>
-                      Application Status
-                    </th>
-
-                    <th style={cellStyle}>
-                      Policy Status
-                    </th>
-
-                    <th style={cellStyle}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {applications.map(
-                    (application) => {
-                      const applicationStatus =
-                        application.status ||
-                        "Pending";
-
-                      const policyStatus =
-                        application.policyStatus ||
-                        (applicationStatus ===
-                        "Approved"
-                          ? "Active"
-                          : "Not Active");
-
-                      return (
-                        <tr
-                          key={
-                            application.applicationNumber
-                          }
-                        >
-                          <td style={cellStyle}>
-                            {application.applicationNumber ||
-                              "Not available"}
-                          </td>
-
-                          <td style={cellStyle}>
-                            {application.fullName ||
-                              ""}{" "}
-                            {application.surname ||
-                              ""}
-                          </td>
-
-                          <td style={cellStyle}>
-                            {application.idNumber ||
-                              "Not provided"}
-                          </td>
-
-                          <td style={cellStyle}>
-                            {application.cellphone ||
-                              "Not provided"}
-                          </td>
-
-                          <td style={cellStyle}>
-                            {application.plan ||
-                              "Not selected"}
-                          </td>
-
-                          <td style={cellStyle}>
-                            <StatusBadge
-                              status={
-                                applicationStatus
-                              }
-                            />
-                          </td>
-
-                          <td style={cellStyle}>
-                            <PolicyBadge
-                              status={
-                                policyStatus
-                              }
-                            />
-                          </td>
-
-                          <td style={cellStyle}>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setSelectedMember(
-                                  application
-                                )
-                              }
-                              style={{
-                                marginRight:
-                                  "5px",
-                                marginBottom:
-                                  "5px",
-                                padding:
-                                  "7px 10px",
-                                background:
-                                  "#071a52",
-                                color:
-                                  "#ffffff",
-                                border: "none",
-                                borderRadius:
-                                  "5px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              View
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updateStatus(
-                                  application.applicationNumber,
-                                  "Approved"
-                                )
-                              }
-                              style={{
-                                marginRight:
-                                  "5px",
-                                marginBottom:
-                                  "5px",
-                                padding:
-                                  "7px 10px",
-                                background:
-                                  "#2e7d32",
-                                color:
-                                  "#ffffff",
-                                border: "none",
-                                borderRadius:
-                                  "5px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Approve
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updateStatus(
-                                  application.applicationNumber,
-                                  "Rejected"
-                                )
-                              }
-                              style={{
-                                marginRight:
-                                  "5px",
-                                marginBottom:
-                                  "5px",
-                                padding:
-                                  "7px 10px",
-                                background:
-                                  "#c62828",
-                                color:
-                                  "#ffffff",
-                                border: "none",
-                                borderRadius:
-                                  "5px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Reject
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updatePolicyStatus(
-                                  application.applicationNumber,
-                                  "Lapsed"
-                                )
-                              }
-                              style={{
-                                marginRight:
-                                  "5px",
-                                marginBottom:
-                                  "5px",
-                                padding:
-                                  "7px 10px",
-                                background:
-                                  "#b26a00",
-                                color:
-                                  "#ffffff",
-                                border: "none",
-                                borderRadius:
-                                  "5px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Lapse
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updatePolicyStatus(
-                                  application.applicationNumber,
-                                  "Active"
-                                )
-                              }
-                              style={{
-                                marginRight:
-                                  "5px",
-                                marginBottom:
-                                  "5px",
-                                padding:
-                                  "7px 10px",
-                                background:
-                                  "#1565c0",
-                                color:
-                                  "#ffffff",
-                                border: "none",
-                                borderRadius:
-                                  "5px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Active
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                deleteMember(
-                                  application.applicationNumber
-                                )
-                              }
-                              style={{
-                                marginBottom:
-                                  "5px",
-                                padding:
-                                  "7px 10px",
-                                background:
-                                  "#8b0000",
-                                color:
-                                  "#ffffff",
-                                border: "none",
-                                borderRadius:
-                                  "5px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    }
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* FULL MEMBER DETAILS */}
-
-      {selectedMember && (
+        {/* SEARCH */}
         <div
           style={{
-            marginTop: "25px",
-            background: "#ffffff",
-            padding: "30px",
+            background: "white",
+            padding: "20px",
             borderRadius: "10px",
+            marginBottom: "20px",
             boxShadow:
-              "0 3px 12px rgba(0,0,0,0.10)",
+              "0 2px 8px rgba(0,0,0,0.08)",
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Search members, application number, ID, policy..."
+            value={search}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
+            style={{
+              width: "100%",
+              padding: "13px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              fontSize: "15px",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* MEMBER TABLE */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "10px",
+            overflowX: "auto",
+            boxShadow:
+              "0 2px 8px rgba(0,0,0,0.08)",
           }}
         >
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px",
+              padding: "20px",
+              borderBottom: "1px solid #ddd",
             }}
           >
             <h2
               style={{
-                color: "#071a52",
+                margin: 0,
+                color: DARK_BLUE,
               }}
             >
-              Full Member Details
+              Member Applications
             </h2>
-
-            <button
-              type="button"
-              onClick={closeDetails}
-              style={{
-                padding: "10px 20px",
-                background: "#071a52",
-                color: "#ffffff",
-                border: "2px solid #d4af37",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              ← Back to Members
-            </button>
           </div>
 
-          <hr />
+          {filteredApplications.length === 0 ? (
+            <div
+              style={{
+                padding: "50px",
+                textAlign: "center",
+                color: "#666",
+              }}
+            >
+              No member applications found.
+            </div>
+          ) : (
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                minWidth: "1100px",
+              }}
+            >
+              <thead>
+                <tr
+                  style={{
+                    background: DARK_BLUE,
+                    color: "white",
+                  }}
+                >
+                  <th style={thStyle}>Member</th>
+                  <th style={thStyle}>Application No.</th>
+                  <th style={thStyle}>Plan</th>
+                  <th style={thStyle}>Status</th>
+                  <th style={thStyle}>Policy</th>
+                  <th style={thStyle}>Actions</th>
+                </tr>
+              </thead>
 
-          <DetailsSection title="Application Information">
+              <tbody>
+                {filteredApplications.map(
+                  (member) => (
+                    <tr
+                      key={
+                        member.applicationNumber ||
+                        member.id
+                      }
+                      style={{
+                        borderBottom:
+                          "1px solid #eee",
+                      }}
+                    >
+                      <td style={tdStyle}>
+                        <strong>
+                          {member.fullName}{" "}
+                          {member.surname}
+                        </strong>
+
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#666",
+                          }}
+                        >
+                          {member.cellphone || ""}
+                        </div>
+                      </td>
+
+                      <td style={tdStyle}>
+                        {member.applicationNumber ||
+                          "-"}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {member.plan || "-"}
+                      </td>
+
+                      <td style={tdStyle}>
+                        <StatusBadge
+                          status={
+                            member.status ||
+                            "Pending"
+                          }
+                        />
+                      </td>
+
+                      <td style={tdStyle}>
+                        {member.status ===
+                        "Approved"
+                          ? member.policyStatus ||
+                            "Active"
+                          : "Not Active"}
+                      </td>
+
+                      <td style={tdStyle}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "6px",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <button
+                            onClick={() =>
+                              setSelectedMember(
+                                member
+                              )
+                            }
+                            style={smallButton}
+                          >
+                            View
+                          </button>
+
+                          {(member.status ||
+                            "Pending") ===
+                            "Pending" && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  updateStatus(
+                                    member.applicationNumber,
+                                    "Approved"
+                                  )
+                                }
+                                style={{
+                                  ...smallButton,
+                                  background:
+                                    "#198754",
+                                  color: "white",
+                                }}
+                              >
+                                Approve
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  updateStatus(
+                                    member.applicationNumber,
+                                    "Rejected"
+                                  )
+                                }
+                                style={{
+                                  ...smallButton,
+                                  background:
+                                    "#C62828",
+                                  color: "white",
+                                }}
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+
+                          {member.status ===
+                            "Approved" && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  updatePolicyStatus(
+                                    member.applicationNumber,
+                                    "Active"
+                                  )
+                                }
+                                style={{
+                                  ...smallButton,
+                                  background:
+                                    "#198754",
+                                  color: "white",
+                                }}
+                              >
+                                Active
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  updatePolicyStatus(
+                                    member.applicationNumber,
+                                    "Lapsed"
+                                  )
+                                }
+                                style={{
+                                  ...smallButton,
+                                  background:
+                                    "#E0A800",
+                                  color: "white",
+                                }}
+                              >
+                                Lapse
+                              </button>
+                            </>
+                          )}
+
+                          <button
+                            onClick={() =>
+                              deleteApplication(
+                                member.applicationNumber
+                              )
+                            }
+                            style={{
+                              ...smallButton,
+                              background:
+                                "#555",
+                              color: "white",
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </main>
+
+      {/* MEMBER DETAILS MODAL */}
+      {selectedMember && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background:
+              "rgba(0,0,0,0.55)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              width: "100%",
+              maxWidth: "800px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              borderRadius: "10px",
+              padding: "30px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent:
+                  "space-between",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  color: DARK_BLUE,
+                }}
+              >
+                Member Details
+              </h2>
+
+              <button
+                onClick={() =>
+                  setSelectedMember(null)
+                }
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  fontSize: "25px",
+                  cursor: "pointer",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <Detail
+              label="Member Number"
+              value={
+                selectedMember.memberNumber ||
+                "Not assigned"
+              }
+            />
+
             <Detail
               label="Application Number"
               value={
@@ -822,26 +766,140 @@ export default function Members() {
             <Detail
               label="Policy Number"
               value={
-                selectedMember.policyNumber
+                selectedMember.policyNumber ||
+                "Not assigned"
               }
             />
 
             <Detail
-              label="Application Date"
+              label="Full Name"
+              value={`${selectedMember.fullName || ""} ${
+                selectedMember.surname || ""
+              }`}
+            />
+
+            <Detail
+              label="ID Number"
               value={
-                selectedMember.applicationDate
-                  ? new Date(
-                      selectedMember.applicationDate
-                    ).toLocaleDateString()
-                  : "Not available"
+                selectedMember.idNumber || "-"
               }
             />
 
             <Detail
-              label="Application Status"
+              label="Date of Birth"
               value={
-                selectedMember.status ||
-                "Pending"
+                selectedMember.dateOfBirth || "-"
+              }
+            />
+
+            <Detail
+              label="Gender"
+              value={
+                selectedMember.gender || "-"
+              }
+            />
+
+            <Detail
+              label="Marital Status"
+              value={
+                selectedMember.maritalStatus ||
+                "-"
+              }
+            />
+
+            <Detail
+              label="Cellphone"
+              value={
+                selectedMember.cellphone || "-"
+              }
+            />
+
+            <Detail
+              label="Email"
+              value={
+                selectedMember.email || "-"
+              }
+            />
+
+            <Detail
+              label="Address"
+              value={
+                selectedMember.address || "-"
+              }
+            />
+
+            <Detail
+              label="Town"
+              value={
+                selectedMember.town || "-"
+              }
+            />
+
+            <Detail
+              label="Employment"
+              value={
+                selectedMember.employmentStatus ||
+                "-"
+              }
+            />
+
+            <Detail
+              label="Occupation"
+              value={
+                selectedMember.occupation || "-"
+              }
+            />
+
+            <Detail
+              label="Plan"
+              value={
+                selectedMember.plan || "-"
+              }
+            />
+
+            <Detail
+              label="Monthly Contribution"
+              value={
+                selectedMember.monthlyContribution
+                  ? `R${selectedMember.monthlyContribution}`
+                  : "-"
+              }
+            />
+
+            <Detail
+              label="Payment Method"
+              value={
+                selectedMember.paymentMethod ||
+                "-"
+              }
+            />
+
+            <Detail
+              label="Bank"
+              value={
+                selectedMember.bankName || "-"
+              }
+            />
+
+            <Detail
+              label="Account Holder"
+              value={
+                selectedMember.accountHolder ||
+                "-"
+              }
+            />
+
+            <Detail
+              label="Account Number"
+              value={
+                selectedMember.accountNumber || "-"
+              }
+            />
+
+            <Detail
+              label="Branch Code"
+              value={
+                selectedMember.branchCode || "-"
               }
             />
 
@@ -854,543 +912,171 @@ export default function Members() {
             />
 
             <Detail
-              label="Monthly Contribution"
+              label="Application Status"
               value={
-                selectedMember.planAmount
-                  ? `R${selectedMember.planAmount}`
-                  : "Not available"
-              }
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Personal Details">
-            <Detail
-              label="Full Name"
-              value={selectedMember.fullName}
-            />
-
-            <Detail
-              label="Surname"
-              value={selectedMember.surname}
-            />
-
-            <Detail
-              label="ID Number"
-              value={selectedMember.idNumber}
-            />
-
-            <Detail
-              label="Date of Birth"
-              value={
-                selectedMember.dateOfBirth
+                selectedMember.status ||
+                "Pending"
               }
             />
 
-            <Detail
-              label="Gender"
-              value={selectedMember.gender}
-            />
+            {selectedMember.status ===
+              "Approved" && (
+              <div
+                style={{
+                  marginTop: "20px",
+                  paddingTop: "20px",
+                  borderTop:
+                    "1px solid #ddd",
+                }}
+              >
+                <strong>
+                  Policy Management
+                </strong>
 
-            <Detail
-              label="Marital Status"
-              value={
-                selectedMember.maritalStatus
-              }
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Contact Details">
-            <Detail
-              label="Cellphone"
-              value={selectedMember.cellphone}
-            />
-
-            <Detail
-              label="Alternative Number"
-              value={
-                selectedMember.alternativeNumber
-              }
-            />
-
-            <Detail
-              label="Email"
-              value={selectedMember.email}
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Residential Address">
-            <Detail
-              label="Address"
-              value={selectedMember.address}
-            />
-
-            <Detail
-              label="Town"
-              value={selectedMember.town}
-            />
-
-            <Detail
-              label="Postal Code"
-              value={
-                selectedMember.postalCode
-              }
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Employment Details">
-            <Detail
-              label="Employment Status"
-              value={
-                selectedMember.employmentStatus
-              }
-            />
-
-            <Detail
-              label="Occupation"
-              value={
-                selectedMember.occupation
-              }
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Membership">
-            <Detail
-              label="Plan"
-              value={selectedMember.plan}
-            />
-
-            <Detail
-              label="Payment Method"
-              value={
-                selectedMember.paymentMethod
-              }
-            />
-
-            <Detail
-              label="Plan Amount"
-              value={
-                selectedMember.planAmount
-                  ? `R${selectedMember.planAmount}`
-                  : "Not available"
-              }
-            />
-
-            <Detail
-              label="Monthly Contribution"
-              value={
-                selectedMember.monthlyContribution
-                  ? `R${selectedMember.monthlyContribution}`
-                  : "Not available"
-              }
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Banking Details">
-            <Detail
-              label="Bank Name"
-              value={
-                selectedMember.bankName
-              }
-            />
-
-            <Detail
-              label="Account Holder"
-              value={
-                selectedMember.accountHolder
-              }
-            />
-
-            <Detail
-              label="Account Number"
-              value={
-                selectedMember.accountNumber
-              }
-            />
-
-            <Detail
-              label="Branch Code"
-              value={
-                selectedMember.branchCode
-              }
-            />
-          </DetailsSection>
-
-          <DetailsSection title="Beneficiaries">
-            {selectedMember.beneficiaries &&
-            selectedMember.beneficiaries.length >
-              0 ? (
-              selectedMember.beneficiaries.map(
-                (
-                  beneficiary,
-                  index
-                ) => (
-                  <div
-                    key={index}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginTop: "12px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      updatePolicyStatus(
+                        selectedMember.applicationNumber,
+                        "Active"
+                      )
+                    }
                     style={{
-                      marginTop: "15px",
-                      padding: "20px",
-                      border:
-                        "2px solid #d4af37",
-                      borderRadius: "8px",
+                      ...buttonStyle,
                       background:
-                        "#fffdf5",
+                        "#198754",
                     }}
                   >
-                    <h4
-                      style={{
-                        color:
-                          "#071a52",
-                        marginTop: 0,
-                      }}
-                    >
-                      Beneficiary{" "}
-                      {index + 1}
-                    </h4>
+                    Set Active
+                  </button>
 
-                    <Detail
-                      label="Full Name"
-                      value={
-                        beneficiary.fullName
-                      }
-                    />
+                  <button
+                    onClick={() =>
+                      updatePolicyStatus(
+                        selectedMember.applicationNumber,
+                        "Lapsed"
+                      )
+                    }
+                    style={{
+                      ...buttonStyle,
+                      background:
+                        "#E0A800",
+                    }}
+                  >
+                    Set Lapsed
+                  </button>
 
-                    <Detail
-                      label="Surname"
-                      value={
-                        beneficiary.surname
-                      }
-                    />
-
-                    <Detail
-                      label="ID Number"
-                      value={
-                        beneficiary.idNumber
-                      }
-                    />
-
-                    <Detail
-                      label="Relationship"
-                      value={
-                        beneficiary.relationship
-                      }
-                    />
-
-                    <Detail
-                      label="Cellphone"
-                      value={
-                        beneficiary.cellphone
-                      }
-                    />
-
-                    <Detail
-                      label="Percentage"
-                      value={
-                        beneficiary.percentage
-                          ? `${beneficiary.percentage}%`
-                          : ""
-                      }
-                    />
-                  </div>
-                )
-              )
-            ) : (
-              <p>
-                No beneficiaries recorded.
-              </p>
+                  <button
+                    onClick={() =>
+                      updatePolicyStatus(
+                        selectedMember.applicationNumber,
+                        "Not Active"
+                      )
+                    }
+                    style={{
+                      ...buttonStyle,
+                      background:
+                        "#C62828",
+                    }}
+                  >
+                    Set Not Active
+                  </button>
+                </div>
+              </div>
             )}
-          </DetailsSection>
 
-          {/* POLICY MANAGEMENT */}
-
-          <div
-            style={{
-              marginTop: "30px",
-              padding: "20px",
-              textAlign: "center",
-              background: "#f4f6f9",
-              borderRadius: "8px",
-              border:
-                "1px solid #d4af37",
-            }}
-          >
-            <h3
+            <div
               style={{
-                color: "#071a52",
+                marginTop: "25px",
+                textAlign: "right",
               }}
             >
-              Policy Management
-            </h3>
-
-            <p>
-              Current Policy Status:
-              {" "}
-              <PolicyBadge
-                status={
-                  selectedMember.policyStatus ||
-                  "Not Active"
+              <button
+                onClick={() =>
+                  setSelectedMember(null)
                 }
-              />
-            </p>
-
-            <button
-              type="button"
-              onClick={() =>
-                updateStatus(
-                  selectedMember.applicationNumber,
-                  "Approved"
-                )
-              }
-              style={{
-                marginRight: "10px",
-                marginBottom: "10px",
-                padding: "12px 25px",
-                background: "#2e7d32",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              APPROVE MEMBER
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                updatePolicyStatus(
-                  selectedMember.applicationNumber,
-                  "Active"
-                )
-              }
-              style={{
-                marginRight: "10px",
-                marginBottom: "10px",
-                padding: "12px 25px",
-                background: "#1565c0",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              MARK ACTIVE
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                updatePolicyStatus(
-                  selectedMember.applicationNumber,
-                  "Lapsed"
-                )
-              }
-              style={{
-                marginRight: "10px",
-                marginBottom: "10px",
-                padding: "12px 25px",
-                background: "#b26a00",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              MARK LAPSED
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                updateStatus(
-                  selectedMember.applicationNumber,
-                  "Rejected"
-                )
-              }
-              style={{
-                marginRight: "10px",
-                marginBottom: "10px",
-                padding: "12px 25px",
-                background: "#c62828",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              REJECT APPLICATION
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                deleteMember(
-                  selectedMember.applicationNumber
-                )
-              }
-              style={{
-                padding: "12px 25px",
-                background: "#8b0000",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              DELETE MEMBER
-            </button>
+                style={buttonStyle}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
-function SummaryCard({
-  title,
-  value,
-  description,
-}) {
+function SummaryCard({ title, value }) {
   return (
-    <article
+    <div
       style={{
-        background: "#ffffff",
-        border: "1px solid #d4af37",
+        background: "white",
         borderRadius: "10px",
-        padding: "20px",
+        padding: "22px",
         boxShadow:
-          "0 3px 10px rgba(0,0,0,0.08)",
+          "0 2px 8px rgba(0,0,0,0.08)",
+        borderTop: `4px solid ${GOLD}`,
       }}
     >
-      <h3
+      <div
         style={{
-          margin: "0 0 10px",
-          color: "#071a52",
-          fontSize: "1rem",
+          color: "#666",
+          fontSize: "14px",
+          marginBottom: "8px",
         }}
       >
         {title}
-      </h3>
+      </div>
 
-      <p
+      <div
         style={{
-          margin: "0 0 5px",
-          color: "#071a52",
-          fontSize: "2rem",
+          color: BLUE,
+          fontSize: "30px",
           fontWeight: "bold",
         }}
       >
         {value}
-      </p>
-
-      <p
-        style={{
-          margin: 0,
-          color: "#666666",
-          fontSize: "0.9rem",
-        }}
-      >
-        {description}
-      </p>
-    </article>
+      </div>
+    </div>
   );
 }
 
 function StatusBadge({ status }) {
-  let background = "#f0ad4e";
+  let background = "#6c757d";
 
   if (status === "Approved") {
-    background = "#2e7d32";
+    background = "#198754";
   }
 
   if (status === "Rejected") {
-    background = "#c62828";
+    background = "#C62828";
   }
 
   if (status === "Pending") {
-    background = "#f0ad4e";
+    background = "#E0A800";
   }
 
   return (
     <span
       style={{
-        display: "inline-block",
-        padding: "6px 10px",
         background,
-        color: "#ffffff",
+        color: "white",
+        padding: "5px 10px",
         borderRadius: "20px",
-        fontSize: "0.85rem",
+        fontSize: "12px",
         fontWeight: "bold",
       }}
     >
       {status}
     </span>
-  );
-}
-
-function PolicyBadge({ status }) {
-  let background = "#777777";
-
-  if (status === "Active") {
-    background = "#2e7d32";
-  }
-
-  if (status === "Lapsed") {
-    background = "#b26a00";
-  }
-
-  if (status === "Not Active") {
-    background = "#777777";
-  }
-
-  return (
-    <span
-      style={{
-        display: "inline-block",
-        padding: "6px 10px",
-        background,
-        color: "#ffffff",
-        borderRadius: "20px",
-        fontSize: "0.85rem",
-        fontWeight: "bold",
-      }}
-    >
-      {status}
-    </span>
-  );
-}
-
-function DetailsSection({
-  title,
-  children,
-}) {
-  return (
-    <div
-      style={{
-        marginTop: "25px",
-        padding: "20px",
-        border: "1px solid #d4af37",
-        borderRadius: "8px",
-        background: "#ffffff",
-      }}
-    >
-      <h3
-        style={{
-          color: "#071a52",
-          borderBottom:
-            "2px solid #d4af37",
-          paddingBottom: "10px",
-        }}
-      >
-        {title}
-      </h3>
-
-      <div>{children}</div>
-    </div>
   );
 }
 
@@ -1398,32 +1084,48 @@ function Detail({ label, value }) {
   return (
     <div
       style={{
-        display: "flex",
-        flexWrap: "wrap",
-        marginBottom: "10px",
-        paddingBottom: "8px",
+        display: "grid",
+        gridTemplateColumns:
+          "200px 1fr",
+        gap: "15px",
+        padding: "10px 0",
         borderBottom:
-          "1px solid #eeeeee",
+          "1px solid #eee",
       }}
     >
-      <strong
-        style={{
-          width: "220px",
-          color: "#172554",
-        }}
-      >
-        {label}:
-      </strong>
-
-      <span style={{ flex: 1 }}>
-        {value || "Not provided"}
-      </span>
+      <strong>{label}</strong>
+      <span>{value}</span>
     </div>
   );
 }
 
-const cellStyle = {
-  padding: "12px",
-  border: "1px solid #dddddd",
+const thStyle = {
+  padding: "14px",
   textAlign: "left",
+  whiteSpace: "nowrap",
+};
+
+const tdStyle = {
+  padding: "14px",
+  verticalAlign: "top",
+};
+
+const smallButton = {
+  border: "none",
+  borderRadius: "5px",
+  padding: "7px 10px",
+  cursor: "pointer",
+  background: BLUE,
+  color: "white",
+  fontSize: "12px",
+};
+
+const buttonStyle = {
+  border: "none",
+  borderRadius: "6px",
+  padding: "10px 16px",
+  cursor: "pointer",
+  background: BLUE,
+  color: "white",
+  fontWeight: "bold",
 };

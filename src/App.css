@@ -260,6 +260,44 @@ textarea:focus {
 }
 
 /* =========================================================
+   PACKAGE CONTENT WATERMARKS
+   ========================================================= */
+
+.package-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.package-card > :not(.package-watermark) {
+  position: relative;
+  z-index: 1;
+}
+
+.package-watermark {
+  position: absolute;
+  right: -28px;
+  bottom: 42px;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 80%;
+  transform: rotate(-24deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.package-watermark span {
+  color: rgba(7, 26, 82, 0.065);
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* =========================================================
    DASHBOARD METRICS
    ========================================================= */
 

@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiRequest } from "../lib/api";
+
+const ADMIN_EMAIL = "info@mabotegroup.co.za";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -8,112 +11,37 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const getSavedAccount = () => {
-    const savedAccount = localStorage.getItem("maboteAccount");
-
-    if (!savedAccount) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(savedAccount);
-    } catch (error) {
-      localStorage.removeItem("maboteAccount");
-      return null;
-    }
-  };
-
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
 
-    const account = getSavedAccount();
+    try {
+      const result = await apiRequest("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!account) {
-      alert(
-        "No MABOTE GROUP account was found. Please create an account first."
-      );
-
-      navigate("/register");
-      return;
-    }
-
-    const enteredEmail = email.trim().toLowerCase();
-    const savedEmail = String(account.email || "")
-      .trim()
-      .toLowerCase();
-
-    const savedPassword = String(account.password || "");
-
-    if (
-      enteredEmail === savedEmail &&
-      password === savedPassword
-    ) {
-      localStorage.setItem("maboteLoggedIn", "true");
-
-      alert("Login successful!");
-
+      localStorage.setItem("maboteAuthToken", result.token);
       navigate("/admin");
-      return;
+    } catch (error) {
+      if (error.status === 401) {
+        alert(
+          "We could not log you in. Check your email and password, or create an account first."
+        );
+      } else {
+        alert(error.message);
+      }
     }
-
-    alert("Incorrect email or password.");
   };
 
   const handleForgotPassword = () => {
-    const account = getSavedAccount();
-
-    if (!account) {
-      alert(
-        "No MABOTE GROUP account was found. Please create an account first."
-      );
-
-      navigate("/register");
-      return;
-    }
-
-    const resetEmail = window.prompt(
-      "Enter your registered email address:"
+    const subject = encodeURIComponent("MABOTE GROUP password reset request");
+    const body = encodeURIComponent(
+      `Hello MABOTE GROUP administrator,\n\nPlease help me reset the password for: ${
+        email.trim() || "[enter my email address]"
+      }\n\nThank you.`
     );
 
-    if (!resetEmail) {
-      return;
-    }
-
-    const registeredEmail = String(account.email || "")
-      .trim()
-      .toLowerCase();
-
-    if (
-      resetEmail.trim().toLowerCase() !==
-      registeredEmail
-    ) {
-      alert("That email address is not registered.");
-      return;
-    }
-
-    const newPassword = window.prompt(
-      "Enter your new password (minimum 6 characters):"
-    );
-
-    if (!newPassword) {
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      alert("Password must be at least 6 characters.");
-      return;
-    }
-
-    account.password = newPassword;
-
-    localStorage.setItem(
-      "maboteAccount",
-      JSON.stringify(account)
-    );
-
-    alert(
-      "Password changed successfully.\n\nYou can now login with your new password."
-    );
+    window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -189,7 +117,7 @@ export default function Login() {
           type="button"
           onClick={handleForgotPassword}
         >
-          FORGOT PASSWORD?
+          CONTACT ADMIN FOR PASSWORD RESET
         </button>
 
         <p>Don't have an account?</p>
