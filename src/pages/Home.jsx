@@ -28,10 +28,6 @@ export default function Home() {
           </nav>
 
           <div className="header-actions">
-            <a href={whatsappLink} target="_blank" rel="noreferrer" className="call-button">
-              WhatsApp
-            </a>
-
             <Link to="/login" className="login-button">
               Member Login
             </Link>
@@ -62,7 +58,7 @@ export default function Home() {
               </div>
 
               <span className="hero-label">
-                MABOTE GROUP PTY(LTD)
+                MABOTE GROUP HOLDINGS
               </span>
 
               <h1>
@@ -73,24 +69,9 @@ export default function Home() {
 
               <p className="hero-lead">
                 A structured funeral grocery membership approach
-                designed to help families plan ahead with clarity,
-                confidence and practical support for future needs.
+                designed to help families plan ahead and prepare
+                for qualifying funeral grocery needs.
               </p>
-
-              <div className="hero-metrics">
-                <div className="metric-item">
-                  <strong>3</strong>
-                  <span>Plans</span>
-                </div>
-                <div className="metric-item">
-                  <strong>R80</strong>
-                  <span>Registration</span>
-                </div>
-                <div className="metric-item">
-                  <strong>4</strong>
-                  <span>Easy steps</span>
-                </div>
-              </div>
 
               <div className="hero-buttons">
                 <Link to="/register" className="primary-button">
@@ -131,7 +112,7 @@ export default function Home() {
                 <div className="hero-card-top">
                   <div>
                     <span className="small-label">
-                      MABOTE GROUP PTY(LTD)
+                      MABOTE GROUP HOLDINGS
                     </span>
 
                     <strong>
@@ -190,23 +171,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="trust-bar">
-          <div className="home-container trust-bar-inner">
-            <div className="trust-pill">
-              <strong>3</strong>
-              <span>Membership plans</span>
-            </div>
-            <div className="trust-pill">
-              <strong>30+</strong>
-              <span>Family-focused benefits</span>
-            </div>
-            <div className="trust-pill">
-              <strong>4</strong>
-              <span>Easy steps to join</span>
-            </div>
-          </div>
-        </section>
-
 
         {/* ================= INTRO ================= */}
         <section className="intro-section">
@@ -217,7 +181,7 @@ export default function Home() {
 
               <div className="section-heading">
 
-                <span>WELCOME TO MABOTE GROUP PTY(LTD)</span>
+                <span>WELCOME TO MABOTE GROUP HOLDINGS</span>
 
                 <h2>
                   Planning for tomorrow
@@ -229,7 +193,7 @@ export default function Home() {
 
               <div className="intro-copy">
                 <p>
-                  MABOTE GROUP PTY(LTD) is built around a simple principle:
+                  MABOTE GROUP HOLDINGS is built around a simple principle:
                   families should have an opportunity to prepare
                   before difficult circumstances arise.
                 </p>
@@ -242,7 +206,7 @@ export default function Home() {
                 </p>
 
                 <Link to="/about" className="text-link">
-                  Learn More About MABOTE GROUP PTY(LTD) →
+                  Learn More About MABOTE GROUP HOLDINGS →
                 </Link>
               </div>
 
@@ -347,7 +311,7 @@ export default function Home() {
               </h2>
 
               <p>
-                MABOTE GROUP PTY(LTD) brings together practical membership
+                MABOTE GROUP HOLDINGS brings together practical membership
                 options designed around preparation, planning and
                 funeral grocery support.
               </p>
@@ -436,7 +400,7 @@ export default function Home() {
 
               <div className="why-title">
 
-                <span>WHY MABOTE GROUP PTY(LTD)?</span>
+                <span>WHY MABOTE GROUP HOLDINGS?</span>
 
                 <h2>
                   Built around
@@ -539,7 +503,7 @@ export default function Home() {
               </h2>
 
               <p>
-                Explore the available MABOTE GROUP PTY(LTD) funeral grocery
+                Explore the available MABOTE GROUP HOLDINGS funeral grocery
                 membership packages and review the applicable
                 benefits and requirements.
               </p>
@@ -687,7 +651,7 @@ export default function Home() {
                   <li>Member preparation focus</li>
                 </ul>
 
-                <Link to="/register" className="pricing-button">Apply</Link>
+                <Link to="/packages" className="pricing-button">View Plan</Link>
               </article>
 
               <article className="pricing-card featured-pricing">
@@ -709,7 +673,7 @@ export default function Home() {
                   <li>Enhanced family coverage</li>
                 </ul>
 
-                <Link to="/register" className="pricing-button">Apply</Link>
+                <Link to="/packages" className="pricing-button">View Package</Link>
               </article>
 
               <article className="pricing-card">
@@ -729,7 +693,7 @@ export default function Home() {
                   <li>More complete preparation</li>
                 </ul>
 
-                <Link to="/register" className="pricing-button">Apply</Link>
+                <Link to="/packages" className="pricing-button">View Package</Link>
               </article>
             </div>
           </div>
@@ -850,7 +814,7 @@ export default function Home() {
               </h2>
 
               <p>
-                Becoming a MABOTE GROUP PTY(LTD) member follows a simple
+                Becoming a MABOTE GROUP HOLDINGS member follows a simple
                 process designed to make registration and
                 membership easier to understand.
               </p>
@@ -944,7 +908,7 @@ export default function Home() {
               <span>OUR APPROACH</span>
 
               <h2>
-                What MABOTE GROUP PTY(LTD)
+                What MABOTE GROUP HOLDINGS
                 <br />
                 <strong>stands for.</strong>
               </h2>
@@ -1013,7 +977,7 @@ export default function Home() {
                 <br />
                 Your preparation.
                 <br />
-                <strong>Your MABOTE GROUP PTY(LTD).</strong>
+                <strong>Your MABOTE GROUP HOLDINGS.</strong>
               </h2>
 
               <p>
@@ -1051,14 +1015,19 @@ export default function Home() {
 
             </div>
 
-            <div className="home-whatsapp-link">
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noreferrer"
+              className="home-whatsapp-link"
+            >
               <span className="whatsapp-qr-mark">WA</span>
               <span>
-                <strong>Chat with MABOTE GROUP PTY(LTD)</strong>
+                <strong>Chat with MABOTE GROUP HOLDINGS</strong>
                 <small>WhatsApp us on 0663331151</small>
-                <small>{contactEmail}</small>
+                <small><a href={`mailto:${contactEmail}`}>{contactEmail}</a></small>
               </span>
-            </div>
+            </a>
 
           </div>
 
@@ -1136,7 +1105,7 @@ export default function Home() {
           <div className="home-container footer-bottom-inner">
 
             <p>
-              © {new Date().getFullYear()} MABOTE GROUP PTY(LTD).
+              © {new Date().getFullYear()} MABOTE GROUP HOLDINGS.
               All rights reserved.
             </p>
 

@@ -45,16 +45,6 @@ app.use(
         return;
       }
 
-      const isVercelPreview = /https:\/\/.*\.vercel\.app$/i.test(origin);
-      const isNetlifyPreview = /https:\/\/.*\.netlify\.app$/i.test(origin);
-      const isRenderPreview = /https:\/\/.*\.onrender\.com$/i.test(origin);
-      const isCustomDomain = /https?:\/\/.+/i.test(origin);
-
-      if (isVercelPreview || isNetlifyPreview || isRenderPreview || isCustomDomain) {
-        callback(null, true);
-        return;
-      }
-
       callback(new Error("Origin not allowed by CORS"));
     },
     credentials: true,

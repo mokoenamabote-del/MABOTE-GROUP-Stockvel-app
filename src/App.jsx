@@ -1,8 +1,6 @@
 ﻿import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import { getAuthToken } from "./lib/auth";
-
 import Home from "./pages/Home";
 import AboutUs from "./pages/AboutUs";
 import HowItWorks from "./pages/HowItWorks";
@@ -11,8 +9,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import GroceryPackages from "./pages/GroceryPackages";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import Members from "./pages/Members";
@@ -29,9 +25,10 @@ import StaffRecruitment from "./pages/StaffRecruitment";
 
 
 function ProtectedRoute({ children }) {
-  const token = getAuthToken();
+  const isLoggedIn =
+    Boolean(localStorage.getItem("maboteAuthToken"));
 
-  if (!token) {
+  if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 
@@ -53,9 +50,6 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/faq" element={<HowItWorks />} />
 
         {/* ADMIN DASHBOARD */}
         <Route
