@@ -1,5 +1,6 @@
-﻿import React from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { apiRequest } from "./lib/api";
 
 import Home from "./pages/Home";
 import AboutUs from "./pages/AboutUs";
@@ -9,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import GroceryPackages from "./pages/GroceryPackages";
+import ClientPortal from "./pages/ClientPortal";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import Members from "./pages/Members";
@@ -24,12 +26,64 @@ import HRRecruitmentDigital from "./pages/HRRecruitmentDigital";
 import StaffRecruitment from "./pages/StaffRecruitment";
 
 
-function ProtectedRoute({ children }) {
-  const isLoggedIn =
-    Boolean(localStorage.getItem("maboteAuthToken"));
+function ProtectedRoute({ children, allowedRoles = ["Admin", "Management", "Support Staff"] }) {
+  const [status, setStatus] = useState("checking");
+  const [role, setRole] = useState(null);
 
-  if (!isLoggedIn) {
+  useEffect(() => {
+    const token = localStorage.getItem("maboteAuthToken");
+
+    if (!token) {
+      setStatus("unauthenticated");
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    apiRequest("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(({ account }) => {
+        if (!isCurrent) return;
+
+        if (!account?.role) {
+          throw new Error("Account role is missing");
+        }
+
+        localStorage.setItem("maboteAccount", JSON.stringify(account));
+        setRole(account.role);
+        setStatus("authenticated");
+      })
+      .catch(() => {
+        if (!isCurrent) return;
+
+        localStorage.removeItem("maboteAuthToken");
+        localStorage.removeItem("maboteAccount");
+        setStatus("unauthenticated");
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
+  if (status === "checking") {
+    return <div role="status">Checking your session...</div>;
+  }
+
+  if (status === "unauthenticated") {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!allowedRoles.includes(role)) {
+    const redirectPath =
+      role === "Member"
+        ? "/client-portal"
+        : ["Admin", "Management", "Support Staff"].includes(role)
+          ? "/admin"
+          : "/";
+
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children;
@@ -50,6 +104,15 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/payments" element={<Payments />} />
+        <Route
+          path="/client-portal"
+          element={
+            <ProtectedRoute allowedRoles={["Member"]}>
+              <ClientPortal />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ADMIN DASHBOARD */}
         <Route

@@ -22,7 +22,8 @@ export default function Login() {
       });
 
       localStorage.setItem("maboteAuthToken", result.token);
-      navigate("/admin");
+      localStorage.setItem("maboteAccount", JSON.stringify(result.account));
+      navigate(result.account.role === "Member" ? "/client-portal" : "/admin");
     } catch (error) {
       if (error.status === 401) {
         alert(
