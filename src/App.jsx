@@ -1,6 +1,8 @@
 ﻿import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
+import { getAuthToken } from "./lib/auth";
+
 import Home from "./pages/Home";
 import AboutUs from "./pages/AboutUs";
 import HowItWorks from "./pages/HowItWorks";
@@ -9,6 +11,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import GroceryPackages from "./pages/GroceryPackages";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import Members from "./pages/Members";
@@ -19,13 +23,15 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import AdminPrintables from "./pages/AdminPrintables";
 import Payments from "./pages/Payments";
+import HRManagement from "./pages/HRManagement";
+import HRRecruitmentDigital from "./pages/HRRecruitmentDigital";
+import StaffRecruitment from "./pages/StaffRecruitment";
 
 
 function ProtectedRoute({ children }) {
-  const isLoggedIn =
-    Boolean(localStorage.getItem("maboteAuthToken"));
+  const token = getAuthToken();
 
-  if (!isLoggedIn) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 
@@ -47,6 +53,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/faq" element={<HowItWorks />} />
 
         {/* ADMIN DASHBOARD */}
         <Route
@@ -144,6 +153,32 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Payments />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* HUMAN RESOURCES */}
+        <Route
+          path="/admin/hr"
+          element={
+            <ProtectedRoute>
+              <HRManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/hr/recruitment"
+          element={
+            <ProtectedRoute>
+              <HRRecruitmentDigital />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/staff-recruitment"
+          element={
+            <ProtectedRoute>
+              <StaffRecruitment />
             </ProtectedRoute>
           }
         />

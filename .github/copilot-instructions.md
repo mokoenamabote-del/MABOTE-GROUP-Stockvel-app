@@ -1,4 +1,4 @@
-# Copilot Instructions for MABOTE GROUP Stockvel App
+# Copilot Instructions for MABOTE GROUP HOLDINGS Stockvel App
 
 Use the repository-specific `fix-error` skill and prompt when diagnosing build, runtime, or syntax issues.
 

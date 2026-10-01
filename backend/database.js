@@ -17,6 +17,32 @@ database.exec(`
     role TEXT NOT NULL DEFAULT 'Admin',
     created_at TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS applications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    application_number TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Pending',
+    application_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS contributions (
+    id INTEGER PRIMARY KEY,
+    email TEXT NOT NULL DEFAULT '',
+    contribution_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS claims (
+    id INTEGER PRIMARY KEY,
+    email TEXT NOT NULL DEFAULT '',
+    claim_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
 `);
 
 export function findAccountByEmail(email) {
@@ -25,24 +51,185 @@ export function findAccountByEmail(email) {
     .get(email);
 }
 
-export function createAccount({ fullName, surname, email, passwordHash }) {
+export function createAccount({
+  fullName,
+  surname,
+  email,
+  passwordHash,
+  role = "Member",
+}) {
   const result = database
     .prepare(`
       INSERT INTO accounts
         (full_name, surname, email, password_hash, role, created_at)
-      VALUES (?, ?, ?, ?, 'Admin', ?)
+      VALUES (?, ?, ?, ?, ?, ?)
     `)
     .run(
       fullName,
       surname,
       email,
       passwordHash,
+      role,
       new Date().toISOString()
     );
 
   return database
     .prepare("SELECT id, full_name, surname, email, role, created_at FROM accounts WHERE id = ?")
     .get(result.lastInsertRowid);
+}
+
+export function setAccountPassword(email, passwordHash) {
+  const result = database
+    .prepare("UPDATE accounts SET password_hash = ? WHERE email = ?")
+    .run(passwordHash, email);
+
+  return result.changes > 0;
+}
+
+export function setAccountRole(email, role) {
+  const result = database
+    .prepare("UPDATE accounts SET role = ? WHERE email = ?")
+    .run(role, email);
+
+  return result.changes > 0;
+}
+
+export function createApplication(application) {
+  const now = new Date().toISOString();
+  const result = database
+    .prepare(`
+      INSERT INTO applications
+        (application_number, email, status, application_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `)
+    .run(
+      application.applicationNumber,
+      String(application.email || "").trim().toLowerCase(),
+      application.status || "Pending",
+      JSON.stringify(application),
+      now,
+      now
+    );
+
+  return getApplicationById(result.lastInsertRowid);
+}
+
+export function getApplicationById(id) {
+  const row = database
+    .prepare("SELECT * FROM applications WHERE id = ?")
+    .get(id);
+
+  return row ? JSON.parse(row.application_json) : null;
+}
+
+export function listApplications() {
+  return database
+    .prepare("SELECT application_json FROM applications ORDER BY created_at DESC")
+    .all()
+    .map((row) => JSON.parse(row.application_json));
+}
+
+export function listApplicationsForEmail(email) {
+  return database
+    .prepare("SELECT application_json FROM applications WHERE email = ? ORDER BY created_at DESC")
+    .all(String(email || "").trim().toLowerCase())
+    .map((row) => JSON.parse(row.application_json));
+}
+
+export function updateApplication(applicationNumber, changes) {
+  const row = database
+    .prepare("SELECT * FROM applications WHERE application_number = ?")
+    .get(applicationNumber);
+
+  if (!row) return null;
+
+  const application = { ...JSON.parse(row.application_json), ...changes };
+  database
+    .prepare(`
+      UPDATE applications
+      SET status = ?, application_json = ?, updated_at = ?
+      WHERE application_number = ?
+    `)
+    .run(
+      application.status || row.status,
+      JSON.stringify(application),
+      new Date().toISOString(),
+      applicationNumber
+    );
+
+  return application;
+}
+
+export function saveContribution(contribution) {
+  const now = new Date().toISOString();
+  database
+    .prepare(`
+      INSERT INTO contributions (id, email, contribution_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        email = excluded.email,
+        contribution_json = excluded.contribution_json,
+        updated_at = excluded.updated_at
+    `)
+    .run(
+      contribution.id,
+      String(contribution.email || "").trim().toLowerCase(),
+      JSON.stringify(contribution),
+      now,
+      now
+    );
+
+  return contribution;
+}
+
+export function listContributions() {
+  return database
+    .prepare("SELECT contribution_json FROM contributions ORDER BY created_at DESC")
+    .all()
+    .map((row) => JSON.parse(row.contribution_json));
+}
+
+export function listContributionsForEmail(email) {
+  return database
+    .prepare("SELECT contribution_json FROM contributions WHERE email = ? ORDER BY created_at DESC")
+    .all(String(email || "").trim().toLowerCase())
+    .map((row) => JSON.parse(row.contribution_json));
+}
+
+export function saveClaim(claim) {
+  const now = new Date().toISOString();
+  database
+    .prepare(`
+      INSERT INTO claims (id, email, claim_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        email = excluded.email,
+        claim_json = excluded.claim_json,
+        updated_at = excluded.updated_at
+    `)
+    .run(
+      claim.id,
+      String(claim.email || "").trim().toLowerCase(),
+      JSON.stringify(claim),
+      now,
+      now
+    );
+
+  return claim;
+}
+
+export function listClaims() {
+  return database
+    .prepare("SELECT claim_json FROM claims ORDER BY created_at DESC")
+    .all()
+    .map((row) => JSON.parse(row.claim_json));
+}
+
+export function listClaimsForEmail(email) {
+  return database
+    .prepare("SELECT claim_json FROM claims WHERE email = ? ORDER BY created_at DESC")
+    .all(String(email || "").trim().toLowerCase())
+    .map((row) => JSON.parse(row.claim_json));
 }
 
 export function closeDatabase() {

@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiRequest } from "../lib/api";
 
 const initialClaims = [
   {
@@ -46,15 +48,9 @@ const emptyClaim = {
   date: "",
 };
 
-export default function Claims() {
-  const [claims, setClaims] =
-    useState(initialClaims);
-
-  const [newClaim, setNewClaim] =
-    useState(emptyClaim);
-
-  const [selectedClaim, setSelectedClaim] =
-    useState(null);
+function ClaimFormContent() {
+  const navigate = useNavigate();
+  const [newClaim, setNewClaim] = useState(emptyClaim);
 
   const handleChange = (field) => (event) => {
     setNewClaim((previous) => ({
@@ -63,7 +59,163 @@ export default function Claims() {
     }));
   };
 
-  const addClaim = (event) => {
+  const addClaim = async (event) => {
+    event.preventDefault();
+
+    if (
+      !newClaim.member.trim() ||
+      !newClaim.membershipNumber.trim() ||
+      !newClaim.amount.trim() ||
+      !newClaim.reason.trim() ||
+      !newClaim.date
+    ) {
+      alert("Please complete all required claim information.");
+      return;
+    }
+
+    const claimToAdd = {
+      id: Date.now(),
+      member: newClaim.member.trim(),
+      membershipNumber: newClaim.membershipNumber.trim(),
+      plan: newClaim.plan,
+      claimType: newClaim.claimType,
+      amount: newClaim.amount.trim(),
+      status: "Pending",
+      reason: newClaim.reason.trim(),
+      date: newClaim.date,
+    };
+
+    try {
+      await apiRequest("/api/claims", {
+        method: "POST",
+        body: JSON.stringify(claimToAdd),
+      });
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Claim submitted successfully and is now pending review.");
+    navigate("/claims");
+  };
+
+  return (
+    <section className="claims-page">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px", flexWrap: "wrap", marginBottom: "30px" }}>
+        <div>
+          <h2 style={{ marginBottom: "8px" }}>📝 Claim Form</h2>
+          <p style={{ margin: 0 }}>Submit a member claim for review and approval.</p>
+        </div>
+
+        <button type="button" className="primary-button" onClick={() => navigate("/claims")} style={{ minWidth: "170px" }}>
+          BACK TO CLAIMS
+        </button>
+      </div>
+
+      <article className="dashboard-card dashboard-card--wide">
+        <form onSubmit={addClaim} className="form-card">
+          <div style={{ marginBottom: "20px" }}>
+            <h4 style={{ marginBottom: "15px" }}>Member Information</h4>
+
+            <div className="form-grid">
+              <label>
+                Member Name
+                <input type="text" value={newClaim.member} onChange={handleChange("member")} placeholder="Enter member full name" />
+              </label>
+
+              <label>
+                Membership Number
+                <input type="text" value={newClaim.membershipNumber} onChange={handleChange("membershipNumber")} placeholder="e.g. M-001" />
+              </label>
+
+              <label>
+                Membership Plan
+                <select value={newClaim.plan} onChange={handleChange("plan")}>
+                  <option value="Plan A">Plan A</option>
+                  <option value="Plan B">Plan B</option>
+                  <option value="Plan C">Plan C</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "20px" }}>
+            <h4 style={{ marginBottom: "15px" }}>Claim Information</h4>
+
+            <div className="form-grid">
+              <label>
+                Claim Type
+                <select value={newClaim.claimType} onChange={handleChange("claimType")}>
+                  <option>Funeral Grocery Support</option>
+                  <option>Funeral Support</option>
+                  <option>Emergency Support</option>
+                  <option>Other</option>
+                </select>
+              </label>
+
+              <label>
+                Claim Amount
+                <input type="text" value={newClaim.amount} onChange={handleChange("amount")} placeholder="e.g. R2,500" />
+              </label>
+
+              <label>
+                Date of Incident
+                <input type="date" value={newClaim.date} onChange={handleChange("date")} />
+              </label>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "25px" }}>
+            <h4 style={{ marginBottom: "15px" }}>Claim Description</h4>
+
+            <label>
+              Reason for Claim
+              <textarea value={newClaim.reason} onChange={handleChange("reason")} placeholder="Provide details about the claim and the support required..." rows="5" />
+            </label>
+          </div>
+
+          <button type="submit" className="primary-button" style={{ minWidth: "190px" }}>
+            SUBMIT CLAIM
+          </button>
+        </form>
+      </article>
+    </section>
+  );
+}
+
+export function ClaimFormPage() {
+  return <ClaimFormContent />;
+}
+
+export default function Claims() {
+  const navigate = useNavigate();
+
+  const [claims, setClaims] =
+    useState(initialClaims);
+
+  const [selectedClaim, setSelectedClaim] =
+    useState(null);
+
+  useEffect(() => {
+    apiRequest("/api/claims")
+      .then((result) => {
+        if (Array.isArray(result.claims) && result.claims.length) {
+          setClaims(result.claims);
+        }
+      })
+      .catch(() => {
+        // Keep seeded claims visible while the backend is unavailable.
+      });
+  }, []);
+
+  const handleChange = (field) => (event) => {
+    setNewClaim((previous) => ({
+      ...previous,
+      [field]: event.target.value,
+    }));
+  };
+
+  const addClaim = async (event) => {
     event.preventDefault();
 
     if (
@@ -98,10 +250,17 @@ export default function Claims() {
       date: newClaim.date,
     };
 
-    setClaims((previous) => [
-      claimToAdd,
-      ...previous,
-    ]);
+    try {
+      await apiRequest("/api/claims", {
+        method: "POST",
+        body: JSON.stringify(claimToAdd),
+      });
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+
+    setClaims((previous) => [claimToAdd, ...previous]);
 
     setNewClaim(emptyClaim);
 
@@ -110,10 +269,24 @@ export default function Claims() {
     );
   };
 
-  const updateClaimStatus = (
+  const updateClaimStatus = async (
     id,
     status
   ) => {
+    const claim = claims.find((item) => item.id === id);
+
+    if (claim) {
+      try {
+        await apiRequest("/api/claims", {
+          method: "POST",
+          body: JSON.stringify({ ...claim, status }),
+        });
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+    }
+
     setClaims((previous) =>
       previous.map((claim) =>
         claim.id === id
@@ -214,13 +387,44 @@ export default function Claims() {
 
         <div
           style={{
-            padding: "14px 20px",
-            borderRadius: "12px",
-            background: "#f4f6f8",
-            fontWeight: "700",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
           }}
         >
-          {totalClaims} Total Claims
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => navigate("/claims/new")}
+            style={{
+              minWidth: "170px",
+            }}
+          >
+            CLAIM FORM
+          </button>
+
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => navigate("/admin/print-materials?doc=claim")}
+            style={{
+              minWidth: "170px",
+            }}
+          >
+            PRINT CLAIM FORM
+          </button>
+
+          <div
+            style={{
+              padding: "14px 20px",
+              borderRadius: "12px",
+              background: "#f4f6f8",
+              fontWeight: "700",
+            }}
+          >
+            {totalClaims} Total Claims
+          </div>
         </div>
       </div>
 
@@ -286,7 +490,7 @@ export default function Claims() {
       </div>
 
       {/* ======================================
-          SUBMIT CLAIM
+          CLAIM FORM CTA
       ======================================= */}
 
       <article
@@ -295,219 +499,16 @@ export default function Claims() {
           marginBottom: "30px",
         }}
       >
-
-        <div
-          style={{
-            marginBottom: "25px",
-          }}
-        >
-          <h3
-            style={{
-              marginBottom: "8px",
-            }}
-          >
-            📝 Submit a Claim
-          </h3>
-
-          <p
-            style={{
-              margin: 0,
-            }}
-          >
-            Complete the information below to
-            submit a member claim for review.
-          </p>
-        </div>
-
-        <form
-          onSubmit={addClaim}
-          className="form-card"
-        >
-
-          {/* MEMBER INFORMATION */}
-
-          <div
-            style={{
-              marginBottom: "20px",
-            }}
-          >
-            <h4
-              style={{
-                marginBottom: "15px",
-              }}
-            >
-              Member Information
-            </h4>
-
-            <div className="form-grid">
-
-              <label>
-                Member Name
-                <input
-                  type="text"
-                  value={newClaim.member}
-                  onChange={handleChange(
-                    "member"
-                  )}
-                  placeholder="Enter member full name"
-                />
-              </label>
-
-              <label>
-                Membership Number
-                <input
-                  type="text"
-                  value={
-                    newClaim.membershipNumber
-                  }
-                  onChange={handleChange(
-                    "membershipNumber"
-                  )}
-                  placeholder="e.g. M-001"
-                />
-              </label>
-
-              <label>
-                Membership Plan
-                <select
-                  value={newClaim.plan}
-                  onChange={handleChange(
-                    "plan"
-                  )}
-                >
-                  <option value="Plan A">
-                    Plan A
-                  </option>
-
-                  <option value="Plan B">
-                    Plan B
-                  </option>
-
-                  <option value="Plan C">
-                    Plan C
-                  </option>
-                </select>
-              </label>
-
-            </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+          <div>
+            <h3 style={{ marginBottom: "8px" }}>📝 Claim Form</h3>
+            <p style={{ margin: 0 }}>Use the dedicated claim form to add a brand new claim submission.</p>
           </div>
 
-          {/* CLAIM INFORMATION */}
-
-          <div
-            style={{
-              marginBottom: "20px",
-            }}
-          >
-            <h4
-              style={{
-                marginBottom: "15px",
-              }}
-            >
-              Claim Information
-            </h4>
-
-            <div className="form-grid">
-
-              <label>
-                Claim Type
-
-                <select
-                  value={
-                    newClaim.claimType
-                  }
-                  onChange={handleChange(
-                    "claimType"
-                  )}
-                >
-                  <option>
-                    Funeral Grocery Support
-                  </option>
-
-                  <option>
-                    Funeral Support
-                  </option>
-
-                  <option>
-                    Emergency Support
-                  </option>
-
-                  <option>
-                    Other
-                  </option>
-                </select>
-              </label>
-
-              <label>
-                Claim Amount
-
-                <input
-                  type="text"
-                  value={newClaim.amount}
-                  onChange={handleChange(
-                    "amount"
-                  )}
-                  placeholder="e.g. R2,500"
-                />
-              </label>
-
-              <label>
-                Date of Incident
-
-                <input
-                  type="date"
-                  value={newClaim.date}
-                  onChange={handleChange(
-                    "date"
-                  )}
-                />
-              </label>
-
-            </div>
-          </div>
-
-          {/* REASON */}
-
-          <div
-            style={{
-              marginBottom: "25px",
-            }}
-          >
-            <h4
-              style={{
-                marginBottom: "15px",
-              }}
-            >
-              Claim Description
-            </h4>
-
-            <label>
-              Reason for Claim
-
-              <textarea
-                value={newClaim.reason}
-                onChange={handleChange(
-                  "reason"
-                )}
-                placeholder="Provide details about the claim and the support required..."
-                rows="5"
-              />
-            </label>
-          </div>
-
-          {/* SUBMIT */}
-
-          <button
-            type="submit"
-            className="primary-button"
-            style={{
-              minWidth: "190px",
-            }}
-          >
-            SUBMIT CLAIM
+          <button type="button" className="primary-button" onClick={() => navigate("/claims/new")} style={{ minWidth: "190px" }}>
+            OPEN CLAIM FORM
           </button>
-
-        </form>
+        </div>
       </article>
 
       {/* ======================================

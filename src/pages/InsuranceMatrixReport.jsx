@@ -161,7 +161,7 @@ export default function InsuranceMatrixReport() {
           }}
         >
           <h1 style={{ margin: 0 }}>
-            MABOTE GROUP
+            MABOTE GROUP HOLDINGS
           </h1>
 
           <p
@@ -443,7 +443,7 @@ export default function InsuranceMatrixReport() {
             fontWeight: "bold",
           }}
         >
-          MABOTE GROUP © 2026
+          MABOTE GROUP HOLDINGS © 2026
         </div>
       </div>
     </div>

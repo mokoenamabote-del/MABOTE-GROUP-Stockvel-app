@@ -6,7 +6,20 @@ import jwt from "jsonwebtoken";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getPaymentUpdates, getAuthUrl, saveToken } from "./sheetsHelper.js";
-import { createAccount, findAccountByEmail } from "./database.js";
+import {
+  createAccount,
+  createApplication,
+  findAccountByEmail,
+  listClaims,
+  listClaimsForEmail,
+  listContributions,
+  listContributionsForEmail,
+  listApplications,
+  listApplicationsForEmail,
+  saveContribution,
+  saveClaim,
+  updateApplication,
+} from "./database.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,6 +28,10 @@ dotenv.config({ path: path.join(currentDirectory, ".env") });
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET must be set in backend/.env before starting the server");
@@ -22,7 +39,25 @@ if (!JWT_SECRET) {
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      const isVercelPreview = /https:\/\/.*\.vercel\.app$/i.test(origin);
+      const isNetlifyPreview = /https:\/\/.*\.netlify\.app$/i.test(origin);
+      const isRenderPreview = /https:\/\/.*\.onrender\.com$/i.test(origin);
+      const isCustomDomain = /https?:\/\/.+/i.test(origin);
+
+      if (isVercelPreview || isNetlifyPreview || isRenderPreview || isCustomDomain) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Origin not allowed by CORS"));
+    },
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -112,6 +147,102 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
   }
 
   res.json({ account: publicAccount(account) });
+});
+
+app.post("/api/applications", requireAuth, (req, res) => {
+  try {
+    const application = {
+      ...req.body,
+      email: String(req.body.email || req.account.email).trim().toLowerCase(),
+    };
+
+    if (!application.applicationNumber || !application.email) {
+      return res.status(400).json({ error: "Application number and email are required" });
+    }
+
+    const savedApplication = createApplication(application);
+    res.status(201).json({ application: savedApplication });
+  } catch (error) {
+    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      return res.status(409).json({ error: "This application has already been submitted" });
+    }
+
+    console.error("Application creation error:", error);
+    res.status(500).json({ error: "Unable to save application" });
+  }
+});
+
+app.get("/api/applications", requireAuth, (req, res) => {
+  const isStaff = ["Admin", "Management", "Support Staff"].includes(req.account.role);
+  const applications = isStaff
+    ? listApplications()
+    : listApplicationsForEmail(req.account.email);
+
+  res.json({ applications });
+});
+
+app.patch("/api/applications/:applicationNumber", requireAuth, (req, res) => {
+  const isStaff = ["Admin", "Management", "Support Staff"].includes(req.account.role);
+
+  if (!isStaff) {
+    return res.status(403).json({ error: "Staff access required" });
+  }
+
+  const application = updateApplication(req.params.applicationNumber, req.body);
+
+  if (!application) {
+    return res.status(404).json({ error: "Application not found" });
+  }
+
+  res.json({ application });
+});
+
+app.post("/api/contributions", requireAuth, (req, res) => {
+  const isStaff = ["Admin", "Management", "Support Staff"].includes(req.account.role);
+
+  if (!isStaff) {
+    return res.status(403).json({ error: "Staff access required" });
+  }
+
+  const contribution = {
+    ...req.body,
+    email: String(req.body.email || "").trim().toLowerCase(),
+  };
+
+  if (!contribution.id) {
+    return res.status(400).json({ error: "Contribution id is required" });
+  }
+
+  res.status(201).json({ contribution: saveContribution(contribution) });
+});
+
+app.get("/api/contributions", requireAuth, (req, res) => {
+  const isStaff = ["Admin", "Management", "Support Staff"].includes(req.account.role);
+  const contributions = isStaff
+    ? listContributions()
+    : listContributionsForEmail(req.account.email);
+
+  res.json({ contributions });
+});
+
+app.post("/api/claims", requireAuth, (req, res) => {
+  const claim = {
+    ...req.body,
+    email: String(req.body.email || req.account.email).trim().toLowerCase(),
+  };
+
+  if (!claim.id) {
+    return res.status(400).json({ error: "Claim id is required" });
+  }
+
+  res.status(201).json({ claim: saveClaim(claim) });
+});
+
+app.get("/api/claims", requireAuth, (req, res) => {
+  const isStaff = ["Admin", "Management", "Support Staff"].includes(req.account.role);
+  const claims = isStaff ? listClaims() : listClaimsForEmail(req.account.email);
+
+  res.json({ claims });
 });
 
 // Get the current payment data from Google Sheets

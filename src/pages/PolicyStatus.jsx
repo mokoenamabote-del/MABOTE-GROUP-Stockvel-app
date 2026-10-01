@@ -62,7 +62,7 @@
       setResponseMessage(
         `Dear ${
           fullName || "Member"
-        }, your MABOTE GROUP policy ${
+        }, your MABOTE GROUP HOLDINGS policy ${
           member.policyNumber || ""
         } is now marked as ACTIVE.`
       );
@@ -72,9 +72,9 @@
       setResponseMessage(
         `Dear ${
           fullName || "Member"
-        }, your MABOTE GROUP policy ${
+        }, your MABOTE GROUP HOLDINGS policy ${
           member.policyNumber || ""
-        } has been marked as LAPSED. Please contact MABOTE GROUP regarding your policy status.`
+        } has been marked as LAPSED. Please contact MABOTE GROUP HOLDINGS regarding your policy status.`
       );
     }
   };

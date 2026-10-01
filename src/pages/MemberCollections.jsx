@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiRequest } from "../lib/api";
 
 const initialCollections = [
   {
@@ -82,6 +83,25 @@ export default function MemberCollections() {
 
   useEffect(() => {
     loadApprovedMembers();
+
+    apiRequest("/api/contributions")
+      .then((result) => {
+        if (!Array.isArray(result.contributions)) return;
+
+        setCollections((previous) => [
+          ...result.contributions,
+          ...previous.filter(
+            (localContribution) =>
+              !result.contributions.some(
+                (remoteContribution) =>
+                  remoteContribution.id === localContribution.id
+              )
+          ),
+        ]);
+      })
+      .catch(() => {
+        // Keep legacy local records visible while the backend is unavailable.
+      });
   }, []);
 
   /*
@@ -229,7 +249,7 @@ export default function MemberCollections() {
   /*
    * ADD COLLECTION
    */
-  const addCollection = () => {
+  const addCollection = async () => {
     if (!formData.membershipNumber.trim()) {
       alert(
         "Please select an approved member."
@@ -342,7 +362,19 @@ export default function MemberCollections() {
           amountDue,
           amountPaid
         ),
+
+      email: selectedMember.email || "",
     };
+
+    try {
+      await apiRequest("/api/contributions", {
+        method: "POST",
+        body: JSON.stringify(newCollection),
+      });
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
 
     setCollections((previous) => [
       newCollection,
@@ -539,7 +571,7 @@ export default function MemberCollections() {
             fontSize: "2rem",
           }}
         >
-          MABOTE GROUP
+          MABOTE GROUP HOLDINGS
         </h1>
 
         <p

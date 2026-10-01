@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiRequest } from "../lib/api";
 
 const createEmptyBeneficiary = () => ({
   fullName: "",
@@ -132,21 +133,21 @@ export default function MemberRegistration() {
 
   const getPlanAmount = (plan) => {
     if (plan === "Plan A") {
-      return 450;
+      return 300;
     }
 
     if (plan === "Plan B") {
-      return 500;
+      return 350;
     }
 
     if (plan === "Plan C") {
-      return 350;
+      return 450;
     }
 
     return 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const referenceNumber = Date.now()
@@ -192,27 +193,18 @@ export default function MemberRegistration() {
         new Date().toISOString(),
     };
 
-    const existingApplications =
-      JSON.parse(
-        localStorage.getItem(
-          "maboteApplications"
-        ) || "[]"
-      );
-
-    const updatedApplications = [
-      ...existingApplications,
-      newMemberApplication,
-    ];
-
-    localStorage.setItem(
-      "maboteApplications",
-      JSON.stringify(
-        updatedApplications
-      )
-    );
+    try {
+      await apiRequest("/api/applications", {
+        method: "POST",
+        body: JSON.stringify(newMemberApplication),
+      });
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
 
     console.log(
-      "MABOTE GROUP Member Application:",
+      "MABOTE GROUP HOLDINGS Member Application:",
       newMemberApplication
     );
 
@@ -298,7 +290,7 @@ export default function MemberRegistration() {
             letterSpacing: "2px",
           }}
         >
-          MABOTE GROUP
+          MABOTE GROUP HOLDINGS
         </h1>
 
         <p
@@ -360,7 +352,7 @@ export default function MemberRegistration() {
             >
               Please complete the
               information below to
-              register as a MABOTE GROUP
+              register as a MABOTE GROUP HOLDINGS
               member.
             </p>
 
@@ -1248,7 +1240,7 @@ export default function MemberRegistration() {
               >
                 Thank you for
                 applying to become
-                a MABOTE GROUP
+                a MABOTE GROUP HOLDINGS
                 member.
               </p>
 
@@ -1321,7 +1313,7 @@ export default function MemberRegistration() {
                     "#071a52",
                 }}
               >
-                MABOTE GROUP
+                MABOTE GROUP HOLDINGS
               </h2>
 
               <h3
@@ -1554,7 +1546,7 @@ export default function MemberRegistration() {
             "bold",
         }}
       >
-        MABOTE GROUP © 2026
+        MABOTE GROUP HOLDINGS © 2026
       </div>
     </div>
   );

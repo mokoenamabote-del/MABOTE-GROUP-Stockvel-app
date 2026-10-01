@@ -1,7 +1,7 @@
-# MABOTE GROUP Stockvel App
+# MABOTE GROUP HOLDINGS Stockvel App
 
 ## About the App
-MABOTE GROUP Stockvel App is a digital platform designed to help communities manage funeral grocery stokvel contributions easily and securely.
+MABOTE GROUP HOLDINGS Stockvel App is a digital platform designed to help communities manage funeral grocery stokvel contributions easily and securely.
 
 ## Main Features
 - Member registration
@@ -13,9 +13,9 @@ MABOTE GROUP Stockvel App is a digital platform designed to help communities man
 - Admin dashboard
 
 ## Plans
-- Plan A: Funeral Grocery Package — R250 per member per month
-- Plan B: Executive Grocery + Inkomo — R450 per member per month
-- Plan C: Custom Plan — R350 per member per month
+- Plan A: Full Grocery — R300 per member per month
+- Plan B: Full Grocery + Cow — R350 per member per month
+- Plan C: Premium Catering — R450 per member per month
 
 ## Payment methods
 - EFT: Electronic funds transfer from member bank accounts
@@ -24,14 +24,14 @@ MABOTE GROUP Stockvel App is a digital platform designed to help communities man
 
 ## Pricing policy
 The current policy defines three stokvel pricing plans:
-- **Plan A**: Funeral Grocery Package, designed for essential funeral grocery support.
-- **Plan B**: Executive Grocery + Inkomo, designed for higher-value support with additional benefits.
-- **Plan C**: Custom Plan, designed for communities seeking a mid-range option with tailored coverage.
+- **Plan A**: Full Grocery, designed for essential funeral grocery and catering support.
+- **Plan B**: Full Grocery + Cow, designed for larger funeral gatherings with additional benefits.
+- **Plan C**: Premium Catering, designed for families seeking the most complete package option.
 
 ## Purpose
 To provide a simple, transparent and reliable way for members to save together and receive funeral grocery support when needed.
 
 ## Developer
-MABOTE GROUP
+MABOTE GROUP HOLDINGS
 
-© 2026 MABOTE GROUP
+© 2026 MABOTE GROUP HOLDINGS

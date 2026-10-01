@@ -1,6 +1,6 @@
 # Google Sheets Payment Sync Setup Guide
 
-This guide will help you connect your Google Sheets tracker to the MABOTE GROUP Stockvel App for automatic payment status updates.
+This guide will help you connect your Google Sheets tracker to the MABOTE GROUP HOLDINGS Stockvel App for automatic payment status updates.
 
 ## Overview
 

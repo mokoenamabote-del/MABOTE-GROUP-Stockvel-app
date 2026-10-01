@@ -1,5 +1,5 @@
 /* =========================================================
-   MABOTE GROUP STOCKVEL APP
+   MABOTE GROUP HOLDINGS STOCKVEL APP
    MAIN APPLICATION STYLES
    ROYAL BLUE & GOLD
    ========================================================= */
@@ -19,8 +19,71 @@ body {
   padding: 0;
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
-  background: #f4f6f9;
+  background: linear-gradient(180deg, #f4f7fb 0%, #eef3fb 100%);
   color: #172554;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.settings-card {
+  padding: 22px;
+  border: 1px solid #dce3ec;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(23, 37, 84, 0.07);
+}
+
+.settings-card h3 { margin: 0 0 8px; color: #071a52; }
+.settings-card p { min-height: 42px; margin: 0 0 18px; color: #5c6878; line-height: 1.5; }
+.settings-card--wide { margin-bottom: 24px; }
+.settings-card-header { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+.settings-status { color: #237a45; font-weight: 700; }
+.payroll-methods { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 0 0 22px; padding: 14px; border: 1px solid #dce3ec; }
+.payroll-methods legend { padding: 0 6px; color: #071a52; font-weight: 700; }
+.payroll-methods label { display: inline-flex; gap: 7px; align-items: center; color: #3d4b5d; }
+.digital-form-section { margin: 0 0 24px; padding: 16px; border: 1px solid #dce3ec; }
+.digital-form-section legend { padding: 0 7px; color: #071a52; font-weight: 700; }
+.digital-notes { display: block; margin-bottom: 18px; }
+.digital-notes textarea { display: block; width: 100%; margin-top: 7px; padding: 11px; border: 1px solid #c9d3df; border-radius: 5px; resize: vertical; }
+.form-error { color: #b3261e; font-weight: 700; }
+.contract-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.agent-contract-document { margin-top: 26px; padding: 34px; border: 1px solid #c9d3df; background: #fffef8; color: #273449; line-height: 1.6; }
+.agent-contract-document h4 { margin: 0 0 22px; color: #071a52; text-align: center; letter-spacing: .04em; }
+.agent-contract-document ol { padding-left: 24px; }
+.agent-contract-document li { margin-bottom: 12px; }
+.contract-draft-label { margin: 0 0 10px; color: #a24b1e; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-align: center; }
+.contract-signatures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; margin-top: 34px; }
+.contract-disclaimer { margin: 28px 0 0; padding-top: 14px; border-top: 1px solid #dce3ec; color: #6b4d2e; font-size: .86rem; }
+
+@media print {
+  body { background: #ffffff; }
+  .app-header, .app-nav, .settings-header, .settings-grid, .settings-card > form, .contract-actions { display: none !important; }
+  .app-shell, .app-main { padding: 0; margin: 0; }
+  .settings-page, .settings-card, .agent-contract-document { border: 0; box-shadow: none; }
+  .agent-contract-editor { display: block; }
+  .agent-contract-document { margin: 0; padding: 0; }
+}
+
+@media (max-width: 800px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .contract-signatures { grid-template-columns: 1fr; }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 /* =========================================================
@@ -36,19 +99,25 @@ textarea {
 
 button {
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
 }
 
 input,
 select,
 textarea {
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   border-color: #d4af37;
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
 
 /* =========================================================
@@ -232,15 +301,21 @@ textarea:focus {
 .dashboard-card {
   min-width: 0;
 
-  border: 2px solid #d4af37;
-  border-radius: 10px;
+  border: 2px solid rgba(212, 175, 55, 0.9);
+  border-radius: 14px;
 
   padding: 20px;
 
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf9 100%);
 
   box-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.08);
+    0 12px 24px rgba(7, 26, 82, 0.06);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(7, 26, 82, 0.1);
 }
 
 .dashboard-card h3 {
@@ -324,24 +399,27 @@ textarea:focus {
    ========================================================= */
 
 .primary-button {
-  background: #071a52;
+  background: linear-gradient(135deg, #071a52 0%, #0f2d68 100%);
   color: #ffffff;
 
   border: 2px solid #d4af37;
-  border-radius: 7px;
+  border-radius: 10px;
 
   padding: 12px 20px;
 
   font-weight: 700;
+  box-shadow: 0 8px 18px rgba(7, 26, 82, 0.12);
 
   transition:
     background 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .primary-button:hover {
-  background: #d4af37;
+  background: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
   color: #071a52;
+  box-shadow: 0 10px 22px rgba(212, 175, 55, 0.18);
 }
 
 .secondary-button {
@@ -349,15 +427,17 @@ textarea:focus {
   color: #071a52;
 
   border: 2px solid #d4af37;
-  border-radius: 7px;
+  border-radius: 10px;
 
   padding: 10px 16px;
 
   font-weight: 700;
+  box-shadow: 0 8px 16px rgba(7, 26, 82, 0.04);
 }
 
 .secondary-button:hover {
-  background: #d4af37;
+  background: #fff7db;
+  border-color: #c99a2e;
 }
 
 /* =========================================================
@@ -630,10 +710,11 @@ textarea:focus {
 .claim-card {
   padding: 20px;
 
-  border: 2px solid #d4af37;
-  border-radius: 10px;
+  border: 2px solid rgba(212, 175, 55, 0.9);
+  border-radius: 14px;
 
-  background: #fffdf5;
+  background: linear-gradient(180deg, #fffdf9 0%, #fffaf0 100%);
+  box-shadow: 0 12px 26px rgba(7, 26, 82, 0.05);
 }
 
 .claim-form {
@@ -781,14 +862,14 @@ textarea:focus {
 
   padding: 35px;
 
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf9 100%);
 
   border: 2px solid #d4af37;
 
-  border-radius: 12px;
+  border-radius: 18px;
 
   box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.12);
+    0 18px 38px rgba(7, 26, 82, 0.12);
 
   text-align: center;
 }
@@ -801,6 +882,13 @@ textarea:focus {
   font-size: 2rem;
 
   letter-spacing: 1px;
+}
+
+.login-logo {
+  display: block;
+  width: min(280px, 100%);
+  height: auto;
+  margin: 0 auto 12px;
 }
 
 .login-box h2 {
@@ -846,25 +934,37 @@ textarea:focus {
 
   border: 2px solid #d4af37;
 
-  border-radius: 7px;
+  border-radius: 10px;
 
-  background: #071a52;
+  background: linear-gradient(135deg, #071a52 0%, #0f2d68 100%);
 
   color: #ffffff;
 
   font-weight: 700;
+  box-shadow: 0 10px 18px rgba(7, 26, 82, 0.08);
 }
 
 .login-box button:hover {
-  background: #d4af37;
+  background: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
 
   color: #071a52;
+  box-shadow: 0 12px 22px rgba(212, 175, 55, 0.18);
 }
 
 .login-box p {
   color: #555555;
 
   margin-top: 25px;
+}
+
+.login-help-message {
+  padding: 10px 12px;
+  border: 1px solid #b7d8c0;
+  border-radius: 6px;
+  background: #f0faf2;
+  color: #205b31 !important;
+  font-size: .9rem;
+  line-height: 1.4;
 }
 
 /* =========================================================

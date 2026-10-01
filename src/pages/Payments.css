@@ -2,7 +2,8 @@
 .payments-container { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 .payments-header { background: white; border-bottom: 1px solid #e2e7ee; }
 .payments-nav { min-height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.payments-logo { color: #092d68; font: 900 22px Georgia, serif; letter-spacing: 1.5px; text-decoration: none; }
+.payments-logo { display: block; width: 170px; }
+.payments-logo img { display: block; width: 100%; height: auto; }
 .payments-logo span { color: #c99a2e; font-size: 17px; }
 .payments-nav nav { display: flex; gap: 22px; }
 .payments-nav nav a { color: #26384f; font-size: 13px; font-weight: 700; text-decoration: none; }

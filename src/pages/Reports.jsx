@@ -110,7 +110,7 @@ export default function Reports() {
               color: "#ffffff",
             }}
           >
-            MABOTE GROUP REPORTS
+            MABOTE GROUP HOLDINGS REPORTS
           </h2>
 
           <p
@@ -500,7 +500,7 @@ export default function Reports() {
           fontWeight: "bold",
         }}
       >
-        MABOTE GROUP © 2026
+        MABOTE GROUP HOLDINGS © 2026
       </div>
     </section>
   );

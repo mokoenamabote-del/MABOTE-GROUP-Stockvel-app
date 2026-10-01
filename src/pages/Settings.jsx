@@ -1,23 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const initialStaff = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    role: "Admin",
-    email: "alice@mabote.com",
-    phone: "0823456789",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Bob Smith",
-    role: "Support Staff",
-    email: "bob@mabote.com",
-    phone: "0834567890",
-    status: "Active",
-  },
-];
+const initialStaff = [];
 
 const initialFormState = {
   name: "",
@@ -25,6 +8,20 @@ const initialFormState = {
   email: "",
   phone: "",
   status: "Active",
+};
+
+const initialBankingDetails = {
+  accountHolder: "MABOTE GROUP HOLDINGS",
+  bankName: "",
+  accountNumber: "",
+  branchCode: "",
+  accountType: "",
+};
+
+const initialPublicSettings = {
+  websiteVisible: true,
+  clientPortalVisible: true,
+  contactPageVisible: true,
 };
 
 export default function Settings() {
@@ -35,7 +32,10 @@ export default function Settings() {
 
     try {
       const saved = window.localStorage.getItem("mabote-staff");
-      return saved ? JSON.parse(saved) : initialStaff;
+      const savedStaff = saved ? JSON.parse(saved) : initialStaff;
+      return Array.isArray(savedStaff)
+        ? savedStaff
+        : initialStaff;
     } catch (error) {
       console.error("Unable to load staff:", error);
       return initialStaff;
@@ -71,6 +71,38 @@ export default function Settings() {
     }
   });
 
+  const [bankingDetails, setBankingDetails] = useState(() => {
+    if (typeof window === "undefined") {
+      return initialBankingDetails;
+    }
+
+    try {
+      const saved = window.localStorage.getItem("mabote-banking-details");
+      return saved
+        ? { ...initialBankingDetails, ...JSON.parse(saved) }
+        : initialBankingDetails;
+    } catch (error) {
+      console.error("Unable to load banking details:", error);
+      return initialBankingDetails;
+    }
+  });
+
+  const [publicSettings, setPublicSettings] = useState(() => {
+    if (typeof window === "undefined") {
+      return initialPublicSettings;
+    }
+
+    try {
+      const saved = window.localStorage.getItem("mabote-public-settings");
+      return saved
+        ? { ...initialPublicSettings, ...JSON.parse(saved) }
+        : initialPublicSettings;
+    } catch (error) {
+      console.error("Unable to load public settings:", error);
+      return initialPublicSettings;
+    }
+  });
+
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const [formState, setFormState] =
@@ -96,6 +128,24 @@ export default function Settings() {
     }
   }, [workflowSettings]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "mabote-banking-details",
+        JSON.stringify(bankingDetails)
+      );
+    }
+  }, [bankingDetails]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "mabote-public-settings",
+        JSON.stringify(publicSettings)
+      );
+    }
+  }, [publicSettings]);
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
 
@@ -107,6 +157,22 @@ export default function Settings() {
 
   const handleWorkflowChange = (setting) => {
     setWorkflowSettings((previous) => ({
+      ...previous,
+      [setting]: !previous[setting],
+    }));
+  };
+
+  const handleBankingChange = (event) => {
+    const { name, value } = event.target;
+
+    setBankingDetails((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const handlePublicSettingChange = (setting) => {
+    setPublicSettings((previous) => ({
       ...previous,
       [setting]: !previous[setting],
     }));
@@ -595,7 +661,72 @@ export default function Settings() {
           </div>
         </section>
 
+        {/* BANKING DETAILS */}
+
+        <section className="settings-section">
+          <div className="section-header">
+            <h3>Banking Details</h3>
+            <p>Manage the verified account shown on the public EFT payment page.</p>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="dashboard-grid">
+              {[
+                ["accountHolder", "Account holder"],
+                ["bankName", "Bank name"],
+                ["accountNumber", "Account number"],
+                ["branchCode", "Branch code"],
+                ["accountType", "Account type"],
+              ].map(([name, label]) => (
+                <label key={name}>
+                  <span>{label}</span>
+                  <input
+                    type="text"
+                    name={name}
+                    value={bankingDetails[name]}
+                    onChange={handleBankingChange}
+                    style={{ width: "100%", boxSizing: "border-box" }}
+                  />
+                </label>
+              ))}
+            </div>
+            <p style={{ marginBottom: 0, color: "#856404" }}>
+              EFT details appear publicly only after every field is completed.
+            </p>
+          </div>
+        </section>
+
         {/* WORKFLOW SETTINGS */}
+
+        {/* PUBLIC WEBSITE CONTROLS */}
+
+        <section className="settings-section">
+          <div className="section-header">
+            <h3>Public Website Controls</h3>
+            <p>Management can control which public experiences are available.</p>
+          </div>
+
+          <div className="dashboard-grid">
+            {[
+              ["websiteVisible", "Public website", "Allow visitors to view the home page."],
+              ["clientPortalVisible", "Client portal", "Allow members to enter the client portal."],
+              ["contactPageVisible", "Contact page", "Show public contact and support information."],
+            ].map(([setting, title, description]) => (
+              <article className="dashboard-card" key={setting}>
+                <h4>{title}</h4>
+                <p>{description}</p>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={publicSettings[setting]}
+                    onChange={() => handlePublicSettingChange(setting)}
+                  />
+                  <span>{publicSettings[setting] ? "Visible to the public" : "Hidden from the public"}</span>
+                </label>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <section className="settings-section">
           <div className="section-header">
@@ -725,7 +856,7 @@ export default function Settings() {
             <h3>🏢 System Information</h3>
 
             <p>
-              MABOTE GROUP Stockvel application
+              MABOTE GROUP HOLDINGS stockvel application
               information.
             </p>
           </div>
@@ -735,7 +866,7 @@ export default function Settings() {
               <h4>Organisation</h4>
               <p>
                 <strong>
-                  MABOTE GROUP
+                  MABOTE GROUP HOLDINGS
                 </strong>
               </p>
               <p>

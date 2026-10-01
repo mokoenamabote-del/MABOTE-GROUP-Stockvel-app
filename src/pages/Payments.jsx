@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Payments.css";
 
@@ -6,13 +6,30 @@ const whatsappLink = "https://wa.me/27663331151";
 const contactEmail = "info@mabotegroup.co.za";
 
 export default function Payments() {
+  const [bankingDetails] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem("mabote-banking-details");
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      return null;
+    }
+  });
+
+  const hasConfirmedBankingDetails = [
+    "accountHolder",
+    "bankName",
+    "accountNumber",
+    "branchCode",
+    "accountType",
+  ].every((field) => bankingDetails?.[field]?.trim());
+
   const printDebitOrderForm = () => window.print();
 
   return (
     <div className="payments-page">
       <header className="payments-header screen-payment-only">
         <div className="payments-container payments-nav">
-          <Link to="/" className="payments-logo">MABOTE <span>GROUP</span></Link>
+          <Link to="/" className="payments-logo"><img src="/mabote-logo.svg" alt="MABOTE GROUP HOLDINGS" /></Link>
           <nav>
             <Link to="/">Home</Link>
             <Link to="/packages">Packages</Link>
@@ -34,20 +51,22 @@ export default function Payments() {
           <article className="payment-panel">
             <span className="payment-number">01</span>
             <h2>EFT payment</h2>
-            <p>Make your transfer using the official MABOTE GROUP banking details supplied by an administrator.</p>
+            <p>Make your transfer using the official MABOTE GROUP HOLDINGS banking details supplied by an administrator.</p>
             <div className="eft-details">
-              <div><span>Account holder</span><strong>MABOTE GROUP</strong></div>
-              <div><span>Bank</span><strong>To be confirmed by administrator</strong></div>
-              <div><span>Account number</span><strong>Request from administrator</strong></div>
+              <div><span>Account holder</span><strong>{hasConfirmedBankingDetails ? bankingDetails.accountHolder : "MABOTE GROUP HOLDINGS"}</strong></div>
+              <div><span>Bank</span><strong>{hasConfirmedBankingDetails ? bankingDetails.bankName : "To be confirmed by administrator"}</strong></div>
+              <div><span>Account number</span><strong>{hasConfirmedBankingDetails ? bankingDetails.accountNumber : "Request from administrator"}</strong></div>
+              <div><span>Branch code</span><strong>{hasConfirmedBankingDetails ? bankingDetails.branchCode : "Request from administrator"}</strong></div>
+              <div><span>Account type</span><strong>{hasConfirmedBankingDetails ? bankingDetails.accountType : "To be confirmed by administrator"}</strong></div>
               <div><span>Reference</span><strong>Your name + application number</strong></div>
             </div>
-            <p className="payment-note">Please do not pay into an account until the bank details have been confirmed directly by MABOTE GROUP.</p>
+            <p className="payment-note">{hasConfirmedBankingDetails ? "Please use the account details above and include your name and application number as the payment reference." : "Please do not pay into an account until the bank details have been confirmed directly by MABOTE GROUP HOLDINGS."}</p>
           </article>
 
           <article className="payment-panel">
             <span className="payment-number">02</span>
             <h2>Debit order</h2>
-            <p>Complete the mandate below and send it to the MABOTE GROUP administrator for verification and processing.</p>
+            <p>Complete the mandate below and send it to the MABOTE GROUP HOLDINGS administrator for verification and processing.</p>
             <button type="button" className="payment-action" onClick={printDebitOrderForm}>Print debit-order form</button>
             <p className="payment-note">The debit order will only be activated after the mandate is reviewed and approved.</p>
           </article>
@@ -64,7 +83,7 @@ export default function Payments() {
         <section className="debit-order-document printable-payment-document">
           <div className="debit-order-heading">
             <div>
-              <p className="payments-eyebrow">MABOTE GROUP</p>
+              <p className="payments-eyebrow">MABOTE GROUP HOLDINGS</p>
               <h2>Debit Order Request Form</h2>
               <p>Stockvel & funeral grocery scheme</p>
             </div>
@@ -88,7 +107,7 @@ export default function Payments() {
 
           <div className="mandate-section">
             <h3>3. Debit-order authorisation</h3>
-            <p>I authorise MABOTE GROUP to submit debit-order instructions to my bank for the agreed membership contribution and registration fee where applicable. I understand that this instruction is subject to verification and acceptance by my bank.</p>
+            <p>I authorise MABOTE GROUP HOLDINGS to submit debit-order instructions to my bank for the agreed membership contribution and registration fee where applicable. I understand that this instruction is subject to verification and acceptance by my bank.</p>
             <div className="mandate-fields amount-fields">
               <label>Monthly amount (R)<span></span></label>
               <label>First collection date<span></span></label>

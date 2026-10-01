@@ -58,7 +58,7 @@ export default function Membership() {
         <section className="membership-hero">
           <div className="membership-container membership-hero-content">
             <div>
-              <span className="membership-eyebrow">JOIN MABOTE GROUP</span>
+              <span className="membership-eyebrow">JOIN MABOTE GROUP HOLDINGS</span>
               <h1>Become a <span>Member</span></h1>
               <p>
                 Join a community-focused funeral grocery stockvel designed to help members prepare
@@ -73,7 +73,7 @@ export default function Membership() {
 
             <div className="membership-hero-card">
               <div className="hero-card-icon">MG</div>
-              <h3>MABOTE GROUP</h3>
+              <h3>MABOTE GROUP HOLDINGS</h3>
               <p>Funeral Grocery Stockvel</p>
               <div className="hero-card-line"></div>
               <strong>Plan Ahead • Share Today • Support Tomorrow</strong>
@@ -88,7 +88,7 @@ export default function Membership() {
               <div>
                 <span>REGISTRATION FEE</span>
                 <h2>R80</h2>
-                <p>A once-off registration fee is required when joining MABOTE GROUP.</p>
+                <p>A once-off registration fee is required when joining MABOTE GROUP HOLDINGS.</p>
               </div>
               <Link to="/register" className="fee-button">Start Registration</Link>
             </div>
@@ -121,7 +121,7 @@ export default function Membership() {
               <span className="section-label">MEMBERSHIP</span>
               <h2>Who can join?</h2>
               <p>
-                MABOTE GROUP is designed for individuals and community members who want to prepare
+                MABOTE GROUP HOLDINGS is designed for individuals and community members who want to prepare
                 for funeral-related grocery support through a structured stockvel arrangement.
               </p>
               <ul>

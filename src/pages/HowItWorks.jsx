@@ -61,12 +61,12 @@ export default function HowItWorks() {
               <span className="eyebrow">HOW IT WORKS</span>
               <h1>Simple steps for a safer future.</h1>
               <p>
-                MABOTE GROUP makes membership simple and clear so members can prepare in a
+                MABOTE GROUP HOLDINGS makes membership simple and clear so members can prepare in a
                 structured, organised way.
               </p>
               <div className="hero-actions">
                 <Link to="/register" className="primary-link">Become a Member</Link>
-                <Link to="/packages" className="outline-link">View Packages</Link>
+                <Link to="/register" className="outline-link">Apply Now</Link>
               </div>
             </div>
 

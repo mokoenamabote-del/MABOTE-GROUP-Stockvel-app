@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiRequest } from "../lib/api";
 
 const BLUE = "#062A63";
 const DARK_BLUE = "#041D45";
@@ -15,19 +16,50 @@ export default function Members() {
     loadApplications();
   }, []);
 
-  const loadApplications = () => {
+  const loadApplications = async () => {
     try {
-      const saved = JSON.parse(
+      const result = await apiRequest("/api/applications");
+      const remoteApplications = Array.isArray(result.applications)
+        ? result.applications
+        : [];
+      const localApplications = JSON.parse(
         localStorage.getItem("maboteApplications") || "[]"
       );
+      const mergedApplications = [
+        ...remoteApplications,
+        ...(Array.isArray(localApplications) ? localApplications : []).filter(
+          (localApplication) =>
+            !remoteApplications.some(
+              (remoteApplication) =>
+                remoteApplication.applicationNumber ===
+                localApplication.applicationNumber
+            )
+        ),
+      ];
 
-      setApplications(Array.isArray(saved) ? saved : []);
+      setApplications(mergedApplications);
     } catch (error) {
-      setApplications([]);
+      try {
+        const saved = JSON.parse(
+          localStorage.getItem("maboteApplications") || "[]"
+        );
+        setApplications(Array.isArray(saved) ? saved : []);
+      } catch {
+        setApplications([]);
+      }
     }
   };
 
-  const updateApplication = (applicationNumber, changes) => {
+  const updateApplication = async (applicationNumber, changes) => {
+    try {
+      await apiRequest(`/api/applications/${applicationNumber}`, {
+        method: "PATCH",
+        body: JSON.stringify(changes),
+      });
+    } catch (error) {
+      console.error("Unable to update application on the server:", error);
+    }
+
     const updated = applications.map((application) =>
       application.applicationNumber === applicationNumber
         ? { ...application, ...changes }
@@ -42,7 +74,7 @@ export default function Members() {
     );
   };
 
-  const updateStatus = (applicationNumber, newStatus) => {
+  const updateStatus = async (applicationNumber, newStatus) => {
     const member = applications.find(
       (application) =>
         application.applicationNumber === applicationNumber
@@ -154,31 +186,31 @@ export default function Members() {
       changes.policyStatus = "Not Active";
     }
 
-    updateApplication(
+    await updateApplication(
       applicationNumber,
       changes
     );
 
     if (newStatus === "Approved") {
       setResponseMessage(
-        `Dear ${fullName || "Member"}, your MABOTE GROUP membership application has been approved. Your application reference is ${applicationNumber}. Your policy is now active. Welcome to MABOTE GROUP.`
+        `Dear ${fullName || "Member"}, your MABOTE GROUP HOLDINGS membership application has been approved. Your application reference is ${applicationNumber}. Your policy is now active. Welcome to MABOTE GROUP HOLDINGS.`
       );
     }
 
     if (newStatus === "Rejected") {
       setResponseMessage(
-        `Dear ${fullName || "Member"}, we regret to inform you that your MABOTE GROUP membership application has not been approved at this time. Your application reference is ${applicationNumber}. Please contact MABOTE GROUP for further information.`
+        `Dear ${fullName || "Member"}, we regret to inform you that your MABOTE GROUP HOLDINGS membership application has not been approved at this time. Your application reference is ${applicationNumber}. Please contact MABOTE GROUP HOLDINGS for further information.`
       );
     }
 
     setSelectedMember(null);
   };
 
-  const updatePolicyStatus = (
+  const updatePolicyStatus = async (
     applicationNumber,
     policyStatus
   ) => {
-    updateApplication(
+    await updateApplication(
       applicationNumber,
       { policyStatus }
     );
@@ -319,7 +351,7 @@ export default function Members() {
       >
         <div>
           <h1 style={{ margin: 0 }}>
-            MABOTE GROUP
+            MABOTE GROUP HOLDINGS
           </h1>
 
           <p

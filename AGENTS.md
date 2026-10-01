@@ -1,7 +1,7 @@
-# AI Agent Instructions for MABOTE GROUP Stockvel App
+# AI Agent Instructions for MABOTE GROUP HOLDINGS Stockvel App
 
 ## Purpose
-This repository contains the skeleton of a frontend stockvel app for MABOTE GROUP. The app currently includes a README and placeholder `src` files, but source content and package metadata are not present.
+This repository contains the skeleton of a frontend stockvel app for MABOTE GROUP HOLDINGS. The app currently includes a README and placeholder `src` files, but source content and package metadata are not present.
 
 ## Key project areas
 - `README.md` — high-level app purpose and feature list.

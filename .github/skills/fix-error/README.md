@@ -1,6 +1,6 @@
 # fix-error Skill
 
-This skill is designed to help diagnose and resolve runtime, build, or syntax errors in the MABOTE GROUP Stockvel app repository.
+This skill is designed to help diagnose and resolve runtime, build, or syntax errors in the MABOTE GROUP HOLDINGS Stockvel app repository.
 
 ## What it does
 

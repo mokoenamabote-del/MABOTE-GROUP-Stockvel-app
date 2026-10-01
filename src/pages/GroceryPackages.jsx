@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "./GroceryPackages.css";
 
 const FULL_GROCERY = {
   catering: [
@@ -164,284 +166,169 @@ export default function GroceryPackages() {
   };
 
   return (
-    <section className="home-page">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "20px",
-          flexWrap: "wrap",
-          marginBottom: "25px",
-        }}
-      >
-        <div>
-          <h2 style={{ marginBottom: "8px" }}>
-            Grocery Packages
-          </h2>
+    <section className="grocery-page">
+      <header className="grocery-header">
+        <div className="grocery-container grocery-header-inner">
+          <Link to="/" className="grocery-brand" aria-label="MABOTE home">
+            <span className="grocery-brand-mark">MG</span>
+            <span className="grocery-brand-copy">
+              <strong>MABOTE</strong>
+              <small>GROUP</small>
+            </span>
+          </Link>
 
-          <p style={{ margin: 0 }}>
-            MABOTE GROUP funeral grocery packages,
-            catering support and package distribution.
-          </p>
-        </div>
+          <nav className="grocery-nav">
+            <Link to="/">Home</Link>
+            <Link to="/about">About Us</Link>
+            <Link to="/packages" className="active">Packages</Link>
+            <Link to="/how-it-works">How It Works</Link>
+            <Link to="/membership">Membership</Link>
+            <Link to="/contact">Contact</Link>
+          </nav>
 
-        <div
-          style={{
-            padding: "12px 18px",
-            borderRadius: "10px",
-            background: "#f4f6f8",
-            fontWeight: "600",
-          }}
-        >
-          3 Active Packages
-        </div>
-      </div>
-
-      <div className="dashboard-grid">
-        {packages.map((pkg) => (
-          <article
-            className="dashboard-card package-card"
-            key={pkg.name}
-          >
-            <div
-              className="package-watermark"
-              aria-hidden="true"
-            >
-              {pkg.watermarkItems.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <span
-                style={{
-                  fontWeight: "700",
-                  fontSize: "14px",
-                  opacity: 0.7,
-                }}
-              >
-                {pkg.shortName}
-              </span>
-
-              <span
-                style={{
-                  padding: "5px 10px",
-                  borderRadius: "20px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  background: "#e8f5e9",
-                  color: "#2e7d32",
-                }}
-              >
-                ACTIVE
-              </span>
-            </div>
-
-            <h3>{pkg.name}</h3>
-
-            <p className="metric-value">
-              {pkg.price}
-            </p>
-
-            <p>{pkg.description}</p>
-
-            <h4>Package Includes</h4>
-
-            {pkg.sections.map((section) => (
-              <div
-                key={section.title}
-                style={{
-                  marginBottom: "15px",
-                }}
-              >
-                <strong>{section.title}</strong>
-
-                <ul>
-                  {section.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-
-            {pkg.extras.length > 0 && (
-              <div>
-                <h4>Additional Package Benefits</h4>
-
-                <ul>
-                  {pkg.extras.map((item) => (
-                    <li key={item}>
-                      <strong>{item}</strong>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={() =>
-                setSelectedPackage(pkg)
-              }
-            >
-              View Package
-            </button>
-          </article>
-        ))}
-      </div>
-
-      {selectedPackage && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "20px",
-            zIndex: 1000,
-            overflowY: "auto",
-          }}
-          onClick={closePackage}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "650px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              background: "#ffffff",
-              borderRadius: "14px",
-              padding: "30px",
-              boxShadow:
-                "0 20px 50px rgba(0,0,0,0.25)",
-            }}
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "15px",
-              }}
-            >
-              <div>
-                <h2 style={{ margin: 0 }}>
-                  {selectedPackage.name}
-                </h2>
-
-                <p
-                  style={{
-                    marginBottom: 0,
-                  }}
-                >
-                  {selectedPackage.description}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={closePackage}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                }}
-                aria-label="Close package"
-              >
-                ×
-              </button>
-            </div>
-
-            <hr
-              style={{
-                margin: "20px 0",
-              }}
-            />
-
-            <h3>Package Price</h3>
-
-            <p
-              style={{
-                fontSize: "28px",
-                fontWeight: "700",
-                marginTop: "5px",
-                color: "#071a52",
-              }}
-            >
-              {selectedPackage.price}
-            </p>
-
-            {selectedPackage.sections.map(
-              (section) => (
-                <div
-                  key={section.title}
-                  style={{
-                    marginBottom: "20px",
-                  }}
-                >
-                  <h3>{section.title}</h3>
-
-                  <ul>
-                    {section.items.map(
-                      (item) => (
-                        <li key={item}>
-                          {item}
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </div>
-              )
-            )}
-
-            {selectedPackage.extras.length >
-              0 && (
-              <div>
-                <h3>
-                  Additional Package Benefits
-                </h3>
-
-                <ul>
-                  {selectedPackage.extras.map(
-                    (item) => (
-                      <li key={item}>
-                        <strong>
-                          {item}
-                        </strong>
-                      </li>
-                    )
-                  )}
-                </ul>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={closePackage}
-              style={{
-                marginTop: "15px",
-              }}
-            >
-              Close
-            </button>
+          <div className="grocery-actions">
+            <Link to="/login" className="grocery-login">Member Login</Link>
+            <Link to="/register" className="grocery-join">Join Now</Link>
           </div>
         </div>
-      )}
+      </header>
+
+      <section className="grocery-hero">
+        <div className="grocery-container grocery-hero-inner">
+          <div>
+            <span className="grocery-kicker">Membership Plans</span>
+            <h1>
+              Choose a <span>plan</span> that fits your future.
+            </h1>
+            <p>
+              MABOTE GROUP HOLDINGS offers structured funeral grocery membership plans designed to help families prepare with clarity, order and confidence.
+            </p>
+
+            <div className="grocery-hero-actions">
+              <Link to="/register" className="grocery-cta">Apply Now</Link>
+              <Link to="/membership" className="grocery-login">View Membership</Link>
+            </div>
+          </div>
+
+          <div className="grocery-hero-card">
+            <div className="card-mark">MG</div>
+            <h3>Funeral Grocery Stockvel</h3>
+            <p>Plan ahead with practical support for families and communities.</p>
+          </div>
+        </div>
+      </section>
+
+      <main className="grocery-container grocery-main">
+        <div className="grocery-summary">
+          <div>
+            <h2>Our package offerings</h2>
+            <p>Transparent plans built around preparation, support and practical household care.</p>
+          </div>
+
+          <div className="grocery-pill">3 Active Packages</div>
+        </div>
+
+        <div className="grocery-grid">
+          {packages.map((pkg) => (
+            <article className="grocery-card" key={pkg.name}>
+              <div className="watermark" aria-hidden="true">
+                {pkg.watermarkItems.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
+
+              <div className="grocery-card-top">
+                <span>{pkg.shortName}</span>
+                <strong>✓</strong>
+              </div>
+
+              <h3>{pkg.name}</h3>
+              <p className="price">{pkg.price}</p>
+              <p>{pkg.description}</p>
+
+              <h4>Package Includes</h4>
+
+              {pkg.sections.map((section) => (
+                <div key={section.title} style={{ marginBottom: "12px" }}>
+                  <strong>{section.title}</strong>
+                  <ul>
+                    {section.items.slice(0, 3).map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+
+              {pkg.extras.length > 0 && (
+                <div>
+                  <h4>Additional Benefits</h4>
+                  <ul>
+                    {pkg.extras.map((item) => (
+                      <li key={item}><strong>{item}</strong></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="grocery-card-actions">
+                <button type="button" className="grocery-view" onClick={() => setSelectedPackage(pkg)}>
+                  View Details
+                </button>
+                <Link to="/register" className="grocery-apply">Apply</Link>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {selectedPackage && (
+          <div className="grocery-modal" onClick={closePackage}>
+            <div className="grocery-modal-panel" onClick={(event) => event.stopPropagation()}>
+              <div className="grocery-modal-header">
+                <div>
+                  <h2>{selectedPackage.name}</h2>
+                  <p>{selectedPackage.description}</p>
+                </div>
+
+                <button type="button" className="grocery-close" onClick={closePackage} aria-label="Close package">
+                  ×
+                </button>
+              </div>
+
+              <div className="grocery-modal-body">
+                <h3>Package Price</h3>
+                <p className="modal-price">{selectedPackage.price}</p>
+
+                {selectedPackage.sections.map((section) => (
+                  <div key={section.title}>
+                    <h3>{section.title}</h3>
+                    <ul>
+                      {section.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+
+                {selectedPackage.extras.length > 0 && (
+                  <div>
+                    <h3>Additional Benefits</h3>
+                    <ul>
+                      {selectedPackage.extras.map((item) => (
+                        <li key={item}><strong>{item}</strong></li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className="grocery-modal-footer">
+                <button type="button" className="grocery-view" onClick={closePackage}>Close</button>
+                <Link to="/register" className="grocery-apply" onClick={closePackage}>Apply Now</Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
     </section>
   );
 }
