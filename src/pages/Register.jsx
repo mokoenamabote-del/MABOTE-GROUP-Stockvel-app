@@ -56,7 +56,7 @@ export default function Register() {
         }),
       });
 
-      alert("MABOTE GROUP PTY(LTD) account created successfully. You can now log in.");
+      alert("MABOTE GROUP HOLDINGS account created successfully. You can now log in.");
       navigate("/login");
     } catch (error) {
       alert(error.message);
@@ -94,7 +94,7 @@ export default function Register() {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "12px", letterSpacing: "2px", color: "#d9b553", fontWeight: 800 }}>MABOTE GROUP PTY(LTD)</div>
+          <div style={{ fontSize: "12px", letterSpacing: "2px", color: "#d9b553", fontWeight: 800 }}>MABOTE GROUP HOLDINGS</div>
           <h1 style={{ margin: "12px 0 0", fontSize: "2.2rem", letterSpacing: "-1px" }}>Create Your Account</h1>
         </div>
 
@@ -124,12 +124,12 @@ export default function Register() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
               <div>
                 <label htmlFor="password" style={{ display: "block", marginBottom: "8px", fontWeight: 700, color: "#163465" }}>Password</label>
-                <input id="password" type={showPassword ? "text" : "password"} placeholder="Create password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" minLength={6} required style={inputStyle} />
+                <input id="password" type={showPassword ? "text" : "password"} placeholder="Create password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" minLength={8} required style={inputStyle} />
               </div>
 
               <div>
                 <label htmlFor="confirmPassword" style={{ display: "block", marginBottom: "8px", fontWeight: 700, color: "#163465" }}>Confirm Password</label>
-                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={6} required style={inputStyle} />
+                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={8} required style={inputStyle} />
               </div>
             </div>
 
