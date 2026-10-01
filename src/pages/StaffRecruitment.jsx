@@ -57,7 +57,7 @@ export default function StaffRecruitment() {
         <section className="printable-document recruitment-document active-document">
           <div className="document-heading">
             <div>
-              <p className="brand-kicker">MABOTE GROUP HOLDINGS</p>
+              <p className="brand-kicker">MABOTE GROUP PTY(LTD)</p>
               <h2>Agent Recruitment Form</h2>
               <p>Human resource recruitment application</p>
             </div>
@@ -106,7 +106,7 @@ export default function StaffRecruitment() {
 
           <section className="form-section declaration-section">
             <h3>7. Declaration</h3>
-            <p>I confirm that the information provided in this recruitment form is complete and accurate. I understand that MABOTE GROUP HOLDINGS may verify my information as part of the recruitment process.</p>
+            <p>I confirm that the information provided in this recruitment form is complete and accurate. I understand that MABOTE GROUP PTY(LTD) may verify my information as part of the recruitment process.</p>
             <p className="checkbox-line">□ I accept the declaration and consent to screening.</p>
             <div className="signature-grid">
               <div>Applicant signature <BlankLines /></div>
@@ -117,10 +117,10 @@ export default function StaffRecruitment() {
           <div className="document-contact">
             <div>
               <strong>WhatsApp: {whatsappNumber}</strong>
-              <a href={whatsappLink} target="_blank" rel="noreferrer">Chat with MABOTE GROUP HOLDINGS on WhatsApp</a>
+              <a href={whatsappLink} target="_blank" rel="noreferrer">Chat with MABOTE GROUP PTY(LTD) on WhatsApp</a>
               <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
             </div>
-            <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP HOLDINGS on WhatsApp" />
+            <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP PTY(LTD) on WhatsApp" />
           </div>
           <p className="document-footer">For HR use: Reviewed by ____________________ Date ____________________</p>
         </section>

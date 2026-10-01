@@ -62,7 +62,7 @@ export default function Home() {
               </div>
 
               <span className="hero-label">
-                MABOTE GROUP HOLDINGS
+                MABOTE GROUP PTY(LTD)
               </span>
 
               <h1>
@@ -131,7 +131,7 @@ export default function Home() {
                 <div className="hero-card-top">
                   <div>
                     <span className="small-label">
-                      MABOTE GROUP HOLDINGS
+                      MABOTE GROUP PTY(LTD)
                     </span>
 
                     <strong>
@@ -217,7 +217,7 @@ export default function Home() {
 
               <div className="section-heading">
 
-                <span>WELCOME TO MABOTE GROUP HOLDINGS</span>
+                <span>WELCOME TO MABOTE GROUP PTY(LTD)</span>
 
                 <h2>
                   Planning for tomorrow
@@ -229,7 +229,7 @@ export default function Home() {
 
               <div className="intro-copy">
                 <p>
-                  MABOTE GROUP HOLDINGS is built around a simple principle:
+                  MABOTE GROUP PTY(LTD) is built around a simple principle:
                   families should have an opportunity to prepare
                   before difficult circumstances arise.
                 </p>
@@ -242,7 +242,7 @@ export default function Home() {
                 </p>
 
                 <Link to="/about" className="text-link">
-                  Learn More About MABOTE GROUP HOLDINGS →
+                  Learn More About MABOTE GROUP PTY(LTD) →
                 </Link>
               </div>
 
@@ -347,7 +347,7 @@ export default function Home() {
               </h2>
 
               <p>
-                MABOTE GROUP HOLDINGS brings together practical membership
+                MABOTE GROUP PTY(LTD) brings together practical membership
                 options designed around preparation, planning and
                 funeral grocery support.
               </p>
@@ -436,7 +436,7 @@ export default function Home() {
 
               <div className="why-title">
 
-                <span>WHY MABOTE GROUP HOLDINGS?</span>
+                <span>WHY MABOTE GROUP PTY(LTD)?</span>
 
                 <h2>
                   Built around
@@ -539,7 +539,7 @@ export default function Home() {
               </h2>
 
               <p>
-                Explore the available MABOTE GROUP HOLDINGS funeral grocery
+                Explore the available MABOTE GROUP PTY(LTD) funeral grocery
                 membership packages and review the applicable
                 benefits and requirements.
               </p>
@@ -850,7 +850,7 @@ export default function Home() {
               </h2>
 
               <p>
-                Becoming a MABOTE GROUP HOLDINGS member follows a simple
+                Becoming a MABOTE GROUP PTY(LTD) member follows a simple
                 process designed to make registration and
                 membership easier to understand.
               </p>
@@ -944,7 +944,7 @@ export default function Home() {
               <span>OUR APPROACH</span>
 
               <h2>
-                What MABOTE GROUP HOLDINGS
+                What MABOTE GROUP PTY(LTD)
                 <br />
                 <strong>stands for.</strong>
               </h2>
@@ -1013,7 +1013,7 @@ export default function Home() {
                 <br />
                 Your preparation.
                 <br />
-                <strong>Your MABOTE GROUP HOLDINGS.</strong>
+                <strong>Your MABOTE GROUP PTY(LTD).</strong>
               </h2>
 
               <p>
@@ -1054,7 +1054,7 @@ export default function Home() {
             <div className="home-whatsapp-link">
               <span className="whatsapp-qr-mark">WA</span>
               <span>
-                <strong>Chat with MABOTE GROUP HOLDINGS</strong>
+                <strong>Chat with MABOTE GROUP PTY(LTD)</strong>
                 <small>WhatsApp us on 0663331151</small>
                 <small>{contactEmail}</small>
               </span>
@@ -1136,7 +1136,7 @@ export default function Home() {
           <div className="home-container footer-bottom-inner">
 
             <p>
-              © {new Date().getFullYear()} MABOTE GROUP HOLDINGS.
+              © {new Date().getFullYear()} MABOTE GROUP PTY(LTD).
               All rights reserved.
             </p>
 

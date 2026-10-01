@@ -201,7 +201,7 @@ export default function GroceryPackages() {
               Choose a <span>plan</span> that fits your future.
             </h1>
             <p>
-              MABOTE GROUP HOLDINGS offers structured funeral grocery membership plans designed to help families prepare with clarity, order and confidence.
+              MABOTE GROUP PTY(LTD) offers structured funeral grocery membership plans designed to help families prepare with clarity, order and confidence.
             </p>
 
             <div className="grocery-hero-actions">

@@ -14,7 +14,7 @@ export default function Contact() {
       <div className="contact-container">
 
         <div className="contact-heading">
-          <span>CONTACT MABOTE GROUP HOLDINGS</span>
+          <span>CONTACT MABOTE GROUP PTY(LTD)</span>
 
           <h1>
             We are here to
@@ -24,7 +24,7 @@ export default function Contact() {
 
           <p>
             Have a question about membership, packages or
-            how MABOTE GROUP HOLDINGS works? Send us a message and
+            how MABOTE GROUP PTY(LTD) works? Send us a message and
             our team will assist you.
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function Contact() {
 
               <div>
                 <h3>Phone</h3>
-                <p>Contact MABOTE GROUP HOLDINGS for assistance.</p>
+                <p>Contact MABOTE GROUP PTY(LTD) for assistance.</p>
                 <a href="tel:+27663331151">
                   +27 66 333 1151
                 </a>
@@ -63,7 +63,7 @@ export default function Contact() {
               <div>
                 <h3>Location</h3>
                 <p>
-                  MABOTE GROUP HOLDINGS
+                  MABOTE GROUP PTY(LTD)
                   <br />
                   South Africa
                 </p>
@@ -102,7 +102,7 @@ export default function Contact() {
                 <h3>Message Received</h3>
 
                 <p>
-                  Thank you for contacting MABOTE GROUP HOLDINGS.
+                  Thank you for contacting MABOTE GROUP PTY(LTD).
                   Your enquiry has been submitted.
                 </p>
 

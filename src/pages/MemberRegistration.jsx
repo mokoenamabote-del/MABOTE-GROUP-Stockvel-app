@@ -204,7 +204,7 @@ export default function MemberRegistration() {
     }
 
     console.log(
-      "MABOTE GROUP HOLDINGS Member Application:",
+      "MABOTE GROUP PTY(LTD) Member Application:",
       newMemberApplication
     );
 
@@ -290,7 +290,7 @@ export default function MemberRegistration() {
             letterSpacing: "2px",
           }}
         >
-          MABOTE GROUP HOLDINGS
+          MABOTE GROUP PTY(LTD)
         </h1>
 
         <p
@@ -352,7 +352,7 @@ export default function MemberRegistration() {
             >
               Please complete the
               information below to
-              register as a MABOTE GROUP HOLDINGS
+              register as a MABOTE GROUP PTY(LTD)
               member.
             </p>
 
@@ -1240,7 +1240,7 @@ export default function MemberRegistration() {
               >
                 Thank you for
                 applying to become
-                a MABOTE GROUP HOLDINGS
+                a MABOTE GROUP PTY(LTD)
                 member.
               </p>
 
@@ -1313,7 +1313,7 @@ export default function MemberRegistration() {
                     "#071a52",
                 }}
               >
-                MABOTE GROUP HOLDINGS
+                MABOTE GROUP PTY(LTD)
               </h2>
 
               <h3
@@ -1546,7 +1546,7 @@ export default function MemberRegistration() {
             "bold",
         }}
       >
-        MABOTE GROUP HOLDINGS © 2026
+        MABOTE GROUP PTY(LTD) © 2026
       </div>
     </div>
   );

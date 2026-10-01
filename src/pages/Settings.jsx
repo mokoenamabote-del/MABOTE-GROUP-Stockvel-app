@@ -11,7 +11,7 @@ const initialFormState = {
 };
 
 const initialBankingDetails = {
-  accountHolder: "MABOTE GROUP HOLDINGS",
+  accountHolder: "MABOTE GROUP PTY(LTD)",
   bankName: "",
   accountNumber: "",
   branchCode: "",
@@ -856,7 +856,7 @@ export default function Settings() {
             <h3>🏢 System Information</h3>
 
             <p>
-              MABOTE GROUP HOLDINGS stockvel application
+              MABOTE GROUP PTY(LTD) stockvel application
               information.
             </p>
           </div>
@@ -866,7 +866,7 @@ export default function Settings() {
               <h4>Organisation</h4>
               <p>
                 <strong>
-                  MABOTE GROUP HOLDINGS
+                  MABOTE GROUP PTY(LTD)
                 </strong>
               </p>
               <p>

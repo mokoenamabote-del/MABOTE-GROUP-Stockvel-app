@@ -103,7 +103,7 @@ export default function AdminDashboard() {
   const quickActions = [
     {
       title: "Members",
-      description: "Manage MABOTE GROUP HOLDINGS members.",
+      description: "Manage MABOTE GROUP PTY(LTD) members.",
       button: "OPEN MEMBERS",
       path: "/members",
     },
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Member Application",
-      description: "Register a new MABOTE GROUP HOLDINGS member.",
+      description: "Register a new MABOTE GROUP PTY(LTD) member.",
       button: "NEW APPLICATION",
       path: "/member-registration",
     },
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
             <div className="admin-brand-block">
               <div className="admin-brand-mark">MG</div>
               <div>
-                <h1>MABOTE GROUP HOLDINGS</h1>
+                <h1>MABOTE GROUP PTY(LTD)</h1>
                 <p>Admin dashboard</p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
           <div className="summary-card">
             <h3>Monthly summary</h3>
             <p>
-              MABOTE GROUP HOLDINGS is currently managing <strong>{memberCount}</strong> members with <strong>{totalCollections}</strong> recorded collections.
+              MABOTE GROUP PTY(LTD) is currently managing <strong>{memberCount}</strong> members with <strong>{totalCollections}</strong> recorded collections.
             </p>
             <p>
               Total recorded contributions: <strong>{formatCurrency(collectedAmount)}</strong>

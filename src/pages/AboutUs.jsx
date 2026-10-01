@@ -11,7 +11,7 @@ export default function About() {
         <div className="about-logo">
           <span className="about-logo-mark">MG</span>
           <div>
-            <strong>MABOTE GROUP HOLDINGS</strong>
+            <strong>MABOTE GROUP PTY(LTD)</strong>
             <small>Funeral Grocery Stockvel</small>
           </div>
         </div>
@@ -34,7 +34,7 @@ export default function About() {
       {/* HERO */}
       <section className="about-hero">
         <div className="about-hero-content">
-          <span className="about-kicker">ABOUT MABOTE GROUP HOLDINGS</span>
+          <span className="about-kicker">ABOUT MABOTE GROUP PTY(LTD)</span>
 
           <h1>
             Preparing today
@@ -43,7 +43,7 @@ export default function About() {
           </h1>
 
           <p>
-            MABOTE GROUP HOLDINGS is a community-focused funeral grocery stockvel
+            MABOTE GROUP PTY(LTD) is a community-focused funeral grocery stockvel
             designed to help members prepare for important family needs
             through structured membership and grocery support.
           </p>
@@ -61,7 +61,7 @@ export default function About() {
 
         <div className="about-hero-card">
           <div className="about-monogram">MG</div>
-          <h3>MABOTE GROUP HOLDINGS</h3>
+          <h3>MABOTE GROUP PTY(LTD)</h3>
           <p>Plan Ahead • Share Today • Support Tomorrow</p>
         </div>
       </section>
@@ -76,7 +76,7 @@ export default function About() {
         <div className="about-two-column">
           <div>
             <p>
-              MABOTE GROUP HOLDINGS provides a structured funeral grocery stockvel
+              MABOTE GROUP PTY(LTD) provides a structured funeral grocery stockvel
               approach for individuals and families who want to prepare
               financially and practically for funeral-related grocery needs.
             </p>
@@ -189,7 +189,7 @@ export default function About() {
           </h2>
 
           <p>
-            From joining MABOTE GROUP HOLDINGS to managing your membership and
+            From joining MABOTE GROUP PTY(LTD) to managing your membership and
             understanding available support, our goal is to keep the process
             straightforward and easy to understand.
           </p>
@@ -233,7 +233,7 @@ export default function About() {
         </h2>
 
         <p>
-          Explore our packages or start your MABOTE GROUP HOLDINGS membership today.
+          Explore our packages or start your MABOTE GROUP PTY(LTD) membership today.
         </p>
 
         <div>
@@ -242,7 +242,7 @@ export default function About() {
           </Link>
 
           <Link to="/register" className="gold-btn">
-            Join MABOTE GROUP HOLDINGS
+            Join MABOTE GROUP PTY(LTD)
           </Link>
         </div>
       </section>
@@ -250,7 +250,7 @@ export default function About() {
       {/* FOOTER */}
       <footer className="about-footer">
         <div>
-          <strong>MABOTE GROUP HOLDINGS</strong>
+          <strong>MABOTE GROUP PTY(LTD)</strong>
           <p>Funeral Grocery Stockvel</p>
         </div>
 
@@ -264,7 +264,7 @@ export default function About() {
         </div>
 
         <p className="copyright">
-          © {new Date().getFullYear()} MABOTE GROUP HOLDINGS. All rights reserved.
+          © {new Date().getFullYear()} MABOTE GROUP PTY(LTD). All rights reserved.
         </p>
       </footer>
 

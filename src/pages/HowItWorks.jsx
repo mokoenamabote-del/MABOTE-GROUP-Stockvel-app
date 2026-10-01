@@ -61,7 +61,7 @@ export default function HowItWorks() {
               <span className="eyebrow">HOW IT WORKS</span>
               <h1>Simple steps for a safer future.</h1>
               <p>
-                MABOTE GROUP HOLDINGS makes membership simple and clear so members can prepare in a
+                MABOTE GROUP PTY(LTD) makes membership simple and clear so members can prepare in a
                 structured, organised way.
               </p>
               <div className="hero-actions">

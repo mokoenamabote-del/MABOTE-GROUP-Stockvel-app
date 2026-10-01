@@ -571,7 +571,7 @@ export default function MemberCollections() {
             fontSize: "2rem",
           }}
         >
-          MABOTE GROUP HOLDINGS
+          MABOTE GROUP PTY(LTD)
         </h1>
 
         <p

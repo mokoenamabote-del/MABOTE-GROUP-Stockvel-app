@@ -214,7 +214,7 @@ export default function HRManagement() {
         <div className="agent-contract-document">
           <p className="contract-draft-label">DRAFT FOR LEGAL REVIEW</p>
           <h4>TEMPORARY COMMISSION-BASED AGENT AGREEMENT</h4>
-          <p>This Temporary Commission-Based Agent Agreement (the “Agreement”) is made between MABOTE GROUP HOLDINGS (the “Company”) and {agentContract.agentName || "[Agent full name]"} (the “Agent”), with an intended start date of {agentContract.startDate || "[Start date]"}.</p>
+          <p>This Temporary Commission-Based Agent Agreement (the “Agreement”) is made between MABOTE GROUP PTY(LTD) (the “Company”) and {agentContract.agentName || "[Agent full name]"} (the “Agent”), with an intended start date of {agentContract.startDate || "[Start date]"}.</p>
           <ol>
             <li><strong>Temporary appointment.</strong> The Company appoints the Agent on a temporary basis to conduct lawful outreach, introduce prospective members, and submit member leads. This Agreement does not create a permanent position or promise continued work.</li>
             <li><strong>Commission-only compensation.</strong> The Agent will earn {agentContract.commissionRate || "[commission amount or rate]"} for each lead that the Company verifies, accepts, and records as an eligible member under its current procedures. No salary, hourly wage, or commission is earned for rejected, duplicate, fraudulent, cancelled, or unverified leads. Payment timing and any required tax deductions must comply with applicable law.</li>
@@ -227,7 +227,7 @@ export default function HRManagement() {
           </ol>
           <div className="contract-signatures">
             <p>Agent: {agentContract.agentName || "[Agent full name]"}<br />Signature: ____________________ Date: ____________</p>
-            <p>For MABOTE GROUP HOLDINGS: {agentContract.companyRepresentative || "[Company representative]"}<br />Signature: ____________________ Date: ____________</p>
+            <p>For MABOTE GROUP PTY(LTD): {agentContract.companyRepresentative || "[Company representative]"}<br />Signature: ____________________ Date: ____________</p>
           </div>
           <p className="contract-disclaimer">This is a business draft, not legal advice. Have a qualified South African employment lawyer review the classification under the Labour Relations Act 66 of 1995, the Basic Conditions of Employment Act 75 of 1997, commission and tax treatment, privacy obligations, termination terms, and permanent-vacancy wording before use.</p>
         </div>

@@ -114,8 +114,8 @@ export default function ClientPortal() {
     <div className="client-portal">
       <header className="portal-header">
         <div>
-          <img src="/mabote-logo.svg" alt="MABOTE GROUP HOLDINGS" className="portal-logo" />
-          <p className="portal-kicker">MABOTE GROUP HOLDINGS / CLIENT PORTAL</p>
+          <img src="/mabote-logo.svg" alt="MABOTE GROUP PTY(LTD)" className="portal-logo" />
+          <p className="portal-kicker">MABOTE GROUP PTY(LTD) / CLIENT PORTAL</p>
           <h1>Welcome back, {fullName.split(" ")[0]}.</h1>
           <p>One calm place to follow your membership, contributions, and claims.</p>
         </div>
@@ -161,7 +161,7 @@ export default function ClientPortal() {
             <p>
               {membershipStatus === "Approved"
                 ? "Your membership is approved. Keep your contributions up to date and use this portal whenever you need a quick status check."
-                : "Your account is active. Submit or confirm your membership application with the MABOTE GROUP HOLDINGS administrator to unlock your full member record."}
+                : "Your account is active. Submit or confirm your membership application with the MABOTE GROUP PTY(LTD) administrator to unlock your full member record."}
             </p>
             <div className="portal-detail-list">
               <div><span>Email</span><strong>{email || "Not available"}</strong></div>
@@ -226,7 +226,7 @@ export default function ClientPortal() {
         </section>
 
         <section className="portal-footer-actions">
-          <Link to="/about">About MABOTE GROUP HOLDINGS</Link>
+          <Link to="/about">About MABOTE GROUP PTY(LTD)</Link>
           <Link to="/packages">View grocery packages</Link>
           <Link to="/contact">Contact us</Link>
         </section>

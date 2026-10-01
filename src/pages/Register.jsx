@@ -56,7 +56,7 @@ export default function Register() {
         }),
       });
 
-      alert("MABOTE GROUP HOLDINGS account created successfully. You can now log in.");
+      alert("MABOTE GROUP PTY(LTD) account created successfully. You can now log in.");
       navigate("/login");
     } catch (error) {
       alert(error.message);
@@ -94,7 +94,7 @@ export default function Register() {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "12px", letterSpacing: "2px", color: "#d9b553", fontWeight: 800 }}>MABOTE GROUP HOLDINGS</div>
+          <div style={{ fontSize: "12px", letterSpacing: "2px", color: "#d9b553", fontWeight: 800 }}>MABOTE GROUP PTY(LTD)</div>
           <h1 style={{ margin: "12px 0 0", fontSize: "2.2rem", letterSpacing: "-1px" }}>Create Your Account</h1>
         </div>
 

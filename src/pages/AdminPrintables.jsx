@@ -130,7 +130,7 @@ export default function AdminPrintables() {
         <section className={`printable-document application-document ${activeDocument === "application" ? "active-document" : ""}`}>
           <div className="document-heading">
             <div>
-              <p className="brand-kicker">MABOTE GROUP HOLDINGS</p>
+              <p className="brand-kicker">MABOTE GROUP PTY(LTD)</p>
               <h2>Membership Application Form</h2>
               <p>Stockvel & funeral grocery scheme</p>
             </div>
@@ -177,7 +177,7 @@ export default function AdminPrintables() {
 
           <section className="form-section declaration-section">
             <h3>7. Declaration</h3>
-            <p>I declare that the information provided in this application is true and correct. I understand that it will be used for MABOTE GROUP HOLDINGS membership administration.</p>
+            <p>I declare that the information provided in this application is true and correct. I understand that it will be used for MABOTE GROUP PTY(LTD) membership administration.</p>
             <p className="checkbox-line">□ I accept and agree to the declaration.</p>
             <div className="signature-grid">
               <div>Applicant signature <BlankLines /></div>
@@ -187,10 +187,10 @@ export default function AdminPrintables() {
           <div className="document-contact">
             <div>
               <strong>WhatsApp: {whatsappNumber}</strong>
-              <a href={whatsappLink} target="_blank" rel="noreferrer">Chat with MABOTE GROUP HOLDINGS on WhatsApp</a>
+              <a href={whatsappLink} target="_blank" rel="noreferrer">Chat with MABOTE GROUP PTY(LTD) on WhatsApp</a>
               <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
             </div>
-            <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP HOLDINGS on WhatsApp" />
+            <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP PTY(LTD) on WhatsApp" />
           </div>
           <p className="document-footer">For office use: Received by ____________________ Date ____________________</p>
         </section>
@@ -198,7 +198,7 @@ export default function AdminPrintables() {
         <section className={`printable-document claim-document ${activeDocument === "claim" ? "active-document" : ""}`}>
           <div className="document-heading">
             <div>
-              <p className="brand-kicker">MABOTE GROUP HOLDINGS</p>
+              <p className="brand-kicker">MABOTE GROUP PTY(LTD)</p>
               <h2>Claim Form</h2>
               <p>Funeral grocery support claim request</p>
             </div>
@@ -246,7 +246,7 @@ export default function AdminPrintables() {
 
           <section className="form-section declaration-section">
             <h3>5. Declaration</h3>
-            <p>I declare that the information provided in this claim form is true and correct. I understand that MABOTE GROUP HOLDINGS may verify this information and use it for claim processing.</p>
+            <p>I declare that the information provided in this claim form is true and correct. I understand that MABOTE GROUP PTY(LTD) may verify this information and use it for claim processing.</p>
             <p className="checkbox-line">□ I confirm the above information is correct.</p>
             <div className="signature-grid">
               <div>Member signature <BlankLines /></div>
@@ -257,20 +257,20 @@ export default function AdminPrintables() {
           <div className="document-contact">
             <div>
               <strong>WhatsApp: {whatsappNumber}</strong>
-              <a href={whatsappLink} target="_blank" rel="noreferrer">Chat with MABOTE GROUP HOLDINGS on WhatsApp</a>
+              <a href={whatsappLink} target="_blank" rel="noreferrer">Chat with MABOTE GROUP PTY(LTD) on WhatsApp</a>
               <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
             </div>
-            <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP HOLDINGS on WhatsApp" />
+            <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP PTY(LTD) on WhatsApp" />
           </div>
           <p className="document-footer">For office use: Reviewed by ____________________ Date ____________________</p>
         </section>
 
         <section className={`printable-document flyer-document ${activeDocument === "flyer" ? "active-document" : ""}`}>
-          <div className="flyer-topline">MABOTE GROUP HOLDINGS</div>
+          <div className="flyer-topline">MABOTE GROUP PTY(LTD)</div>
           <div className="flyer-content">
             <p className="flyer-label">BUILD TOGETHER. PROTECT EACH OTHER.</p>
             <h2>Stronger together,<br /><span>prepared for tomorrow.</span></h2>
-            <p className="flyer-copy">Join MABOTE GROUP HOLDINGS and make consistent monthly contributions toward meaningful support, funeral grocery benefits and a connected community.</p>
+            <p className="flyer-copy">Join MABOTE GROUP PTY(LTD) and make consistent monthly contributions toward meaningful support, funeral grocery benefits and a connected community.</p>
             <div className="flyer-features">
               <div><strong>01</strong><span>Affordable monthly plans</span></div>
               <div><strong>02</strong><span>Funeral grocery support</span></div>
@@ -281,11 +281,11 @@ export default function AdminPrintables() {
               <span>Ask an administrator for an application form.</span>
             </div>
             <div className="flyer-contact">
-              <span>CONTACT MABOTE GROUP HOLDINGS</span>
+              <span>CONTACT MABOTE GROUP PTY(LTD)</span>
               <span>WhatsApp {whatsappNumber}</span>
               <a href={whatsappLink}>Chat with us on WhatsApp</a>
               <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-              <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP HOLDINGS on WhatsApp" />
+              <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP PTY(LTD) on WhatsApp" />
             </div>
           </div>
           <div className="flyer-bottomline">STOCKVEL & FUNERAL GROCERY SCHEME</div>
@@ -294,8 +294,8 @@ export default function AdminPrintables() {
         <section className={`printable-document brochure-document ${activeDocument === "brochure" ? "active-document" : ""}`}>
           <div className="brochure-sheet brochure-outside">
             <article className="brochure-panel brochure-panel--contact">
-              <img src="/mabote-logo.svg" alt="MABOTE GROUP HOLDINGS" className="brochure-logo" />
-              <p className="brochure-overline">MABOTE GROUP HOLDINGS</p>
+              <img src="/mabote-logo.svg" alt="MABOTE GROUP PTY(LTD)" className="brochure-logo" />
+              <p className="brochure-overline">MABOTE GROUP PTY(LTD)</p>
               <h2>Support that shows up when it matters.</h2>
               <p>We bring members together through consistent contributions, practical funeral grocery benefits and community care.</p>
               <div className="brochure-rule" />
@@ -313,15 +313,15 @@ export default function AdminPrintables() {
             </article>
             <article className="brochure-panel brochure-panel--back">
               <p className="brochure-overline">LET'S TALK</p>
-              <h3>Ready to join MABOTE GROUP HOLDINGS?</h3>
+              <h3>Ready to join MABOTE GROUP PTY(LTD)?</h3>
               <p>Speak to an administrator for an application form, membership guidance and confirmed payment details.</p>
               <div className="brochure-contact-block">
                 <strong>WhatsApp {whatsappNumber}</strong>
                 <a href={whatsappLink}>Chat with us on WhatsApp</a>
                 <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
               </div>
-              <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP HOLDINGS on WhatsApp" />
-              <small>Prices and package contents are subject to confirmation by MABOTE GROUP HOLDINGS.</small>
+              <img src={whatsappQrUrl} alt="Scan to chat with MABOTE GROUP PTY(LTD) on WhatsApp" />
+              <small>Prices and package contents are subject to confirmation by MABOTE GROUP PTY(LTD).</small>
             </article>
           </div>
 

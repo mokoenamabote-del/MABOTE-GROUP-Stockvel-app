@@ -39,9 +39,9 @@ export default function Login() {
 
   const handleForgotPassword = () => {
     const requestedEmail = email.trim() || "[enter my email address]";
-    const subject = encodeURIComponent("MABOTE GROUP HOLDINGS password reset request");
+    const subject = encodeURIComponent("MABOTE GROUP PTY(LTD) password reset request");
     const body = encodeURIComponent(
-      `Hello MABOTE GROUP HOLDINGS administrator,\n\nPlease help me reset the password for: ${requestedEmail}\n\nThank you.`
+      `Hello MABOTE GROUP PTY(LTD) administrator,\n\nPlease help me reset the password for: ${requestedEmail}\n\nThank you.`
     );
 
     setForgotMessage(
