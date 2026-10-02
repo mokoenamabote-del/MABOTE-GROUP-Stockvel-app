@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiRequest } from "../lib/api";
 
 export function usePaymentSync(intervalMs = 5000) {
   const [syncStatus, setSyncStatus] = useState({
@@ -13,14 +14,7 @@ export function usePaymentSync(intervalMs = 5000) {
 
     const syncPayments = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/payments/sync"
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const result = await response.json();
+        const result = await apiRequest("/api/payments/sync");
         if (isMounted) {
           setSyncStatus({
             lastSync: new Date().toISOString(),
@@ -65,11 +59,7 @@ export function usePaymentSync(intervalMs = 5000) {
 
 export async function fetchPaymentUpdates() {
   try {
-    const response = await fetch("http://localhost:5000/api/payments/sync");
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    return await response.json();
+    return await apiRequest("/api/payments/sync");
   } catch (error) {
     console.error("Failed to fetch payment updates:", error);
     throw error;
