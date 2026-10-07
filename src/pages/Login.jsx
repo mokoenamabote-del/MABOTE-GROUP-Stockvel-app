@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 
-const ADMIN_EMAIL = "info@mabote-group.co.za";
-
 export default function Login() {
   const navigate = useNavigate();
 
@@ -11,6 +9,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [forgotMessage, setForgotMessage] = useState("");
+  const [forgotError, setForgotError] = useState(false);
+  const [isRequestingReset, setIsRequestingReset] = useState(false);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -35,22 +35,31 @@ export default function Login() {
     }
   };
 
-  const handleForgotPassword = () => {
-    const requestedEmail = email.trim() || "[enter my email address]";
-    const subject = encodeURIComponent("MABOTE GROUP HOLDINGS password reset request");
-    const body = encodeURIComponent(
-      `Hello MABOTE GROUP HOLDINGS administrator,\n\nPlease help me reset the password for: ${requestedEmail}\n\nThank you.`
-    );
+  const handleForgotPassword = async () => {
+    const requestedEmail = email.trim();
+    setForgotMessage("");
+    setForgotError(false);
 
-    setForgotMessage(
-      `Please email ${ADMIN_EMAIL} to request a password reset. Your email address has been included in the request.`
-    );
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(ADMIN_EMAIL).catch(() => {});
+    if (!requestedEmail) {
+      setForgotMessage("Enter your account email address first.");
+      setForgotError(true);
+      return;
     }
 
-    window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
+    setIsRequestingReset(true);
+
+    try {
+      const result = await apiRequest("/api/auth/password-reset-requests", {
+        method: "POST",
+        body: JSON.stringify({ email: requestedEmail }),
+      });
+      setForgotMessage(result.message);
+    } catch (error) {
+      setForgotMessage(error.message);
+      setForgotError(true);
+    } finally {
+      setIsRequestingReset(false);
+    }
   };
 
   return (
@@ -125,11 +134,19 @@ export default function Login() {
         <button
           type="button"
           onClick={handleForgotPassword}
+          disabled={isRequestingReset}
         >
-          CONTACT ADMIN FOR PASSWORD RESET
+          {isRequestingReset ? "SENDING RESET LINK..." : "FORGOT PASSWORD?"}
         </button>
 
-        {forgotMessage && <p className="login-help-message">{forgotMessage}</p>}
+        {forgotMessage && (
+          <p
+            className={forgotError ? "login-error-message" : "login-help-message"}
+            role={forgotError ? "alert" : "status"}
+          >
+            {forgotMessage}
+          </p>
+        )}
 
         <p>Don't have an account?</p>
 

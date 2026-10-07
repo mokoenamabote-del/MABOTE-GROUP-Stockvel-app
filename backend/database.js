@@ -43,6 +43,17 @@ database.exec(`
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    token_hash TEXT PRIMARY KEY,
+    account_id INTEGER NOT NULL,
+    expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS password_reset_tokens_account_id
+    ON password_reset_tokens(account_id);
 `);
 
 export function findAccountByEmail(email) {
@@ -78,12 +89,55 @@ export function createAccount({
     .get(result.lastInsertRowid);
 }
 
-export function setAccountPassword(email, passwordHash) {
-  const result = database
-    .prepare("UPDATE accounts SET password_hash = ? WHERE email = ?")
-    .run(passwordHash, email);
+export function createPasswordResetToken(accountId, tokenHash, expiresAt) {
+  const insertToken = database.transaction(() => {
+    database
+      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
+      .run(accountId);
 
-  return result.changes > 0;
+    database
+      .prepare(`
+        INSERT INTO password_reset_tokens (token_hash, account_id, expires_at, created_at)
+        VALUES (?, ?, ?, ?)
+      `)
+      .run(tokenHash, accountId, expiresAt, new Date().toISOString());
+  });
+
+  insertToken();
+}
+
+export function consumePasswordResetToken(tokenHash, passwordHash, now) {
+  const resetPassword = database.transaction(() => {
+    const token = database
+      .prepare(`
+        SELECT account_id
+        FROM password_reset_tokens
+        WHERE token_hash = ? AND expires_at > ?
+      `)
+      .get(tokenHash, now);
+
+    if (!token) return false;
+
+    const result = database
+      .prepare("UPDATE accounts SET password_hash = ? WHERE id = ?")
+      .run(passwordHash, token.account_id);
+
+    if (result.changes === 0) return false;
+
+    database
+      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
+      .run(token.account_id);
+
+    return true;
+  });
+
+  return resetPassword();
+}
+
+export function deletePasswordResetToken(tokenHash) {
+  database
+    .prepare("DELETE FROM password_reset_tokens WHERE token_hash = ?")
+    .run(tokenHash);
 }
 
 export function setAccountRole(email, role) {

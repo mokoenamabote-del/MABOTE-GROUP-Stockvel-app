@@ -906,6 +906,25 @@ textarea:focus {
   margin-top: 25px;
 }
 
+.login-help-message,
+.login-error-message {
+  margin: 12px 0 !important;
+  line-height: 1.5;
+}
+
+.login-help-message {
+  color: #166534 !important;
+}
+
+.login-error-message {
+  color: #b91c1c !important;
+}
+
+.login-box button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 /* =========================================================
    MEMBERS PAGE
    ========================================================= */

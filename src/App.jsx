@@ -7,6 +7,7 @@ import AboutUs from "./pages/AboutUs";
 import HowItWorks from "./pages/HowItWorks";
 import Membership from "./pages/Membership";
 import Login from "./pages/Login";
+import PasswordReset from "./pages/PasswordReset";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import GroceryPackages from "./pages/GroceryPackages";
@@ -102,6 +103,7 @@ export default function App() {
         <Route path="/membership" element={<Membership />} />
         <Route path="/packages" element={<GroceryPackages />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<PasswordReset />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/payments" element={<Payments />} />
