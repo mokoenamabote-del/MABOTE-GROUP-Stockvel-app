@@ -1,5 +1,17 @@
 services:
   - type: web
+    name: mabote-group-stockvel-app
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://mabote-group-api.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+  - type: web
     name: mabote-group-api
     runtime: node
     rootDir: backend
@@ -9,7 +21,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGIN
-        value: https://www.mabote-group.co.za,https://mabote-group.co.za,https://www.mabotegroup.co.za,https://mabotegroup.co.za,http://localhost:5173
+        value: https://mabote-group-stockvel-app.onrender.com,https://www.mabote-group.co.za,https://mabote-group.co.za,https://www.mabotegroup.co.za,https://mabotegroup.co.za,http://localhost:5173
       - key: DATABASE_PATH
         value: /var/data/mabote.sqlite
       - key: NODE_ENV

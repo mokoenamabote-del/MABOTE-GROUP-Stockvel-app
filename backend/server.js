@@ -30,6 +30,10 @@ dotenv.config({ path: path.join(currentDirectory, ".env") });
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "mokoenamabote@gmail.com";
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "Mabote@2026!";
 const DEFAULT_MANAGEMENT_EMAIL = process.env.DEFAULT_MANAGEMENT_EMAIL || "management@mabotegroup.co.za";
@@ -97,7 +101,14 @@ const ensureDefaultManagementAccount = async () => {
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin ${origin} is not allowed by CORS`));
+    },
   })
 );
 app.use(express.json());
