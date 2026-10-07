@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { apiRequest } from "../lib/api";
 
 const createEmptyBeneficiary = () => ({
@@ -61,6 +61,25 @@ export default function MemberRegistration() {
     useState("");
   const [policyNumber, setPolicyNumber] =
     useState("");
+
+  useEffect(() => {
+    try {
+      const account = JSON.parse(localStorage.getItem("maboteAccount") || "null");
+
+      if (!account) {
+        return;
+      }
+
+      setFormData((previous) => ({
+        ...previous,
+        fullName: previous.fullName || account.fullName || "",
+        surname: previous.surname || account.surname || "",
+        email: previous.email || account.email || "",
+      }));
+    } catch {
+      // Ignore malformed saved account data.
+    }
+  }, []);
 
   const handleChange = (e) => {
     const {

@@ -51,8 +51,8 @@ export default function Contact() {
               <div>
                 <h3>Email</h3>
                 <p>Send us your enquiry by email.</p>
-                <a href="mailto:info@mabotegroup.co.za">
-                  info@mabotegroup.co.za
+                <a href="mailto:info@mabote-group.co.za">
+                  info@mabote-group.co.za
                 </a>
               </div>
             </div>

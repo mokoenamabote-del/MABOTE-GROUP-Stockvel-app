@@ -1,11 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export async function apiRequest(path, options = {}) {
   let response;
-  const token =
-    typeof window !== "undefined"
-      ? window.localStorage.getItem("maboteAuthToken")
-      : null;
+  const token = localStorage.getItem("maboteAuthToken");
 
   try {
     response = await fetch(`${API_URL}${path}`, {

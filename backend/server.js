@@ -18,6 +18,8 @@ import {
   listApplicationsForEmail,
   saveContribution,
   saveClaim,
+  setAccountPassword,
+  setAccountRole,
   updateApplication,
 } from "./database.js";
 
@@ -28,26 +30,74 @@ dotenv.config({ path: path.join(currentDirectory, ".env") });
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET;
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "mokoenamabote@gmail.com";
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "Mabote@2026!";
+const DEFAULT_MANAGEMENT_EMAIL = process.env.DEFAULT_MANAGEMENT_EMAIL || "management@mabotegroup.co.za";
+const DEFAULT_MANAGEMENT_PASSWORD = process.env.DEFAULT_MANAGEMENT_PASSWORD || "MaboteManage@2026!";
 
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET must be set in backend/.env before starting the server");
 }
 
+const ensureDefaultAdminAccount = async () => {
+  const existingAccount = findAccountByEmail(DEFAULT_ADMIN_EMAIL);
+  const passwordHash = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 12);
+
+  if (existingAccount) {
+    const updated = setAccountPassword(DEFAULT_ADMIN_EMAIL, passwordHash);
+    if (updated) {
+      console.log(`Default admin password restored for ${DEFAULT_ADMIN_EMAIL}`);
+    }
+    return;
+  }
+
+  try {
+    createAccount({
+      fullName: "MABOTE",
+      surname: "GROUP",
+      email: DEFAULT_ADMIN_EMAIL,
+      passwordHash,
+      role: "Admin",
+    });
+
+    console.log(`Default admin account created for ${DEFAULT_ADMIN_EMAIL}`);
+  } catch (error) {
+    if (error.code !== "SQLITE_CONSTRAINT_UNIQUE") {
+      throw error;
+    }
+  }
+};
+
+const ensureDefaultManagementAccount = async () => {
+  const existingAccount = findAccountByEmail(DEFAULT_MANAGEMENT_EMAIL);
+  const passwordHash = await bcrypt.hash(DEFAULT_MANAGEMENT_PASSWORD, 12);
+
+  if (existingAccount) {
+    setAccountPassword(DEFAULT_MANAGEMENT_EMAIL, passwordHash);
+    setAccountRole(DEFAULT_MANAGEMENT_EMAIL, "Management");
+    return;
+  }
+
+  try {
+    createAccount({
+      fullName: "MABOTE",
+      surname: "MANAGEMENT",
+      email: DEFAULT_MANAGEMENT_EMAIL,
+      passwordHash,
+      role: "Management",
+    });
+
+    console.log(`Management account created for ${DEFAULT_MANAGEMENT_EMAIL}`);
+  } catch (error) {
+    if (error.code !== "SQLITE_CONSTRAINT_UNIQUE") {
+      throw error;
+    }
+  }
+};
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error("Origin not allowed by CORS"));
-    },
-    credentials: true,
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   })
 );
 app.use(express.json());
@@ -126,6 +176,47 @@ app.post("/api/auth/login", async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Unable to log in" });
+  }
+});
+
+app.post("/api/auth/reset-password", async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const newPassword = String(req.body.newPassword || "");
+    const confirmPassword = String(req.body.confirmPassword || "");
+
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: "Email and a new password are required" });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters long" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    const account = findAccountByEmail(email);
+
+    if (!account) {
+      return res.status(404).json({ error: "No account was found for that email" });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    const updated = setAccountPassword(email, passwordHash);
+
+    if (!updated) {
+      return res.status(500).json({ error: "Unable to update the password" });
+    }
+
+    res.json({
+      message: "Password updated successfully. You can now log in with your new password.",
+      account: publicAccount(account),
+    });
+  } catch (error) {
+    console.error("Password reset error:", error);
+    res.status(500).json({ error: "Unable to reset password" });
   }
 });
 
@@ -300,6 +391,9 @@ app.post("/api/auth/google-sheets-callback", async (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+await ensureDefaultAdminAccount();
+await ensureDefaultManagementAccount();
 
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);

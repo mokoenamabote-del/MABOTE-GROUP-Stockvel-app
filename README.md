@@ -1,7 +1,9 @@
-# MABOTE GROUP PTY(LTD) Stockvel App
+# MABOTE GROUP Stockvel App
+
+Official website: [mabote-group.co.za](https://mabote-group.co.za/)
 
 ## About the App
-MABOTE GROUP PTY(LTD) Stockvel App is a digital platform designed to help communities manage funeral grocery stokvel contributions easily and securely.
+MABOTE GROUP Stockvel App is a digital platform designed to help communities manage funeral grocery stokvel contributions easily and securely.
 
 ## Main Features
 - Member registration
@@ -32,6 +34,6 @@ The current policy defines three stokvel pricing plans:
 To provide a simple, transparent and reliable way for members to save together and receive funeral grocery support when needed.
 
 ## Developer
-MABOTE GROUP PTY(LTD)
+MABOTE GROUP
 
-© 2026 MABOTE GROUP PTY(LTD)
+© 2026 MABOTE GROUP

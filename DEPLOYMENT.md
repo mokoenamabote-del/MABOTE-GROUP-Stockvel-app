@@ -10,6 +10,7 @@ This project is ready for a Vercel frontend + Render backend launch setup.
 - Set the output directory to: `dist`
 - Add environment variable:
   - `VITE_API_URL=https://your-render-backend-url.onrender.com`
+- For the live site, connect the custom domain: `https://www.mabote-group.co.za`
 
 ## 2) Backend deploy (Render)
 
@@ -18,7 +19,7 @@ This project is ready for a Vercel frontend + Render backend launch setup.
 - Use the existing `render.yaml` file if available.
 - Add environment variables:
   - `JWT_SECRET=<long-random-secret>`
-  - `CORS_ORIGIN=https://your-vercel-domain.vercel.app,https://www.your-domain.com,http://localhost:5173`
+  - `CORS_ORIGIN=https://www.mabote-group.co.za,https://mabote-group.co.za,https://your-vercel-domain.vercel.app,http://localhost:5173`
   - `DATABASE_PATH=/var/data/mabote.sqlite`
   - `GOOGLE_SHEETS_ID=<optional>`
   - `GOOGLE_SHEETS_NAME=Sheet1`

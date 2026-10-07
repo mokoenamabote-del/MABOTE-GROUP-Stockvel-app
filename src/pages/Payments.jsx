@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./Payments.css";
 
 const whatsappLink = "https://wa.me/27663331151";
-const contactEmail = "info@mabotegroup.co.za";
+const contactEmail = "info@mabote-group.co.za";
 
 export default function Payments() {
   const [bankingDetails] = useState(() => {

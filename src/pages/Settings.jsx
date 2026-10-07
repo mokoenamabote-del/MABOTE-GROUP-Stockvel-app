@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from "react";
 
-const initialStaff = [];
+const initialStaff = [
+  {
+    id: 1,
+    name: "Alice Johnson",
+    role: "Admin",
+    email: "alice@mabote.com",
+    phone: "0823456789",
+    status: "Active",
+  },
+  {
+    id: 2,
+    name: "Bob Smith",
+    role: "Support Staff",
+    email: "bob@mabote.com",
+    phone: "0834567890",
+    status: "Active",
+  },
+];
 
 const initialFormState = {
   name: "",
@@ -11,7 +28,7 @@ const initialFormState = {
 };
 
 const initialBankingDetails = {
-  accountHolder: "MABOTE GROUP PTY(LTD)",
+  accountHolder: "MABOTE GROUP",
   bankName: "",
   accountNumber: "",
   branchCode: "",
@@ -32,10 +49,7 @@ export default function Settings() {
 
     try {
       const saved = window.localStorage.getItem("mabote-staff");
-      const savedStaff = saved ? JSON.parse(saved) : initialStaff;
-      return Array.isArray(savedStaff)
-        ? savedStaff
-        : initialStaff;
+      return saved ? JSON.parse(saved) : initialStaff;
     } catch (error) {
       console.error("Unable to load staff:", error);
       return initialStaff;
@@ -856,7 +870,7 @@ export default function Settings() {
             <h3>🏢 System Information</h3>
 
             <p>
-              MABOTE GROUP PTY(LTD) stockvel application
+              MABOTE GROUP Stockvel application
               information.
             </p>
           </div>
@@ -866,7 +880,7 @@ export default function Settings() {
               <h4>Organisation</h4>
               <p>
                 <strong>
-                  MABOTE GROUP PTY(LTD)
+                  MABOTE GROUP
                 </strong>
               </p>
               <p>

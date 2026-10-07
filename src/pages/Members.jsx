@@ -193,13 +193,13 @@ export default function Members() {
 
     if (newStatus === "Approved") {
       setResponseMessage(
-        `Dear ${fullName || "Member"}, your MABOTE GROUP PTY(LTD) membership application has been approved. Your application reference is ${applicationNumber}. Your policy is now active. Welcome to MABOTE GROUP PTY(LTD).`
+        `Dear ${fullName || "Member"}, your MABOTE GROUP membership application has been approved. Your application reference is ${applicationNumber}. Your policy is now active. Welcome to MABOTE GROUP.`
       );
     }
 
     if (newStatus === "Rejected") {
       setResponseMessage(
-        `Dear ${fullName || "Member"}, we regret to inform you that your MABOTE GROUP PTY(LTD) membership application has not been approved at this time. Your application reference is ${applicationNumber}. Please contact MABOTE GROUP PTY(LTD) for further information.`
+        `Dear ${fullName || "Member"}, we regret to inform you that your MABOTE GROUP membership application has not been approved at this time. Your application reference is ${applicationNumber}. Please contact MABOTE GROUP for further information.`
       );
     }
 
@@ -351,7 +351,7 @@ export default function Members() {
       >
         <div>
           <h1 style={{ margin: 0 }}>
-            MABOTE GROUP PTY(LTD)
+            MABOTE GROUP
           </h1>
 
           <p

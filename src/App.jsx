@@ -138,7 +138,7 @@ export default function App() {
         <Route
           path="/member-registration"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["Member", "Admin", "Management", "Support Staff"]}>
               <MemberRegistration />
             </ProtectedRoute>
           }

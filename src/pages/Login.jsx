@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 
-const ADMIN_EMAIL = "info@mabotegroup.co.za";
+const ADMIN_EMAIL = "info@mabote-group.co.za";
 
 export default function Login() {
   const navigate = useNavigate();

@@ -61,9 +61,6 @@
 .document-contact a, .flyer-contact a { color: #102f57; font-weight: 700; }
 .document-contact img { width: 76px; height: 76px; }
 .claim-document { padding: 46px 54px; }
-.recruitment-document { padding: 46px 54px; }
-.recruitment-notes { display: grid; gap: 10px; font: 12px Arial, sans-serif; color: #4b5969; }
-.recruitment-notes p { margin: 0; }
 
 .flyer-document { display: flex; flex-direction: column; min-height: 1120px; background: #102f57; color: white; overflow: hidden; }
 .flyer-topline, .flyer-bottomline { padding: 24px 54px; background: #b58a24; color: #102f57; font: 700 14px Arial, sans-serif; letter-spacing: 3px; }
@@ -147,7 +144,7 @@
   .screen-only, .printable-document:not(.active-document) { display: none !important; }
   .printables-page, .printable-document { margin: 0; min-height: 0; box-shadow: none; }
   .active-document { display: flex !important; }
-  .application-document.active-document, .claim-document.active-document, .recruitment-document.active-document { display: block !important; }
+  .application-document.active-document, .claim-document.active-document { display: block !important; }
   .flyer-document.active-document { min-height: 297mm; }
   .brochure-document.active-document { display: block !important; max-width: none; padding: 0; background: white; box-shadow: none; }
   .brochure-sheet { min-height: 0; height: 190mm; box-shadow: none; }

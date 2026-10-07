@@ -172,9 +172,17 @@ export default function ClientPortal() {
 
           <article className="portal-panel portal-panel--next">
             <p className="portal-label">NEXT STEP</p>
-            <h2>{memberCollections.length ? "Keep your contributions current." : "Complete your first contribution."}</h2>
-            <p>Use the official payment instructions and include your application or membership number as the reference.</p>
-            <Link className="portal-primary-action" to="/payments">View payment instructions <span>→</span></Link>
+            <h2>{application ? "Keep your contributions current." : "Complete your membership application."}</h2>
+            <p>
+              {application
+                ? "Use the official payment instructions and include your application or membership number as the reference."
+                : "Submit your application details to complete your membership profile and unlock your member record."}
+            </p>
+            {application ? (
+              <Link className="portal-primary-action" to="/payments">View payment instructions <span>→</span></Link>
+            ) : (
+              <Link className="portal-primary-action" to="/member-registration">Complete membership application <span>→</span></Link>
+            )}
           </article>
         </section>
 
@@ -221,7 +229,7 @@ export default function ClientPortal() {
             ) : (
               <p className="portal-empty-state">No claims are currently linked to your membership.</p>
             )}
-            <a className="portal-text-action" href="mailto:info@mabotegroup.co.za?subject=Membership%20support">Contact membership support <span>↗</span></a>
+            <a className="portal-text-action" href="mailto:info@mabote-group.co.za?subject=Membership%20support">Contact membership support <span>↗</span></a>
           </article>
         </section>
 

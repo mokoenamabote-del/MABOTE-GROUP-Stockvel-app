@@ -571,7 +571,7 @@ export default function MemberCollections() {
             fontSize: "2rem",
           }}
         >
-          MABOTE GROUP PTY(LTD)
+          MABOTE GROUP
         </h1>
 
         <p

@@ -95,13 +95,14 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("maboteAuthToken");
+    localStorage.removeItem("maboteAccount");
     navigate("/login");
   };
 
   const quickActions = [
     {
       title: "Members",
-      description: "Manage MABOTE GROUP HOLDINGS members.",
+      description: "Manage MABOTE GROUP members.",
       button: "OPEN MEMBERS",
       path: "/members",
     },
@@ -142,14 +143,8 @@ export default function AdminDashboard() {
       path: "/settings",
     },
     {
-      title: "Human Resources",
-      description: "Manage permanent staff, recruitment, payroll, and contracts.",
-      button: "OPEN HUMAN RESOURCES",
-      path: "/admin/hr",
-    },
-    {
       title: "Member Application",
-      description: "Register a new MABOTE GROUP HOLDINGS member.",
+      description: "Register a new MABOTE GROUP member.",
       button: "NEW APPLICATION",
       path: "/member-registration",
     },
@@ -171,7 +166,7 @@ export default function AdminDashboard() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f7fb",
+        background: "linear-gradient(180deg, #f4f7fb 0%, #edf3ff 100%)",
         padding: "30px",
         boxSizing: "border-box",
       }}
@@ -179,16 +174,17 @@ export default function AdminDashboard() {
       {/* Dashboard Header */}
       <div
         style={{
-          background: "#0b2a5b",
+          background: "linear-gradient(135deg, #0b2a5b 0%, #123d7a 45%, #0d2143 100%)",
           color: "white",
-          borderRadius: "16px",
-          padding: "28px",
+          borderRadius: "18px",
+          padding: "28px 30px",
           marginBottom: "25px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           gap: "20px",
           flexWrap: "wrap",
+          boxShadow: "0 18px 32px rgba(11, 42, 91, 0.18)",
         }}
       >
         <div>
@@ -198,7 +194,7 @@ export default function AdminDashboard() {
               fontSize: "30px",
             }}
           >
-            MABOTE GROUP HOLDINGS
+            MABOTE GROUP
           </h1>
 
           <p
@@ -214,13 +210,14 @@ export default function AdminDashboard() {
         <button
           onClick={handleLogout}
           style={{
-            background: "#d4af37",
+            background: "linear-gradient(135deg, #d4af37 0%, #c89d2f 100%)",
             color: "#111",
             border: "none",
             padding: "12px 22px",
-            borderRadius: "8px",
+            borderRadius: "10px",
             fontWeight: "bold",
             cursor: "pointer",
+            boxShadow: "0 8px 18px rgba(212, 175, 55, 0.22)",
           }}
         >
           LOGOUT
@@ -230,26 +227,41 @@ export default function AdminDashboard() {
       {/* Welcome */}
       <div
         style={{
-          background: "white",
-          borderRadius: "16px",
-          padding: "25px",
+          background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
+          borderRadius: "18px",
+          padding: "25px 26px",
           marginBottom: "25px",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          boxShadow: "0 12px 22px rgba(11, 42, 91, 0.06)",
+          border: "1px solid rgba(212, 175, 55, 0.4)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <h2
+        <div
           style={{
-            marginTop: 0,
-            color: "#0b2a5b",
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: "5px",
+            background: "linear-gradient(180deg, #d4af37 0%, #c89d2f 100%)",
           }}
-        >
-          Welcome to the MABOTE GROUP HOLDINGS Dashboard
-        </h2>
+        />
+        <div style={{ paddingLeft: "18px" }}>
+          <h2
+            style={{
+              marginTop: 0,
+              color: "#0b2a5b",
+            }}
+          >
+            Welcome to the MABOTE GROUP Dashboard
+          </h2>
 
-        <p style={{ marginBottom: 0 }}>
-          Manage members, contributions, grocery packages,
-          policies, claims and reports from one place.
-        </p>
+          <p style={{ marginBottom: 0, color: "#52607a" }}>
+            Manage members, contributions, grocery packages,
+            policies, claims and reports from one place.
+          </p>
+        </div>
       </div>
 
       {/* Statistics */}
@@ -264,20 +276,23 @@ export default function AdminDashboard() {
       >
         <div
           style={{
-            background: "white",
+            background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
             padding: "22px",
-            borderRadius: "14px",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+            borderRadius: "16px",
+            boxShadow: "0 12px 24px rgba(11, 42, 91, 0.06)",
+            border: "1px solid rgba(212, 175, 55, 0.35)",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
           }}
         >
-          <p style={{ margin: 0, color: "#666" }}>
+          <p style={{ margin: 0, color: "#66728a", fontWeight: 700 }}>
             Total Members
           </p>
 
           <h2
             style={{
-              margin: "10px 0 0",
+              margin: "12px 0 0",
               color: "#0b2a5b",
+              fontSize: "2rem",
             }}
           >
             {memberCount}
@@ -286,20 +301,23 @@ export default function AdminDashboard() {
 
         <div
           style={{
-            background: "white",
+            background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
             padding: "22px",
-            borderRadius: "14px",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+            borderRadius: "16px",
+            boxShadow: "0 12px 24px rgba(11, 42, 91, 0.06)",
+            border: "1px solid rgba(212, 175, 55, 0.35)",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
           }}
         >
-          <p style={{ margin: 0, color: "#666" }}>
+          <p style={{ margin: 0, color: "#66728a", fontWeight: 700 }}>
             Total Collections
           </p>
 
           <h2
             style={{
-              margin: "10px 0 0",
+              margin: "12px 0 0",
               color: "#0b2a5b",
+              fontSize: "2rem",
             }}
           >
             {totalCollections}
@@ -308,20 +326,23 @@ export default function AdminDashboard() {
 
         <div
           style={{
-            background: "white",
+            background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
             padding: "22px",
-            borderRadius: "14px",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+            borderRadius: "16px",
+            boxShadow: "0 12px 24px rgba(11, 42, 91, 0.06)",
+            border: "1px solid rgba(212, 175, 55, 0.35)",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
           }}
         >
-          <p style={{ margin: 0, color: "#666" }}>
+          <p style={{ margin: 0, color: "#66728a", fontWeight: 700 }}>
             Collected Amount
           </p>
 
           <h2
             style={{
-              margin: "10px 0 0",
+              margin: "12px 0 0",
               color: "#0b2a5b",
+              fontSize: "2rem",
             }}
           >
             {formatCurrency(collectedAmount)}
@@ -330,20 +351,23 @@ export default function AdminDashboard() {
 
         <div
           style={{
-            background: "white",
+            background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
             padding: "22px",
-            borderRadius: "14px",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+            borderRadius: "16px",
+            boxShadow: "0 12px 24px rgba(11, 42, 91, 0.06)",
+            border: "1px solid rgba(212, 175, 55, 0.35)",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
           }}
         >
-          <p style={{ margin: 0, color: "#666" }}>
+          <p style={{ margin: 0, color: "#66728a", fontWeight: 700 }}>
             Pending Collections
           </p>
 
           <h2
             style={{
-              margin: "10px 0 0",
+              margin: "12px 0 0",
               color: "#0b2a5b",
+              fontSize: "2rem",
             }}
           >
             {pendingCollections}
@@ -374,10 +398,12 @@ export default function AdminDashboard() {
           <div
             key={action.path}
             style={{
-              background: "white",
-              borderRadius: "14px",
+              background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
+              borderRadius: "16px",
               padding: "22px",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+              boxShadow: "0 12px 22px rgba(11, 42, 91, 0.06)",
+              border: "1px solid rgba(212, 175, 55, 0.35)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
             }}
           >
             <h3
@@ -391,8 +417,9 @@ export default function AdminDashboard() {
 
             <p
               style={{
-                color: "#666",
+                color: "#556179",
                 minHeight: "45px",
+                lineHeight: "1.55",
               }}
             >
               {action.description}
@@ -401,13 +428,14 @@ export default function AdminDashboard() {
             <button
               onClick={() => navigate(action.path)}
               style={{
-                background: "#0b2a5b",
+                background: "linear-gradient(135deg, #0b2a5b 0%, #123d7a 100%)",
                 color: "white",
                 border: "none",
                 padding: "11px 16px",
-                borderRadius: "7px",
+                borderRadius: "10px",
                 cursor: "pointer",
                 fontWeight: "bold",
+                boxShadow: "0 8px 18px rgba(11, 42, 91, 0.12)",
               }}
             >
               {action.button}
@@ -419,11 +447,13 @@ export default function AdminDashboard() {
       {/* Monthly Summary */}
       <div
         style={{
-          background: "white",
-          borderRadius: "16px",
-          padding: "25px",
+          background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
+          borderRadius: "18px",
+          padding: "25px 26px",
           marginBottom: "25px",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          boxShadow: "0 12px 22px rgba(11, 42, 91, 0.06)",
+          border: "1px solid rgba(212, 175, 55, 0.35)",
+          borderLeft: "5px solid #d4af37",
         }}
       >
         <h2
@@ -435,19 +465,19 @@ export default function AdminDashboard() {
           Monthly Summary
         </h2>
 
-        <p>
-          MABOTE GROUP HOLDINGS is currently managing{" "}
+        <p style={{ color: "#49566f" }}>
+          MABOTE GROUP is currently managing{" "}
           <strong>{memberCount}</strong> members with{" "}
           <strong>{totalCollections}</strong> recorded
           collections.
         </p>
 
-        <p>
+        <p style={{ color: "#49566f" }}>
           Total recorded contributions:{" "}
           <strong>{formatCurrency(collectedAmount)}</strong>
         </p>
 
-        <p>
+        <p style={{ color: "#49566f", marginBottom: 0 }}>
           Pending collections:{" "}
           <strong>{pendingCollections}</strong>
         </p>
@@ -456,10 +486,11 @@ export default function AdminDashboard() {
       {/* Recent Collections */}
       <div
         style={{
-          background: "white",
-          borderRadius: "16px",
-          padding: "25px",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          background: "linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)",
+          borderRadius: "18px",
+          padding: "25px 26px",
+          boxShadow: "0 12px 22px rgba(11, 42, 91, 0.06)",
+          border: "1px solid rgba(212, 175, 55, 0.35)",
         }}
       >
         <h2
@@ -472,7 +503,7 @@ export default function AdminDashboard() {
         </h2>
 
         {collections.length === 0 ? (
-          <p style={{ color: "#666" }}>
+          <p style={{ color: "#66728a" }}>
             No collections have been recorded yet.
           </p>
         ) : (
@@ -481,15 +512,17 @@ export default function AdminDashboard() {
               style={{
                 width: "100%",
                 borderCollapse: "collapse",
+                borderRadius: "12px",
+                overflow: "hidden",
               }}
             >
               <thead>
-                <tr>
+                <tr style={{ background: "#0b2a5b", color: "#fff" }}>
                   <th
                     style={{
                       textAlign: "left",
-                      padding: "12px",
-                      borderBottom: "1px solid #ddd",
+                      padding: "12px 14px",
+                      borderBottom: "1px solid rgba(255,255,255,0.2)",
                     }}
                   >
                     Member
@@ -498,8 +531,8 @@ export default function AdminDashboard() {
                   <th
                     style={{
                       textAlign: "left",
-                      padding: "12px",
-                      borderBottom: "1px solid #ddd",
+                      padding: "12px 14px",
+                      borderBottom: "1px solid rgba(255,255,255,0.2)",
                     }}
                   >
                     Amount
@@ -508,8 +541,8 @@ export default function AdminDashboard() {
                   <th
                     style={{
                       textAlign: "left",
-                      padding: "12px",
-                      borderBottom: "1px solid #ddd",
+                      padding: "12px 14px",
+                      borderBottom: "1px solid rgba(255,255,255,0.2)",
                     }}
                   >
                     Status
@@ -519,11 +552,17 @@ export default function AdminDashboard() {
 
               <tbody>
                 {collections.slice(-5).reverse().map((item, index) => (
-                  <tr key={item.id || index}>
+                  <tr
+                    key={item.id || index}
+                    style={{
+                      background: index % 2 === 0 ? "#fff" : "#fafcff",
+                    }}
+                  >
                     <td
                       style={{
-                        padding: "12px",
-                        borderBottom: "1px solid #eee",
+                        padding: "12px 14px",
+                        borderBottom: "1px solid #edf1f6",
+                        color: "#1f2d3d",
                       }}
                     >
                       {item.memberName ||
@@ -534,8 +573,10 @@ export default function AdminDashboard() {
 
                     <td
                       style={{
-                        padding: "12px",
-                        borderBottom: "1px solid #eee",
+                        padding: "12px 14px",
+                        borderBottom: "1px solid #edf1f6",
+                        color: "#1f2d3d",
+                        fontWeight: 600,
                       }}
                     >
                       {formatCurrency(
@@ -548,11 +589,23 @@ export default function AdminDashboard() {
 
                     <td
                       style={{
-                        padding: "12px",
-                        borderBottom: "1px solid #eee",
+                        padding: "12px 14px",
+                        borderBottom: "1px solid #edf1f6",
                       }}
                     >
-                      {item.status || "Recorded"}
+                      <span
+                        style={{
+                          display: "inline-block",
+                          padding: "6px 10px",
+                          borderRadius: "999px",
+                          background: "#fff7da",
+                          color: "#7a5a00",
+                          fontWeight: 700,
+                          fontSize: "12px",
+                        }}
+                      >
+                        {item.status || "Recorded"}
+                      </span>
                     </td>
                   </tr>
                 ))}

@@ -5,7 +5,7 @@ import "./AdminPrintables.css";
 const whatsappNumber = "0663331151";
 const whatsappLink = "https://wa.me/27663331151";
 const whatsappQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(whatsappLink)}`;
-const contactEmail = "info@mabotegroup.co.za";
+const contactEmail = "info@mabote-group.co.za";
 
 const recruitmentSections = [
   {
