@@ -1,39 +1,89 @@
 import React, { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 
-export default function PasswordReset() {
-  const [searchParams] = useSearchParams();
+export default function ResetPassword() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(
+    location.search
+  );
+
   const token = searchParams.get("token") || "";
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
   const [message, setMessage] = useState("");
-  const [hasError, setHasError] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setMessage("");
-    setHasError(false);
-    setIsSaving(true);
+    setErrorMessage("");
+
+    if (!token) {
+      setErrorMessage(
+        "This password reset link is invalid or missing."
+      );
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setErrorMessage(
+        "Password must be at least 8 characters long."
+      );
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMessage(
+        "Passwords do not match."
+      );
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const result = await apiRequest("/api/auth/reset-password", {
-        method: "POST",
-        body: JSON.stringify({
-          token,
-          newPassword: password,
-          confirmPassword,
-        }),
-      });
-      setMessage(result.message);
-      setIsComplete(true);
+      const result = await apiRequest(
+        "/api/auth/reset-password",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            token,
+            newPassword,
+            confirmPassword,
+          }),
+        }
+      );
+
+      setMessage(
+        result.message ||
+          "Password updated successfully. You can now log in."
+      );
+
+      setSuccess(true);
+
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
-      setMessage(error.message);
-      setHasError(true);
+      setErrorMessage(
+        error.message ||
+          "Unable to reset your password. The link may be invalid or expired."
+      );
     } finally {
-      setIsSaving(false);
+      setLoading(false);
     }
   };
 
@@ -41,54 +91,131 @@ export default function PasswordReset() {
     <section className="login-container">
       <div className="login-box">
         <h1>MABOTE GROUP HOLDINGS</h1>
+
         <h2>Reset Password</h2>
 
-        {!token ? (
-          <p className="login-error-message" role="alert">
-            This password reset link is invalid. Request a new link from the login page.
-          </p>
-        ) : isComplete ? (
+        {!success ? (
           <>
-            <p className="login-help-message" role="status">{message}</p>
-            <Link to="/login">Return to login</Link>
-          </>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="new-password">New password</label>
-            <input
-              id="new-password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="new-password"
-              minLength={8}
-              required
-            />
+            <p className="login-help-message">
+              Choose a new password for your
+              MABOTE GROUP account.
+            </p>
 
-            <label htmlFor="confirm-password">Confirm new password</label>
-            <input
-              id="confirm-password"
-              type="password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              autoComplete="new-password"
-              minLength={8}
-              required
-            />
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="new-password">
+                New Password
+              </label>
 
-            <button type="submit" disabled={isSaving}>
-              {isSaving ? "SAVING..." : "SAVE NEW PASSWORD"}
-            </button>
+              <input
+                id="new-password"
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(event) =>
+                  setNewPassword(
+                    event.target.value
+                  )
+                }
+                autoComplete="new-password"
+                required
+              />
 
-            {message && (
-              <p
-                className={hasError ? "login-error-message" : "login-help-message"}
-                role={hasError ? "alert" : "status"}
+              <label htmlFor="confirm-password">
+                Confirm New Password
+              </label>
+
+              <input
+                id="confirm-password"
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(
+                    event.target.value
+                  )
+                }
+                autoComplete="new-password"
+                required
+              />
+
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginTop: "8px",
+                  cursor: "pointer",
+                }}
               >
-                {message}
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={(event) =>
+                    setShowPassword(
+                      event.target.checked
+                    )
+                  }
+                />
+
+                Show Password
+              </label>
+
+              <button
+                type="submit"
+                disabled={loading}
+              >
+                {loading
+                  ? "UPDATING..."
+                  : "UPDATE PASSWORD"}
+              </button>
+            </form>
+
+            {errorMessage && (
+              <p
+                className="login-error-message"
+                role="alert"
+              >
+                {errorMessage}
               </p>
             )}
-          </form>
+          </>
+        ) : (
+          <>
+            <p
+              className="login-help-message"
+              role="status"
+            >
+              {message}
+            </p>
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate("/login")
+              }
+            >
+              GO TO LOGIN
+            </button>
+          </>
+        )}
+
+        {!success && (
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/login")
+            }
+          >
+            BACK TO LOGIN
+          </button>
         )}
       </div>
     </section>

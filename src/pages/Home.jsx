@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 
 const whatsappLink = "https://wa.me/27663331151";
-const contactEmail = "info@mabote-group.co.za";
+const contactEmail = "info@mabotegroup.co.za";
 
 export default function Home() {
   return (
@@ -1025,7 +1025,7 @@ export default function Home() {
               <span>
                 <strong>Chat with MABOTE GROUP HOLDINGS</strong>
                 <small>WhatsApp us on 0663331151</small>
-                <small>{contactEmail}</small>
+                <small><a href={`mailto:${contactEmail}`}>{contactEmail}</a></small>
               </span>
             </a>
 
