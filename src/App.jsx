@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from "react";
+﻿
+import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { apiRequest } from "./lib/api";
 
@@ -26,8 +27,10 @@ import HRManagement from "./pages/HRManagement";
 import HRRecruitmentDigital from "./pages/HRRecruitmentDigital";
 import StaffRecruitment from "./pages/StaffRecruitment";
 
-
-function ProtectedRoute({ children, allowedRoles = ["Admin", "Management", "Support Staff"] }) {
+function ProtectedRoute({
+  children,
+  allowedRoles = ["Admin", "Management", "Support Staff"],
+}) {
   const [status, setStatus] = useState("checking");
   const [role, setRole] = useState(null);
 
@@ -42,7 +45,9 @@ function ProtectedRoute({ children, allowedRoles = ["Admin", "Management", "Supp
     let isCurrent = true;
 
     apiRequest("/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     })
       .then(({ account }) => {
         if (!isCurrent) return;
@@ -51,7 +56,11 @@ function ProtectedRoute({ children, allowedRoles = ["Admin", "Management", "Supp
           throw new Error("Account role is missing");
         }
 
-        localStorage.setItem("maboteAccount", JSON.stringify(account));
+        localStorage.setItem(
+          "maboteAccount",
+          JSON.stringify(account)
+        );
+
         setRole(account.role);
         setStatus("authenticated");
       })
@@ -90,12 +99,10 @@ function ProtectedRoute({ children, allowedRoles = ["Admin", "Management", "Supp
   return children;
 }
 
-
 export default function App() {
   return (
     <div>
       <Routes>
-
         {/* PUBLIC WEBSITE */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
@@ -107,6 +114,8 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/payments" element={<Payments />} />
+
+        {/* CLIENT PORTAL */}
         <Route
           path="/client-portal"
           element={
@@ -140,7 +149,7 @@ export default function App() {
         <Route
           path="/member-registration"
           element={
-            <ProtectedRoute allowedRoles={["Member", "Admin", "Management", "Support Staff"]}>
+            <ProtectedRoute>
               <MemberRegistration />
             </ProtectedRoute>
           }
@@ -206,7 +215,7 @@ export default function App() {
           }
         />
 
-        {/* ADMIN PAYMENT MATERIALS */}
+        {/* ADMIN PAYMENTS */}
         <Route
           path="/admin/payments"
           element={
@@ -225,6 +234,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/admin/hr/recruitment"
           element={
@@ -233,6 +243,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/admin/staff-recruitment"
           element={
@@ -245,11 +256,8 @@ export default function App() {
         {/* UNKNOWN ROUTES */}
         <Route
           path="*"
-          element={
-            <Navigate to="/" replace />
-          }
+          element={<Navigate to="/" replace />}
         />
-
       </Routes>
     </div>
   );

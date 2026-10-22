@@ -1015,19 +1015,14 @@ export default function Home() {
 
             </div>
 
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noreferrer"
-              className="home-whatsapp-link"
-            >
+            <div className="home-whatsapp-link">
               <span className="whatsapp-qr-mark">WA</span>
               <span>
                 <strong>Chat with MABOTE GROUP HOLDINGS</strong>
                 <small>WhatsApp us on 0663331151</small>
-                <small><a href={`mailto:${contactEmail}`}>{contactEmail}</a></small>
+                <small>{contactEmail}</small>
               </span>
-            </a>
+            </div>
 
           </div>
 

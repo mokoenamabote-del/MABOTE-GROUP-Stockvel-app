@@ -1,8 +1,15 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://mabote-group-stockvel-app.onrender.com";
 
 export async function apiRequest(path, options = {}) {
   let response;
-  const token = localStorage.getItem("maboteAuthToken");
+
+  const token =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("maboteAuthToken")
+      : null;
 
   try {
     response = await fetch(`${API_URL}${path}`, {
@@ -15,7 +22,7 @@ export async function apiRequest(path, options = {}) {
     });
   } catch {
     throw new Error(
-      `Unable to connect to the server at ${API_URL}. Start the backend with "npm start" in the backend folder and try again.`
+      `Unable to connect to the server at ${API_URL}. Please check the backend connection and try again.`
     );
   }
 
