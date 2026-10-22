@@ -1,12 +1,16 @@
+
 import Database from "better-sqlite3";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
-const databasePath = process.env.DATABASE_PATH || path.join(currentDirectory, "mabote.sqlite");
+const databasePath =
+  process.env.DATABASE_PATH || path.join(currentDirectory, "mabote.sqlite");
+
 const database = new Database(databasePath);
 
 database.pragma("journal_mode = WAL");
+
 database.exec(`
   CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,7 +89,11 @@ export function createAccount({
     );
 
   return database
-    .prepare("SELECT id, full_name, surname, email, role, created_at FROM accounts WHERE id = ?")
+    .prepare(`
+      SELECT id, full_name, surname, email, role, created_at
+      FROM accounts
+      WHERE id = ?
+    `)
     .get(result.lastInsertRowid);
 }
 
@@ -97,7 +105,8 @@ export function createPasswordResetToken(accountId, tokenHash, expiresAt) {
 
     database
       .prepare(`
-        INSERT INTO password_reset_tokens (token_hash, account_id, expires_at, created_at)
+        INSERT INTO password_reset_tokens
+          (token_hash, account_id, expires_at, created_at)
         VALUES (?, ?, ?, ?)
       `)
       .run(tokenHash, accountId, expiresAt, new Date().toISOString());
@@ -148,8 +157,25 @@ export function setAccountRole(email, role) {
   return result.changes > 0;
 }
 
+export function setAccountPassword(email, passwordHash) {
+  const result = database
+    .prepare("UPDATE accounts SET password_hash = ? WHERE email = ?")
+    .run(passwordHash, email);
+
+  return result.changes > 0;
+}
+
+export function updateAccountEmail(currentEmail, newEmail) {
+  const result = database
+    .prepare("UPDATE accounts SET email = ? WHERE email = ?")
+    .run(newEmail, currentEmail);
+
+  return result.changes > 0;
+}
+
 export function createApplication(application) {
   const now = new Date().toISOString();
+
   const result = database
     .prepare(`
       INSERT INTO applications
@@ -178,14 +204,23 @@ export function getApplicationById(id) {
 
 export function listApplications() {
   return database
-    .prepare("SELECT application_json FROM applications ORDER BY created_at DESC")
+    .prepare(`
+      SELECT application_json
+      FROM applications
+      ORDER BY created_at DESC
+    `)
     .all()
     .map((row) => JSON.parse(row.application_json));
 }
 
 export function listApplicationsForEmail(email) {
   return database
-    .prepare("SELECT application_json FROM applications WHERE email = ? ORDER BY created_at DESC")
+    .prepare(`
+      SELECT application_json
+      FROM applications
+      WHERE email = ?
+      ORDER BY created_at DESC
+    `)
     .all(String(email || "").trim().toLowerCase())
     .map((row) => JSON.parse(row.application_json));
 }
@@ -198,6 +233,7 @@ export function updateApplication(applicationNumber, changes) {
   if (!row) return null;
 
   const application = { ...JSON.parse(row.application_json), ...changes };
+
   database
     .prepare(`
       UPDATE applications
@@ -216,9 +252,11 @@ export function updateApplication(applicationNumber, changes) {
 
 export function saveContribution(contribution) {
   const now = new Date().toISOString();
+
   database
     .prepare(`
-      INSERT INTO contributions (id, email, contribution_json, created_at, updated_at)
+      INSERT INTO contributions
+        (id, email, contribution_json, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         email = excluded.email,
@@ -238,23 +276,34 @@ export function saveContribution(contribution) {
 
 export function listContributions() {
   return database
-    .prepare("SELECT contribution_json FROM contributions ORDER BY created_at DESC")
+    .prepare(`
+      SELECT contribution_json
+      FROM contributions
+      ORDER BY created_at DESC
+    `)
     .all()
     .map((row) => JSON.parse(row.contribution_json));
 }
 
 export function listContributionsForEmail(email) {
   return database
-    .prepare("SELECT contribution_json FROM contributions WHERE email = ? ORDER BY created_at DESC")
+    .prepare(`
+      SELECT contribution_json
+      FROM contributions
+      WHERE email = ?
+      ORDER BY created_at DESC
+    `)
     .all(String(email || "").trim().toLowerCase())
     .map((row) => JSON.parse(row.contribution_json));
 }
 
 export function saveClaim(claim) {
   const now = new Date().toISOString();
+
   database
     .prepare(`
-      INSERT INTO claims (id, email, claim_json, created_at, updated_at)
+      INSERT INTO claims
+        (id, email, claim_json, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         email = excluded.email,
@@ -274,14 +323,23 @@ export function saveClaim(claim) {
 
 export function listClaims() {
   return database
-    .prepare("SELECT claim_json FROM claims ORDER BY created_at DESC")
+    .prepare(`
+      SELECT claim_json
+      FROM claims
+      ORDER BY created_at DESC
+    `)
     .all()
     .map((row) => JSON.parse(row.claim_json));
 }
 
 export function listClaimsForEmail(email) {
   return database
-    .prepare("SELECT claim_json FROM claims WHERE email = ? ORDER BY created_at DESC")
+    .prepare(`
+      SELECT claim_json
+      FROM claims
+      WHERE email = ?
+      ORDER BY created_at DESC
+    `)
     .all(String(email || "").trim().toLowerCase())
     .map((row) => JSON.parse(row.claim_json));
 }
