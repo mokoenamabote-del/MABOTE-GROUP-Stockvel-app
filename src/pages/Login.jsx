@@ -12,9 +12,11 @@ export default function Login() {
   const [showResetForm, setShowResetForm] = useState(
     searchParams.get("reset") === "1"
   );
+  const [resetMethod, setResetMethod] = useState("current-password");
   const [resetEmail, setResetEmail] = useState("");
   const [resetCode, setResetCode] = useState("");
   const [resetCodeSent, setResetCodeSent] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [resetMessage, setResetMessage] = useState("");
@@ -101,6 +103,37 @@ export default function Login() {
     }
   };
 
+  const handlePasswordChangeWithoutCode = async (event) => {
+    event.preventDefault();
+    setResetError("");
+    setResetMessage("");
+    setResetLoading(true);
+
+    try {
+      const result = await apiRequest("/api/auth/change-password-with-current-password", {
+        method: "POST",
+        body: JSON.stringify({
+          email: resetEmail.trim(),
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      setEmail(resetEmail.trim());
+      setPassword("");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowResetForm(false);
+      setResetMessage(result.message || "Password changed successfully. You can now log in.");
+    } catch (error) {
+      setResetError(error.message || "Unable to change your password.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <section className="login-container">
       <div className="login-box">
@@ -176,9 +209,11 @@ export default function Login() {
             const opening = !showResetForm;
             setResetEmail(email);
             setResetCode("");
+            setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
             setResetCodeSent(false);
+            setResetMethod("current-password");
             setResetError("");
             setResetMessage("");
             setShowResetForm(opening);
@@ -190,10 +225,45 @@ export default function Login() {
         {showResetForm && (
           <form
             onSubmit={
-              resetCodeSent ? handlePasswordReset : handlePasswordResetRequest
+              resetMethod === "current-password"
+                ? handlePasswordChangeWithoutCode
+                : resetCodeSent
+                  ? handlePasswordReset
+                  : handlePasswordResetRequest
             }
             style={{ marginTop: "16px" }}
           >
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setResetMethod("current-password");
+                  setResetCodeSent(false);
+                  setResetCode("");
+                  setCurrentPassword("");
+                  setResetError("");
+                  setResetMessage("");
+                }}
+                disabled={resetLoading}
+              >
+                USE CURRENT PASSWORD
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setResetMethod("email-code");
+                  setResetCodeSent(false);
+                  setResetCode("");
+                  setCurrentPassword("");
+                  setResetError("");
+                  setResetMessage("");
+                }}
+                disabled={resetLoading}
+              >
+                I FORGOT MY PASSWORD
+              </button>
+            </div>
+
             <label htmlFor="reset-email">Email Address</label>
             <input
               id="reset-email"
@@ -202,11 +272,52 @@ export default function Login() {
               value={resetEmail}
               onChange={(event) => setResetEmail(event.target.value)}
               autoComplete="email"
-              readOnly={resetCodeSent}
+              readOnly={resetMethod === "email-code" && resetCodeSent}
               required
             />
 
-            {resetCodeSent && (
+            {resetMethod === "current-password" ? (
+              <>
+                <p className="login-help-message">
+                  No email code is needed. Enter your current password to verify your account and set a new one.
+                </p>
+
+                <label htmlFor="reset-current-password">Current Password</label>
+                <input
+                  id="reset-current-password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Enter your current password"
+                  value={currentPassword}
+                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  required
+                />
+
+                <label htmlFor="reset-new-password">New Password</label>
+                <input
+                  id="reset-new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  minLength={8}
+                  required
+                />
+
+                <label htmlFor="reset-confirm-password">Confirm New Password</label>
+                <input
+                  id="reset-confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  minLength={8}
+                  required
+                />
+              </>
+            ) : resetCodeSent ? (
               <>
                 <p className="login-help-message">
                   Enter the 6-digit verification code sent to your email, then choose a new password.
@@ -252,7 +363,7 @@ export default function Login() {
                   required
                 />
               </>
-            )}
+            ) : null}
 
             <button
               type="submit"
@@ -260,15 +371,17 @@ export default function Login() {
               disabled={resetLoading}
             >
               {resetLoading
-                ? resetCodeSent
+                ? resetMethod === "current-password" || resetCodeSent
                   ? "UPDATING..."
                   : "SENDING CODE..."
-                : resetCodeSent
-                  ? "RESET PASSWORD"
-                  : "SEND VERIFICATION CODE"}
+                : resetMethod === "current-password"
+                  ? "CHANGE PASSWORD"
+                  : resetCodeSent
+                    ? "RESET PASSWORD"
+                    : "SEND VERIFICATION CODE"}
             </button>
 
-            {resetCodeSent && (
+            {resetMethod === "email-code" && resetCodeSent && (
               <button
                 type="button"
                 onClick={handlePasswordResetRequest}

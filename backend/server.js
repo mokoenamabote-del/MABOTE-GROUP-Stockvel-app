@@ -260,6 +260,44 @@ app.post("/api/auth/change-password", requireAuth, passwordChangeLimiter, async 
   }
 });
 
+app.post("/api/auth/change-password-with-current-password", passwordChangeLimiter, async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const currentPassword = String(req.body?.currentPassword || "");
+    const newPassword = String(req.body?.newPassword || "");
+    const confirmPassword = String(req.body?.confirmPassword || "");
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+      return res.status(400).json({ error: "Enter a valid email address" });
+    }
+
+    const account = findAccountByEmail(email);
+    if (!account || !(await bcrypt.compare(currentPassword, account.password_hash))) {
+      return res.status(401).json({ error: "The email or current password is incorrect" });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters long" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    const updated = changeAccountPassword(account.id, passwordHash);
+
+    if (!updated) {
+      return res.status(404).json({ error: "Account no longer exists" });
+    }
+
+    res.json({ message: "Password changed successfully. You can now log in with your new password." });
+  } catch (error) {
+    console.error("Password change error:", error);
+    res.status(500).json({ error: "Unable to change password" });
+  }
+});
+
 app.post("/api/auth/password-reset-requests", passwordResetLimiter, async (req, res) => {
   try {
     const email = String(req.body?.email || "").trim().toLowerCase();

@@ -40,7 +40,7 @@ This project supports a Render static frontend + Render backend setup, or a Verc
 - Enable 2-Step Verification on the Gmail sender account and create a Google App Password for the backend.
 - In the Render backend service, add `SMTP_USER` and `SMTP_APP_PASSWORD` under **Environment**.
 - Never use the Gmail account password as `SMTP_APP_PASSWORD`, and do not commit the App Password to the repository.
-- After adding the variables, redeploy the backend. Signed-in members can change their password from the client portal, and staff can change theirs in Settings, by entering their current password and choosing a new one. For a forgotten password, the login page's **Reset password** action still emails a single-use verification code that expires after 10 minutes; the user enters the code with their new password and confirmation on the login page.
+- Signed-in members can change their password from the client portal, and staff can change theirs in Settings, by entering their current password and choosing a new one. From the login page, users who know their current password can also change it without an email code. Only users who have forgotten their current password need the **I forgot my password** email verification code, which expires after 10 minutes.
 - Existing account passwords are no longer overwritten when the backend starts. `DEFAULT_ADMIN_PASSWORD` and `DEFAULT_MANAGEMENT_PASSWORD` are used only when provisioning those accounts on a new database.
 
 ## 3) Final checks
