@@ -30,9 +30,8 @@ This project supports a Render static frontend + Render backend setup, or a Verc
   - `JWT_SECRET=<long-random-secret>`
   - `CORS_ORIGIN=https://mabote-group-stockvel-app.onrender.com,https://www.mabote-group.co.za,https://mabote-group.co.za,https://your-vercel-domain.vercel.app,http://localhost:5173`
   - `DATABASE_PATH=/var/data/mabote.sqlite`
-  - `SMTP_USER=<Gmail address used to send password reset links>`
+  - `SMTP_USER=<Gmail address used to send password reset codes>`
   - `SMTP_APP_PASSWORD=<Google App Password; keep it private>`
-  - `APP_BASE_URL=https://www.mabote-group.co.za`
   - `GOOGLE_SHEETS_ID=<optional>`
   - `GOOGLE_SHEETS_NAME=Sheet1`
 
@@ -41,7 +40,7 @@ This project supports a Render static frontend + Render backend setup, or a Verc
 - Enable 2-Step Verification on the Gmail sender account and create a Google App Password for the backend.
 - In the Render backend service, add `SMTP_USER` and `SMTP_APP_PASSWORD` under **Environment**.
 - Never use the Gmail account password as `SMTP_APP_PASSWORD`, and do not commit the App Password to the repository.
-- After adding the variables, redeploy the backend. The login page's **Forgot password?** action will email a single-use reset link that expires after 10 minutes. The link opens a page where the user sets and confirms a new password.
+- After adding the variables, redeploy the backend. The login page's **Forgot password?** action will email a single-use verification code that expires after 10 minutes. The user enters the code with their new password and confirmation on the login page.
 - Existing account passwords are no longer overwritten when the backend starts. `DEFAULT_ADMIN_PASSWORD` and `DEFAULT_MANAGEMENT_PASSWORD` are used only when provisioning those accounts on a new database.
 
 ## 3) Final checks

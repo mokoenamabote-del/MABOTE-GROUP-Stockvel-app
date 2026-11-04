@@ -10,6 +10,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [resetCodeSent, setResetCodeSent] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [resetError, setResetError] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
@@ -53,8 +57,40 @@ export default function Login() {
 
       setResetMessage(
         result.message ||
-          "If an account exists for that email, a password reset link will be sent."
+          "If an account exists for that email, a verification code will be sent."
       );
+      setResetCodeSent(true);
+    } catch (error) {
+      setResetError(error.message || "Unable to reset your password.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (event) => {
+    event.preventDefault();
+    setResetError("");
+    setResetMessage("");
+    setResetLoading(true);
+
+    try {
+      const result = await apiRequest("/api/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({
+          email: resetEmail.trim(),
+          code: resetCode.trim(),
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      setEmail(resetEmail.trim());
+      setResetCode("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setResetCodeSent(false);
+      setShowResetForm(false);
+      setResetMessage(result.message || "Password updated successfully. You can now log in.");
     } catch (error) {
       setResetError(error.message || "Unable to reset your password.");
     } finally {
@@ -136,6 +172,10 @@ export default function Login() {
           onClick={() => {
             const opening = !showResetForm;
             setResetEmail(email);
+            setResetCode("");
+            setNewPassword("");
+            setConfirmPassword("");
+            setResetCodeSent(false);
             setResetError("");
             setResetMessage("");
             setShowResetForm(opening);
@@ -146,7 +186,9 @@ export default function Login() {
 
         {showResetForm && (
           <form
-            onSubmit={handlePasswordResetRequest}
+            onSubmit={
+              resetCodeSent ? handlePasswordReset : handlePasswordResetRequest
+            }
             style={{ marginTop: "16px" }}
           >
             <label htmlFor="reset-email">Email Address</label>
@@ -157,20 +199,81 @@ export default function Login() {
               value={resetEmail}
               onChange={(event) => setResetEmail(event.target.value)}
               autoComplete="email"
+              readOnly={resetCodeSent}
               required
             />
 
-            <p className="login-help-message">
-              We’ll email you a secure link to choose a new password.
-            </p>
+            {resetCodeSent && (
+              <>
+                <p className="login-help-message">
+                  Enter the 6-digit verification code sent to your email, then choose a new password.
+                </p>
+
+                <label htmlFor="reset-code">Verification Code</label>
+                <input
+                  id="reset-code"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  placeholder="Enter 6-digit code"
+                  value={resetCode}
+                  onChange={(event) =>
+                    setResetCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
+                  required
+                />
+
+                <label htmlFor="reset-new-password">New Password</label>
+                <input
+                  id="reset-new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  minLength={8}
+                  required
+                />
+
+                <label htmlFor="reset-confirm-password">Confirm New Password</label>
+                <input
+                  id="reset-confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  minLength={8}
+                  required
+                />
+              </>
+            )}
 
             <button
               type="submit"
               style={{ marginTop: "12px" }}
               disabled={resetLoading}
             >
-              {resetLoading ? "SENDING LINK..." : "SEND RESET LINK"}
+              {resetLoading
+                ? resetCodeSent
+                  ? "UPDATING..."
+                  : "SENDING CODE..."
+                : resetCodeSent
+                  ? "RESET PASSWORD"
+                  : "SEND VERIFICATION CODE"}
             </button>
+
+            {resetCodeSent && (
+              <button
+                type="button"
+                onClick={handlePasswordResetRequest}
+                disabled={resetLoading}
+              >
+                RESEND CODE
+              </button>
+            )}
           </form>
         )}
 

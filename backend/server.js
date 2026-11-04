@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
 import nodemailer from "nodemailer";
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomInt } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getPaymentUpdates, getAuthUrl, saveToken } from "./sheetsHelper.js";
@@ -233,33 +233,27 @@ app.post("/api/auth/password-reset-requests", passwordResetLimiter, async (req, 
       });
     }
 
-    const appBaseUrl = String(process.env.APP_BASE_URL || "").replace(/\/+$/, "");
-    if (!appBaseUrl) {
-      return res.status(503).json({
-        error: "Password reset links are not configured yet. Please try again later.",
-      });
-    }
-
     const account = findAccountByEmail(email);
     if (!account) {
       return res.status(202).json({
-        message: "If an account exists for that email, a password reset link will be sent.",
+        message: "If an account exists for that email, a verification code will be sent.",
       });
     }
 
-    const token = randomBytes(32).toString("hex");
-    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
+    const tokenHash = createHash("sha256")
+      .update(`${email}:${code}`)
+      .digest("hex");
     const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS).toISOString();
     createPasswordResetToken(account.id, tokenHash, expiresAt);
-    const resetUrl = `${appBaseUrl}/reset-password?token=${token}`;
 
     try {
       await mailer.sendMail({
         from: process.env.SMTP_FROM || process.env.SMTP_USER,
         to: account.email,
-        subject: "Reset your MABOTE GROUP password",
-        text: `Use this link to choose a new password: ${resetUrl}\n\nThis link expires in 10 minutes. If you did not request a password reset, you can ignore this email.`,
-        html: `<p>Use the link below to choose a new password:</p><p><a href="${resetUrl}">Reset your password</a></p><p>This link expires in 10 minutes. If you did not request a password reset, you can ignore this email.</p>`,
+        subject: "Your MABOTE GROUP password reset code",
+        text: `Your password reset verification code is ${code}. Enter this code on the login page to choose a new password. The code expires in 10 minutes. If you did not request this, you can ignore this email.`,
+        html: `<p>Your password reset verification code is:</p><p style="font-size:24px;font-weight:bold;letter-spacing:4px">${code}</p><p>Enter this code on the login page to choose a new password. It expires in 10 minutes. If you did not request this, you can ignore this email.</p>`,
       });
     } catch (error) {
       deletePasswordResetToken(tokenHash);
@@ -270,7 +264,7 @@ app.post("/api/auth/password-reset-requests", passwordResetLimiter, async (req, 
     }
 
     res.status(202).json({
-      message: "If an account exists for that email, a password reset link will be sent.",
+      message: "If an account exists for that email, a verification code will be sent.",
     });
   } catch (error) {
     console.error("Password reset request error:", error);
@@ -280,12 +274,13 @@ app.post("/api/auth/password-reset-requests", passwordResetLimiter, async (req, 
 
 app.post("/api/auth/reset-password", passwordResetLimiter, async (req, res) => {
   try {
-    const token = String(req.body?.token || "").trim();
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const code = String(req.body?.code || "").trim();
     const newPassword = String(req.body?.newPassword || "");
     const confirmPassword = String(req.body?.confirmPassword || "");
 
-    if (!/^[a-f0-9]{64}$/i.test(token)) {
-      return res.status(400).json({ error: "This password reset link is invalid or expired." });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) {
+      return res.status(400).json({ error: "The verification code is invalid or expired" });
     }
 
     if (newPassword.length < 8) {
@@ -296,7 +291,14 @@ app.post("/api/auth/reset-password", passwordResetLimiter, async (req, res) => {
       return res.status(400).json({ error: "Passwords do not match" });
     }
 
-    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const account = findAccountByEmail(email);
+    if (!account) {
+      return res.status(400).json({ error: "The verification code is invalid or expired" });
+    }
+
+    const tokenHash = createHash("sha256")
+      .update(`${email}:${code}`)
+      .digest("hex");
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const updated = consumePasswordResetToken(
       tokenHash,
@@ -305,7 +307,7 @@ app.post("/api/auth/reset-password", passwordResetLimiter, async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(400).json({ error: "This password reset link is invalid or expired." });
+      return res.status(400).json({ error: "The verification code is invalid or expired" });
     }
 
     res.json({ message: "Password updated successfully. You can now log in." });
