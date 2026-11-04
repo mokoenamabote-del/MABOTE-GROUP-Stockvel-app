@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(
+    searchParams.get("reset") === "1"
+  );
   const [resetEmail, setResetEmail] = useState("");
   const [resetCode, setResetCode] = useState("");
   const [resetCodeSent, setResetCodeSent] = useState(false);
@@ -181,7 +184,7 @@ export default function Login() {
             setShowResetForm(opening);
           }}
         >
-          {showResetForm ? "CLOSE PASSWORD RESET" : "FORGOT PASSWORD?"}
+          {showResetForm ? "CLOSE PASSWORD RESET" : "RESET PASSWORD"}
         </button>
 
         {showResetForm && (
