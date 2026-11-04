@@ -1,7 +1,9 @@
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://mabote-group-stockvel-app.onrender.com";
+const configuredApiUrl =
+  import.meta.env.VITE_API_URL || "https://mabote-group-api.onrender.com";
+const API_URL = configuredApiUrl.replace(
+  "https://mabote-group-api-backend.onrender.com",
+  "https://mabote-group-api.onrender.com"
+);
 
 export async function apiRequest(path, options = {}) {
   let response;

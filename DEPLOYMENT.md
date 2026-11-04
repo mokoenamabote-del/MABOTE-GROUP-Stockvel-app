@@ -8,6 +8,7 @@ This project supports a Render static frontend + Render backend setup, or a Verc
 - Render creates the `mabote-group-stockvel-app` static site from the repository root.
 - The site builds with `npm ci && npm run build` and publishes `dist`.
 - The frontend API URL is configured as `https://mabote-group-api.onrender.com`.
+- If `VITE_API_URL` is set in the Render dashboard, use that same API URL; Vite embeds it in the static build, so redeploy the frontend after changing it. The legacy `mabote-group-api-backend.onrender.com` hostname has a CORS configuration issue.
 - To use the live site, add `mabote-group.co.za` and `www.mabote-group.co.za` under the static site's Custom Domains. Set the DNS records at the domain provider to the exact values Render displays.
 
 ## Alternative: Frontend deploy (Vercel)
