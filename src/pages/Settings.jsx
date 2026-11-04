@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ChangePasswordForm from "../components/ChangePasswordForm";
 
 const initialStaff = [
   {
@@ -302,6 +303,10 @@ export default function Settings() {
       </div>
 
       <div className="settings-container">
+        <section className="settings-section">
+          <ChangePasswordForm />
+        </section>
+
         {/* ROLE MANAGEMENT */}
 
         <section className="settings-section">

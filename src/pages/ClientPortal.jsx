@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiRequest } from "../lib/api";
+import ChangePasswordForm from "../components/ChangePasswordForm";
 import "./ClientPortal.css";
 
 const readList = (key) => {
@@ -231,6 +232,10 @@ export default function ClientPortal() {
             )}
             <a className="portal-text-action" href="mailto:info@mabote-group.co.za?subject=Membership%20support">Contact membership support <span>↗</span></a>
           </article>
+        </section>
+
+        <section className="portal-panel portal-password-panel">
+          <ChangePasswordForm />
         </section>
 
         <section className="portal-footer-actions">

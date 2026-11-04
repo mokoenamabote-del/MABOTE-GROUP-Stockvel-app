@@ -106,6 +106,8 @@
   border: 1px solid #d9d2c3;
 }
 
+.portal-password-panel { margin-top: 18px; }
+
 .portal-panel--welcome { min-height: 270px; }
 .portal-panel--next { background: #e8dfcd; border-color: #e8dfcd; }
 .portal-panel-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }

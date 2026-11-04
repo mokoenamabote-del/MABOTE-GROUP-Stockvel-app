@@ -12,6 +12,7 @@ import { getPaymentUpdates, getAuthUrl, saveToken } from "./sheetsHelper.js";
 import {
   createAccount,
   createApplication,
+  changeAccountPassword,
   consumePasswordResetToken,
   createPasswordResetToken,
   deletePasswordResetToken,
@@ -47,6 +48,13 @@ const passwordResetLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many password reset attempts. Please try again later." },
+});
+const passwordChangeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many password change attempts. Please try again later." },
 });
 
 if (!JWT_SECRET) {
@@ -215,6 +223,40 @@ app.post("/api/auth/login", async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Unable to log in" });
+  }
+});
+
+app.post("/api/auth/change-password", requireAuth, passwordChangeLimiter, async (req, res) => {
+  try {
+    const email = String(req.account.email || "").trim().toLowerCase();
+    const currentPassword = String(req.body?.currentPassword || "");
+    const newPassword = String(req.body?.newPassword || "");
+    const confirmPassword = String(req.body?.confirmPassword || "");
+    const account = findAccountByEmail(email);
+
+    if (!account || !(await bcrypt.compare(currentPassword, account.password_hash))) {
+      return res.status(401).json({ error: "Your current password is incorrect" });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters long" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    const updated = changeAccountPassword(account.id, passwordHash);
+
+    if (!updated) {
+      return res.status(404).json({ error: "Account no longer exists" });
+    }
+
+    res.json({ message: "Password changed successfully." });
+  } catch (error) {
+    console.error("Password change error:", error);
+    res.status(500).json({ error: "Unable to change password" });
   }
 });
 

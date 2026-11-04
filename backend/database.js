@@ -165,6 +165,24 @@ export function setAccountPassword(email, passwordHash) {
   return result.changes > 0;
 }
 
+export function changeAccountPassword(accountId, passwordHash) {
+  const updatePassword = database.transaction(() => {
+    const result = database
+      .prepare("UPDATE accounts SET password_hash = ? WHERE id = ?")
+      .run(passwordHash, accountId);
+
+    if (result.changes === 0) return false;
+
+    database
+      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
+      .run(accountId);
+
+    return true;
+  });
+
+  return updatePassword();
+}
+
 export function updateAccountEmail(currentEmail, newEmail) {
   const result = database
     .prepare("UPDATE accounts SET email = ? WHERE email = ?")
