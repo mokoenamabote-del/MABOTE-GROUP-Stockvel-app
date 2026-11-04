@@ -10,10 +10,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [resetError, setResetError] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -42,25 +41,24 @@ export default function Login() {
     event.preventDefault();
     setResetError("");
     setResetMessage("");
+    setResetLoading(true);
 
     try {
-      const result = await apiRequest("/api/auth/reset-password", {
+      const result = await apiRequest("/api/auth/password-reset-requests", {
         method: "POST",
         body: JSON.stringify({
           email: resetEmail.trim(),
-          newPassword,
-          confirmPassword,
         }),
       });
 
-      setResetMessage(result.message || "Password updated successfully.");
-      setShowResetForm(false);
-      setEmail(resetEmail.trim());
-      setPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      setResetMessage(
+        result.message ||
+          "If an account exists for that email, a password reset link will be sent."
+      );
     } catch (error) {
       setResetError(error.message || "Unable to reset your password.");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -158,30 +156,12 @@ export default function Login() {
               required
             />
 
-            <label htmlFor="new-password">New Password</label>
-            <input
-              id="new-password"
-              type="password"
-              placeholder="Enter a new password"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-              minLength={8}
-              required
-            />
-
-            <label htmlFor="confirm-password">Confirm New Password</label>
-            <input
-              id="confirm-password"
-              type="password"
-              placeholder="Confirm your new password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              minLength={8}
-              required
-            />
-
-            <button type="submit" style={{ marginTop: "12px" }}>
-              RESET PASSWORD
+            <button
+              type="submit"
+              style={{ marginTop: "12px" }}
+              disabled={resetLoading}
+            >
+              {resetLoading ? "SENDING..." : "SEND RESET LINK"}
             </button>
           </form>
         )}

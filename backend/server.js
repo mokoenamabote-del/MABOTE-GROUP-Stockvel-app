@@ -3,12 +3,18 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
+import nodemailer from "nodemailer";
+import { createHash, randomBytes } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getPaymentUpdates, getAuthUrl, saveToken } from "./sheetsHelper.js";
 import {
   createAccount,
   createApplication,
+  consumePasswordResetToken,
+  createPasswordResetToken,
+  deletePasswordResetToken,
   findAccountByEmail,
   listClaims,
   listClaimsForEmail,
@@ -34,6 +40,15 @@ const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "mokoenamabote@gm
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "Mabote@2026!";
 const DEFAULT_MANAGEMENT_EMAIL = process.env.DEFAULT_MANAGEMENT_EMAIL || "management@mabotegroup.co.za";
 const DEFAULT_MANAGEMENT_PASSWORD = process.env.DEFAULT_MANAGEMENT_PASSWORD || "MaboteManage@2026!";
+const PASSWORD_RESET_TTL_MS = 30 * 60 * 1000;
+const APP_BASE_URL = (process.env.APP_BASE_URL || "https://www.mabote-group.co.za").replace(/\/+$/, "");
+const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many password reset attempts. Please try again later." },
+});
 
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET must be set in backend/.env before starting the server");
@@ -95,9 +110,15 @@ const ensureDefaultManagementAccount = async () => {
   }
 };
 
+const configuredOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin:
+      configuredOrigins.length === 1 ? configuredOrigins[0] : configuredOrigins,
   })
 );
 app.use(express.json());
@@ -116,6 +137,18 @@ const createSessionToken = (account) =>
     JWT_SECRET,
     { expiresIn: "8h" }
   );
+
+const getPasswordResetMailer = () => {
+  const user = String(process.env.SMTP_USER || "").trim();
+  const pass = String(process.env.SMTP_APP_PASSWORD || "").replace(/\s/g, "");
+
+  if (!user || !pass) return null;
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: { user, pass },
+  });
+};
 
 const requireAuth = (req, res, next) => {
   const authorization = req.headers.authorization || "";
@@ -179,14 +212,67 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-app.post("/api/auth/reset-password", async (req, res) => {
+app.post("/api/auth/password-reset-requests", passwordResetLimiter, async (req, res) => {
   try {
-    const email = String(req.body.email || "").trim().toLowerCase();
-    const newPassword = String(req.body.newPassword || "");
-    const confirmPassword = String(req.body.confirmPassword || "");
+    const email = String(req.body?.email || "").trim().toLowerCase();
 
-    if (!email || !newPassword || !confirmPassword) {
-      return res.status(400).json({ error: "Email and a new password are required" });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+      return res.status(400).json({ error: "Enter a valid email address" });
+    }
+
+    const mailer = getPasswordResetMailer();
+    if (!mailer) {
+      return res.status(503).json({
+        error: "Password reset email is not configured yet. Please try again later.",
+      });
+    }
+
+    const account = findAccountByEmail(email);
+    if (!account) {
+      return res.status(202).json({
+        message: "If an account exists for that email, a password reset link will be sent.",
+      });
+    }
+
+    const token = randomBytes(32).toString("hex");
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS).toISOString();
+    createPasswordResetToken(account.id, tokenHash, expiresAt);
+
+    const resetUrl = `${APP_BASE_URL}/reset-password?token=${token}`;
+    try {
+      await mailer.sendMail({
+        from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        to: account.email,
+        subject: "Reset your MABOTE GROUP password",
+        text: `We received a request to reset the password for your MABOTE GROUP account. Open this link within 30 minutes to choose a new password:\n\n${resetUrl}\n\nIf you did not request this, you can ignore this email.`,
+        html: `<p>We received a request to reset the password for your MABOTE GROUP account.</p><p><a href="${resetUrl}">Reset your password</a></p><p>This link expires in 30 minutes. If you did not request this, you can ignore this email.</p>`,
+      });
+    } catch (error) {
+      deletePasswordResetToken(tokenHash);
+      console.error("Password reset email delivery failed:", error);
+      return res.status(503).json({
+        error: "We could not send the password reset email. Please try again later.",
+      });
+    }
+
+    res.status(202).json({
+      message: "If an account exists for that email, a password reset link will be sent.",
+    });
+  } catch (error) {
+    console.error("Password reset request error:", error);
+    res.status(500).json({ error: "Unable to process the password reset request" });
+  }
+});
+
+app.post("/api/auth/reset-password", passwordResetLimiter, async (req, res) => {
+  try {
+    const token = String(req.body?.token || "");
+    const newPassword = String(req.body?.newPassword || "");
+    const confirmPassword = String(req.body?.confirmPassword || "");
+
+    if (!/^[a-f0-9]{64}$/i.test(token)) {
+      return res.status(400).json({ error: "This password reset link is invalid or expired" });
     }
 
     if (newPassword.length < 8) {
@@ -197,23 +283,19 @@ app.post("/api/auth/reset-password", async (req, res) => {
       return res.status(400).json({ error: "Passwords do not match" });
     }
 
-    const account = findAccountByEmail(email);
-
-    if (!account) {
-      return res.status(404).json({ error: "No account was found for that email" });
-    }
-
+    const tokenHash = createHash("sha256").update(token).digest("hex");
     const passwordHash = await bcrypt.hash(newPassword, 12);
-    const updated = setAccountPassword(email, passwordHash);
+    const updated = consumePasswordResetToken(
+      tokenHash,
+      passwordHash,
+      new Date().toISOString()
+    );
 
     if (!updated) {
-      return res.status(500).json({ error: "Unable to update the password" });
+      return res.status(400).json({ error: "This password reset link is invalid or expired" });
     }
 
-    res.json({
-      message: "Password updated successfully. You can now log in with your new password.",
-      account: publicAccount(account),
-    });
+    res.json({ message: "Password updated successfully. You can now log in." });
   } catch (error) {
     console.error("Password reset error:", error);
     res.status(500).json({ error: "Unable to reset password" });
