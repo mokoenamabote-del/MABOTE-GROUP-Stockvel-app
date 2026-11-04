@@ -110,10 +110,17 @@ const ensureDefaultManagementAccount = async () => {
   }
 };
 
-const configuredOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
+const configuredOrigins = [
+  "https://mabote-group-stockvel-app.onrender.com",
+  "https://www.mabote-group.co.za",
+  "https://mabote-group.co.za",
+  "https://www.mabotegroup.co.za",
+  "https://mabotegroup.co.za",
+  "http://localhost:5173",
+  ...(process.env.CORS_ORIGIN || "").split(","),
+]
   .map((origin) => origin.trim())
-  .filter(Boolean);
+  .filter((origin, index, origins) => origin && origins.indexOf(origin) === index);
 
 app.use(
   cors({
