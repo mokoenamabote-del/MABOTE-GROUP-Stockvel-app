@@ -20,12 +20,7 @@ export default function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setError("");
     setMessage("");
   };
@@ -37,9 +32,7 @@ export default function Login() {
       return attemptedPath;
     }
 
-    if (role === "Member") {
-      return "/client-portal";
-    }
+    if (role === "Member") return "/client-portal";
 
     if (["Admin", "Management", "Support Staff"].includes(role)) {
       return "/admin";
@@ -50,7 +43,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
     setError("");
     setMessage("");
@@ -71,19 +63,14 @@ export default function Login() {
       }
 
       localStorage.setItem("maboteAuthToken", token);
-      localStorage.setItem(
-        "maboteAccount",
-        JSON.stringify(account)
-      );
+      localStorage.setItem("maboteAccount", JSON.stringify(account));
 
       navigate(getRedirectPathByRole(account.role), {
         replace: true,
       });
-
     } catch (err) {
       setError(
-        err.message ||
-        "Unable to log in. Check your email and password."
+        err.message || "Unable to log in. Check your email and password."
       );
     } finally {
       setLoading(false);
@@ -104,42 +91,28 @@ export default function Login() {
 
   return (
     <div className="login-container">
+      <div className="login-box">
 
-      <h2>MABOTE GROUP LOGIN</h2>
+        <h1>MABOTE GROUP</h1>
 
-      {error && (
-        <div
-          role="alert"
-          style={{
-            color: "red",
-            marginBottom: "1rem",
-          }}
-        >
-          {error}
-        </div>
-      )}
+        <h2>{showReset ? "FORGOT PASSWORD" : "MEMBER LOGIN"}</h2>
 
-      {message && (
-        <div
-          role="status"
-          style={{
-            color: "green",
-            marginBottom: "1rem",
-          }}
-        >
-          {message}
-        </div>
-      )}
+        {error && (
+          <div role="alert" className="login-error-message">
+            {error}
+          </div>
+        )}
 
-      {!showReset ? (
+        {message && (
+          <div role="status" className="login-help-message">
+            {message}
+          </div>
+        )}
 
-        <>
-          <form onSubmit={handleSubmit}>
-
-            <div style={{ marginBottom: "1rem" }}>
-              <label htmlFor="email">
-                Email Address
-              </label>
+        {!showReset ? (
+          <>
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="email">Email Address</label>
 
               <input
                 id="email"
@@ -150,17 +123,10 @@ export default function Login() {
                 onChange={handleChange}
                 autoComplete="username"
                 disabled={loading}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                }}
+                placeholder="Enter your email address"
               />
-            </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label htmlFor="password">
-                Password
-              </label>
+              <label htmlFor="password">Password</label>
 
               <input
                 id="password"
@@ -171,95 +137,64 @@ export default function Login() {
                 onChange={handleChange}
                 autoComplete="current-password"
                 disabled={loading}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                }}
+                placeholder="Enter your password"
               />
 
               <label
                 style={{
-                  display: "block",
-                  marginTop: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginTop: "8px",
                 }}
               >
                 <input
                   type="checkbox"
                   checked={showPassword}
-                  onChange={(e) =>
-                    setShowPassword(e.target.checked)
-                  }
-                />{" "}
+                  onChange={(e) => setShowPassword(e.target.checked)}
+                  style={{ width: "auto" }}
+                />
                 Show Password
               </label>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-              }}
-            >
-              {loading ? "Signing in..." : "LOGIN"}
-            </button>
+              <button type="submit" disabled={loading}>
+                {loading ? "SIGNING IN..." : "LOGIN"}
+              </button>
+            </form>
 
-          </form>
-
-          <div style={{ marginTop: "1rem" }}>
             <button
               type="button"
+              className="secondary-button"
               onClick={openPasswordReset}
-              style={{
-                width: "100%",
-                padding: "0.65rem",
-              }}
             >
               FORGOT PASSWORD?
             </button>
+          </>
+        ) : (
+          <div>
+            <p>
+              Password recovery is temporarily unavailable.
+              Please contact MABOTE GROUP administration for assistance.
+            </p>
+
+            <button type="button" onClick={closePasswordReset}>
+              BACK TO LOGIN
+            </button>
           </div>
-        </>
+        )}
 
-      ) : (
+        <p>
+          Don't have an account?{" "}
+          <Link to="/register">
+            <strong>CREATE ACCOUNT</strong>
+          </Link>
+        </p>
 
-        <div style={{ marginTop: "1rem" }}>
+        <p className="login-help-message">
+          Prepare Today. Support Tomorrow.
+        </p>
 
-          <button
-            type="button"
-            onClick={closePasswordReset}
-            style={{
-              width: "100%",
-              padding: "0.65rem",
-            }}
-          >
-            BACK TO LOGIN
-          </button>
-
-          <h3>FORGOT PASSWORD</h3>
-
-          <p>
-            Password recovery is temporarily unavailable.
-            A secure recovery service will be added to
-            MABOTE GROUP.
-          </p>
-
-          <p>
-            You will be able to create a new password
-            without entering your current password.
-          </p>
-
-        </div>
-
-      )}
-
-      <div style={{ marginTop: "1.5rem" }}>
-        Don't have an account?{" "}
-        <Link to="/register">
-          CREATE ACCOUNT
-        </Link>
       </div>
-
     </div>
   );
 }
