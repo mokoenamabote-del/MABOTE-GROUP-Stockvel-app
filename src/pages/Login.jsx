@@ -1,415 +1,265 @@
+
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(
-    searchParams.get("reset") === "1"
-  );
-  const [resetMethod, setResetMethod] = useState("current-password");
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetCode, setResetCode] = useState("");
-  const [resetCodeSent, setResetCodeSent] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [resetMessage, setResetMessage] = useState("");
-  const [resetError, setResetError] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setError("");
+    setMessage("");
+  };
+
+  const getRedirectPathByRole = (role) => {
+    const attemptedPath = location.state?.from?.pathname;
+
+    if (attemptedPath && attemptedPath !== "/login") {
+      return attemptedPath;
+    }
+
+    if (role === "Member") {
+      return "/client-portal";
+    }
+
+    if (["Admin", "Management", "Support Staff"].includes(role)) {
+      return "/admin";
+    }
+
+    return "/";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError("");
+    setMessage("");
 
     try {
-      const result = await apiRequest("/api/auth/login", {
+      const response = await apiRequest("/api/auth/login", {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
 
-      localStorage.setItem("maboteAuthToken", result.token);
-      localStorage.setItem("maboteAccount", JSON.stringify(result.account));
-      navigate(["Admin", "Management"].includes(result.account?.role) ? "/admin" : "/portal");
-    } catch (error) {
-      if (error.status === 401) {
-        alert(
-          "We could not log you in. Check your email and password, or create an account first."
-        );
-      } else {
-        alert(error.message);
+      const { token, account } = response;
+
+      if (!token || !account?.role) {
+        throw new Error("Invalid response received from server.");
       }
-    }
-  };
 
-  const handlePasswordResetRequest = async (event) => {
-    event?.preventDefault();
-    setResetError("");
-    setResetMessage("");
-    setResetLoading(true);
-
-    try {
-      const result = await apiRequest("/api/auth/password-reset-requests", {
-        method: "POST",
-        body: JSON.stringify({
-          email: resetEmail.trim(),
-        }),
-      });
-
-      setResetMessage(
-        result.message ||
-          "If an account exists for that email, a verification code will be sent."
+      localStorage.setItem("maboteAuthToken", token);
+      localStorage.setItem(
+        "maboteAccount",
+        JSON.stringify(account)
       );
-      setResetCodeSent(true);
-    } catch (error) {
-      setResetError(error.message || "Unable to reset your password.");
+
+      navigate(getRedirectPathByRole(account.role), {
+        replace: true,
+      });
+
+    } catch (err) {
+      setError(
+        err.message ||
+        "Unable to log in. Check your email and password."
+      );
     } finally {
-      setResetLoading(false);
+      setLoading(false);
     }
   };
 
-  const handlePasswordReset = async (event) => {
-    event.preventDefault();
-    setResetError("");
-    setResetMessage("");
-    setResetLoading(true);
-
-    try {
-      const result = await apiRequest("/api/auth/reset-password", {
-        method: "POST",
-        body: JSON.stringify({
-          email: resetEmail.trim(),
-          code: resetCode.trim(),
-          newPassword,
-          confirmPassword,
-        }),
-      });
-
-      setEmail(resetEmail.trim());
-      setResetCode("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setResetCodeSent(false);
-      setShowResetForm(false);
-      setResetMessage(result.message || "Password updated successfully. You can now log in.");
-    } catch (error) {
-      setResetError(error.message || "Unable to reset your password.");
-    } finally {
-      setResetLoading(false);
-    }
+  const openPasswordReset = () => {
+    setShowReset(true);
+    setError("");
+    setMessage("");
   };
 
-  const handlePasswordChangeWithoutCode = async (event) => {
-    event.preventDefault();
-    setResetError("");
-    setResetMessage("");
-    setResetLoading(true);
-
-    try {
-      const result = await apiRequest("/api/auth/change-password-with-current-password", {
-        method: "POST",
-        body: JSON.stringify({
-          email: resetEmail.trim(),
-          currentPassword,
-          newPassword,
-          confirmPassword,
-        }),
-      });
-
-      setEmail(resetEmail.trim());
-      setPassword("");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setShowResetForm(false);
-      setResetMessage(result.message || "Password changed successfully. You can now log in.");
-    } catch (error) {
-      setResetError(error.message || "Unable to change your password.");
-    } finally {
-      setResetLoading(false);
-    }
+  const closePasswordReset = () => {
+    setShowReset(false);
+    setError("");
+    setMessage("");
   };
 
   return (
-    <section className="login-container">
-      <div className="login-box">
-        <img src="/mabote-logo.svg" alt="MABOTE GROUP" className="login-logo" />
+    <div className="login-container">
 
-        <h2>Login</h2>
+      <h2>MABOTE GROUP LOGIN</h2>
 
-        <form onSubmit={handleLogin}>
-          <label htmlFor="email">
-            Email Address
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(event) =>
-              setEmail(event.target.value)
-            }
-            autoComplete="email"
-            required
-          />
-
-          <label htmlFor="password">
-            Password
-          </label>
-
-          <input
-            id="password"
-            type={
-              showPassword
-                ? "text"
-                : "password"
-            }
-            placeholder="Enter your password"
-            value={password}
-            onChange={(event) =>
-              setPassword(event.target.value)
-            }
-            autoComplete="current-password"
-            required
-          />
-
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginTop: "8px",
-              cursor: "pointer",
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={showPassword}
-              onChange={(event) =>
-                setShowPassword(event.target.checked)
-              }
-            />
-
-            Show Password
-          </label>
-
-          <button type="submit">
-            LOGIN
-          </button>
-        </form>
-
-        <button
-          type="button"
-          onClick={() => {
-            const opening = !showResetForm;
-            setResetEmail(email);
-            setResetCode("");
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
-            setResetCodeSent(false);
-            setResetMethod("current-password");
-            setResetError("");
-            setResetMessage("");
-            setShowResetForm(opening);
+      {error && (
+        <div
+          role="alert"
+          style={{
+            color: "red",
+            marginBottom: "1rem",
           }}
         >
-          {showResetForm ? "CLOSE PASSWORD RESET" : "RESET PASSWORD"}
-        </button>
+          {error}
+        </div>
+      )}
 
-        {showResetForm && (
-          <form
-            onSubmit={
-              resetMethod === "current-password"
-                ? handlePasswordChangeWithoutCode
-                : resetCodeSent
-                  ? handlePasswordReset
-                  : handlePasswordResetRequest
-            }
-            style={{ marginTop: "16px" }}
-          >
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setResetMethod("current-password");
-                  setResetCodeSent(false);
-                  setResetCode("");
-                  setCurrentPassword("");
-                  setResetError("");
-                  setResetMessage("");
+      {message && (
+        <div
+          role="status"
+          style={{
+            color: "green",
+            marginBottom: "1rem",
+          }}
+        >
+          {message}
+        </div>
+      )}
+
+      {!showReset ? (
+
+        <>
+          <form onSubmit={handleSubmit}>
+
+            <div style={{ marginBottom: "1rem" }}>
+              <label htmlFor="email">
+                Email Address
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="username"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
                 }}
-                disabled={resetLoading}
-              >
-                USE CURRENT PASSWORD
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setResetMethod("email-code");
-                  setResetCodeSent(false);
-                  setResetCode("");
-                  setCurrentPassword("");
-                  setResetError("");
-                  setResetMessage("");
-                }}
-                disabled={resetLoading}
-              >
-                I FORGOT MY PASSWORD
-              </button>
+              />
             </div>
 
-            <label htmlFor="reset-email">Email Address</label>
-            <input
-              id="reset-email"
-              type="email"
-              placeholder="Enter your email"
-              value={resetEmail}
-              onChange={(event) => setResetEmail(event.target.value)}
-              autoComplete="email"
-              readOnly={resetMethod === "email-code" && resetCodeSent}
-              required
-            />
+            <div style={{ marginBottom: "1rem" }}>
+              <label htmlFor="password">
+                Password
+              </label>
 
-            {resetMethod === "current-password" ? (
-              <>
-                <p className="login-help-message">
-                  No email code is needed. Enter your current password to verify your account and set a new one.
-                </p>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                }}
+              />
 
-                <label htmlFor="reset-current-password">Current Password</label>
+              <label
+                style={{
+                  display: "block",
+                  marginTop: "0.5rem",
+                }}
+              >
                 <input
-                  id="reset-current-password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="Enter your current password"
-                  value={currentPassword}
-                  onChange={(event) => setCurrentPassword(event.target.value)}
-                  required
-                />
-
-                <label htmlFor="reset-new-password">New Password</label>
-                <input
-                  id="reset-new-password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
-                  minLength={8}
-                  required
-                />
-
-                <label htmlFor="reset-confirm-password">Confirm New Password</label>
-                <input
-                  id="reset-confirm-password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(event) => setConfirmPassword(event.target.value)}
-                  minLength={8}
-                  required
-                />
-              </>
-            ) : resetCodeSent ? (
-              <>
-                <p className="login-help-message">
-                  Enter the 6-digit verification code sent to your email, then choose a new password.
-                </p>
-
-                <label htmlFor="reset-code">Verification Code</label>
-                <input
-                  id="reset-code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  placeholder="Enter 6-digit code"
-                  value={resetCode}
-                  onChange={(event) =>
-                    setResetCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={(e) =>
+                    setShowPassword(e.target.checked)
                   }
-                  required
-                />
-
-                <label htmlFor="reset-new-password">New Password</label>
-                <input
-                  id="reset-new-password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
-                  minLength={8}
-                  required
-                />
-
-                <label htmlFor="reset-confirm-password">Confirm New Password</label>
-                <input
-                  id="reset-confirm-password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(event) => setConfirmPassword(event.target.value)}
-                  minLength={8}
-                  required
-                />
-              </>
-            ) : null}
+                />{" "}
+                Show Password
+              </label>
+            </div>
 
             <button
               type="submit"
-              style={{ marginTop: "12px" }}
-              disabled={resetLoading}
+              disabled={loading}
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+              }}
             >
-              {resetLoading
-                ? resetMethod === "current-password" || resetCodeSent
-                  ? "UPDATING..."
-                  : "SENDING CODE..."
-                : resetMethod === "current-password"
-                  ? "CHANGE PASSWORD"
-                  : resetCodeSent
-                    ? "RESET PASSWORD"
-                    : "SEND VERIFICATION CODE"}
+              {loading ? "Signing in..." : "LOGIN"}
             </button>
 
-            {resetMethod === "email-code" && resetCodeSent && (
-              <button
-                type="button"
-                onClick={handlePasswordResetRequest}
-                disabled={resetLoading}
-              >
-                RESEND CODE
-              </button>
-            )}
           </form>
-        )}
 
-        {resetMessage && (
-          <p style={{ color: "#0b7a35", marginTop: "12px", fontWeight: 700 }}>{resetMessage}</p>
-        )}
+          <div style={{ marginTop: "1rem" }}>
+            <button
+              type="button"
+              onClick={openPasswordReset}
+              style={{
+                width: "100%",
+                padding: "0.65rem",
+              }}
+            >
+              FORGOT PASSWORD?
+            </button>
+          </div>
+        </>
 
-        {resetError && (
-          <p style={{ color: "#a61d1d", marginTop: "12px", fontWeight: 700 }}>{resetError}</p>
-        )}
+      ) : (
 
-        <p>Don't have an account?</p>
+        <div style={{ marginTop: "1rem" }}>
 
-        <button
-          type="button"
-          onClick={() => navigate("/register")}
-        >
+          <button
+            type="button"
+            onClick={closePasswordReset}
+            style={{
+              width: "100%",
+              padding: "0.65rem",
+            }}
+          >
+            BACK TO LOGIN
+          </button>
+
+          <h3>FORGOT PASSWORD</h3>
+
+          <p>
+            Password recovery is temporarily unavailable.
+            A secure recovery service will be added to
+            MABOTE GROUP.
+          </p>
+
+          <p>
+            You will be able to create a new password
+            without entering your current password.
+          </p>
+
+        </div>
+
+      )}
+
+      <div style={{ marginTop: "1.5rem" }}>
+        Don't have an account?{" "}
+        <Link to="/register">
           CREATE ACCOUNT
-        </button>
+        </Link>
       </div>
-    </section>
+
+    </div>
   );
 }
