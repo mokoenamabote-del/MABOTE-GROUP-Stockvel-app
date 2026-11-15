@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ChangePasswordForm from "../components/ChangePasswordForm";
+import bankingDetailsDefaults from "../lib/bankingDetails";
 
 const initialStaff = [
   {
@@ -28,13 +29,7 @@ const initialFormState = {
   status: "Active",
 };
 
-const initialBankingDetails = {
-  accountHolder: "MABOTE GROUP",
-  bankName: "",
-  accountNumber: "",
-  branchCode: "",
-  accountType: "",
-};
+const initialBankingDetails = bankingDetailsDefaults;
 
 const initialPublicSettings = {
   websiteVisible: true,
@@ -685,7 +680,7 @@ export default function Settings() {
         <section className="settings-section">
           <div className="section-header">
             <h3>Banking Details</h3>
-            <p>Manage the verified account shown on the public EFT payment page.</p>
+            <p>Public EFT details are configured in the website source. These settings are stored only in this browser.</p>
           </div>
 
           <div className="dashboard-card">
@@ -710,7 +705,7 @@ export default function Settings() {
               ))}
             </div>
             <p style={{ marginBottom: 0, color: "#856404" }}>
-              EFT details appear publicly only after every field is completed.
+              Changes here do not update the public Payments page; updating its details requires a website deployment.
             </p>
           </div>
         </section>

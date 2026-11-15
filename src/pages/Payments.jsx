@@ -1,28 +1,11 @@
-import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import bankingDetails from "../lib/bankingDetails";
 import "./Payments.css";
 
 const whatsappLink = "https://wa.me/27663331151";
 const contactEmail = "info@mabote-group.co.za";
 
 export default function Payments() {
-  const [bankingDetails] = useState(() => {
-    try {
-      const saved = window.localStorage.getItem("mabote-banking-details");
-      return saved ? JSON.parse(saved) : null;
-    } catch (error) {
-      return null;
-    }
-  });
-
-  const hasConfirmedBankingDetails = [
-    "accountHolder",
-    "bankName",
-    "accountNumber",
-    "branchCode",
-    "accountType",
-  ].every((field) => bankingDetails?.[field]?.trim());
-
   const printDebitOrderForm = () => window.print();
 
   return (
@@ -51,16 +34,16 @@ export default function Payments() {
           <article className="payment-panel">
             <span className="payment-number">01</span>
             <h2>EFT payment</h2>
-            <p>Make your transfer using the official MABOTE GROUP PTY(LTD) banking details supplied by an administrator.</p>
+            <p>Make your transfer using the official MABOTE GROUP banking details below.</p>
             <div className="eft-details">
-              <div><span>Account holder</span><strong>{hasConfirmedBankingDetails ? bankingDetails.accountHolder : "MABOTE GROUP PTY(LTD)"}</strong></div>
-              <div><span>Bank</span><strong>{hasConfirmedBankingDetails ? bankingDetails.bankName : "To be confirmed by administrator"}</strong></div>
-              <div><span>Account number</span><strong>{hasConfirmedBankingDetails ? bankingDetails.accountNumber : "Request from administrator"}</strong></div>
-              <div><span>Branch code</span><strong>{hasConfirmedBankingDetails ? bankingDetails.branchCode : "Request from administrator"}</strong></div>
-              <div><span>Account type</span><strong>{hasConfirmedBankingDetails ? bankingDetails.accountType : "To be confirmed by administrator"}</strong></div>
-              <div><span>Reference</span><strong>Your name + application number</strong></div>
+              <div><span>Account holder</span><strong>{bankingDetails.accountHolder}</strong></div>
+              <div><span>Bank</span><strong>{bankingDetails.bankName}</strong></div>
+              <div><span>Account number</span><strong>{bankingDetails.accountNumber}</strong></div>
+              <div><span>Branch code</span><strong>{bankingDetails.branchCode}</strong></div>
+              <div><span>Account type</span><strong>{bankingDetails.accountType}</strong></div>
+              <div><span>Reference</span><strong>{bankingDetails.paymentReference}</strong></div>
             </div>
-            <p className="payment-note">{hasConfirmedBankingDetails ? "Please use the account details above and include your name and application number as the payment reference." : "Please do not pay into an account until the bank details have been confirmed directly by MABOTE GROUP PTY(LTD)."}</p>
+            <p className="payment-note">Use N/A as the payment reference if your banking app requires one.</p>
           </article>
 
           <article className="payment-panel">
