@@ -170,7 +170,7 @@ export default function GroceryPackages() {
       <header className="grocery-header">
         <div className="grocery-container grocery-header-inner">
           <Link to="/" className="grocery-brand" aria-label="MABOTE home">
-            <span className="grocery-brand-mark">MG</span>
+            <img className="grocery-brand-mark" src="/mabote-logo.png" alt="" />
             <span className="grocery-brand-copy">
               <strong>MABOTE</strong>
               <small>GROUP</small>
@@ -211,7 +211,7 @@ export default function GroceryPackages() {
           </div>
 
           <div className="grocery-hero-card">
-            <div className="card-mark">MG</div>
+            <img className="card-mark" src="/mabote-logo.png" alt="" />
             <h3>Funeral Grocery Stockvel</h3>
             <p>Plan ahead with practical support for families and communities.</p>
           </div>

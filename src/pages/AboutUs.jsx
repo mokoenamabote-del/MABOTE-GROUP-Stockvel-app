@@ -9,7 +9,7 @@ export default function About() {
       {/* HEADER */}
       <header className="about-header">
         <div className="about-logo">
-          <span className="about-logo-mark">MG</span>
+          <img className="about-logo-mark" src="/mabote-logo.png" alt="" />
           <div>
             <strong>MABOTE GROUP PTY(LTD)</strong>
             <small>Funeral Grocery Stockvel</small>
@@ -60,7 +60,7 @@ export default function About() {
         </div>
 
         <div className="about-hero-card">
-          <div className="about-monogram">MG</div>
+          <img className="about-monogram" src="/mabote-logo.png" alt="" />
           <h3>MABOTE GROUP PTY(LTD)</h3>
           <p>Plan Ahead • Share Today • Support Tomorrow</p>
         </div>

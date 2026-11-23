@@ -160,7 +160,7 @@ export default function ClientPortal() {
       <header className="portal-header">
         <div>
           <img
-            src="/mabote-logo.svg"
+            src="/mabote-logo.png"
             alt="MABOTE GROUP PTY(LTD)"
             className="portal-logo"
           />

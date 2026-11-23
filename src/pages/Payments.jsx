@@ -62,7 +62,7 @@ export default function Payments() {
     <div className="payments-page">
       <header className="payments-header screen-payment-only">
         <div className="payments-container payments-nav">
-          <Link to="/" className="payments-logo"><img src="/mabote-logo.svg" alt="MABOTE GROUP PTY(LTD)" /></Link>
+          <Link to="/" className="payments-logo"><img src="/mabote-logo.png" alt="MABOTE GROUP PTY(LTD)" /></Link>
           <nav>
             <Link to="/">Home</Link>
             <Link to="/packages">Packages</Link>

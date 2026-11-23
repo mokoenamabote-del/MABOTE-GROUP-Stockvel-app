@@ -295,7 +295,7 @@ export default function Privacy() {
   return (
     <main className="terms-page">
       <header className="terms-header">
-        <Link to="/" className="terms-brand"><img src="/mabote-logo.svg" alt="MABOTE GROUP" /></Link>
+        <Link to="/" className="terms-brand"><img src="/mabote-logo.png" alt="MABOTE GROUP" /></Link>
         <Link to="/" className="terms-back">Back to home</Link>
       </header>
       <article className="terms-document">
@@ -303,7 +303,7 @@ export default function Privacy() {
           <span>PRIVACY DOCUMENT</span>
           <button type="button" onClick={() => window.print()}>Print privacy policy</button>
         </div>
-        <img className="terms-print-logo" src="/mabote-logo.svg" alt="MABOTE GROUP PTY(LTD)" />
+        <img className="terms-print-logo" src="/mabote-logo.png" alt="MABOTE GROUP PTY(LTD)" />
         <pre>{privacyText}</pre>
       </article>
     </main>

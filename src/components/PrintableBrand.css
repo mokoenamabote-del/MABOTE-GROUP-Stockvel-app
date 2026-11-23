@@ -8,8 +8,8 @@
 }
 
 .printable-brand > img {
-  width: 230px;
-  max-width: 46%;
+  width: 76px;
+  max-width: 24%;
   height: auto;
   flex: 0 0 auto;
 }
@@ -34,7 +34,7 @@
 }
 
 .printable-brand--compact > img {
-  width: 180px;
+  width: 68px;
 }
 
 @media print {

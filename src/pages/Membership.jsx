@@ -31,7 +31,7 @@ export default function Membership() {
       <header className="membership-header">
         <div className="membership-container membership-nav">
           <Link to="/" className="membership-logo">
-            <span className="logo-mark">MG</span>
+            <img className="logo-mark" src="/mabote-logo.png" alt="" />
             <span>
               <strong>MABOTE</strong>
               <small>GROUP</small>
@@ -72,7 +72,7 @@ export default function Membership() {
             </div>
 
             <div className="membership-hero-card">
-              <div className="hero-card-icon">MG</div>
+              <img className="hero-card-icon" src="/mabote-logo.png" alt="" />
               <h3>MABOTE GROUP PTY(LTD)</h3>
               <p>Funeral Grocery Stockvel</p>
               <div className="hero-card-line"></div>

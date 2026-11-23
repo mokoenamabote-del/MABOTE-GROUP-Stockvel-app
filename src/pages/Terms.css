@@ -21,7 +21,7 @@
   letter-spacing: 2px;
 }
 
-.terms-brand img { display: block; width: 180px; height: auto; }
+.terms-brand img { display: block; width: 56px; height: 56px; object-fit: contain; }
 
 .terms-brand span { color: #e5c46a; }
 .terms-back { color: #f1d78c; font: 700 12px Arial, sans-serif; }
@@ -67,8 +67,9 @@
 
 .terms-print-logo {
   display: none;
-  width: 230px;
-  height: auto;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
   margin: 32px 56px 18px;
 }
 

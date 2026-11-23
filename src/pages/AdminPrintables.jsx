@@ -297,7 +297,7 @@ export default function AdminPrintables() {
         <section className={`printable-document brochure-document ${activeDocument === "brochure" ? "active-document" : ""}`}>
           <div className="brochure-sheet brochure-outside">
             <article className="brochure-panel brochure-panel--contact">
-              <img src="/mabote-logo.svg" alt="MABOTE GROUP PTY(LTD)" className="brochure-logo" />
+              <img src="/mabote-logo.png" alt="MABOTE GROUP PTY(LTD)" className="brochure-logo" />
               <p className="brochure-overline">MABOTE GROUP PTY(LTD)</p>
               <h2>Support that shows up when it matters.</h2>
               <p>We bring members together through consistent contributions, practical funeral grocery benefits and community care.</p>

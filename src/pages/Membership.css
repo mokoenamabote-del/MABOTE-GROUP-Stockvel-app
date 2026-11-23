@@ -57,12 +57,8 @@
 .logo-mark {
   width: 42px;
   height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: #092d68;
-  color: #ffffff;
+  object-fit: contain;
+  flex: 0 0 auto;
   border: 2px solid #c99a2e;
   font-weight: 800;
   font-size: 13px;
@@ -196,14 +192,7 @@
   width: 86px;
   height: 86px;
   margin: 0 auto 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #d9ac42;
-  color: #061a3a;
-  font-weight: 900;
-  font-size: 22px;
+  object-fit: contain;
 }
 
 .membership-hero-card h3 {

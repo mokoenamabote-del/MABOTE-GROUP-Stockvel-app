@@ -105,14 +105,12 @@ export default function Reports() {
         }}
       >
         <img
-          src="/mabote-logo.svg"
+          src="/mabote-logo.png"
           alt="MABOTE GROUP PTY(LTD)"
           style={{
-            width: "210px",
-            height: "auto",
-            background: "#ffffff",
-            borderRadius: "6px",
-            padding: "4px",
+            width: "72px",
+            height: "72px",
+            objectFit: "contain",
             flexShrink: 0,
           }}
         />

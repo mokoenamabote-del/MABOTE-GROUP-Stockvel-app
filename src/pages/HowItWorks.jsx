@@ -31,7 +31,7 @@ export default function HowItWorks() {
       <header className="how-header">
         <div className="how-container header-row">
           <Link to="/" className="how-brand">
-            <span className="brand-mark">MG</span>
+            <img className="brand-mark" src="/mabote-logo.png" alt="" />
             <div>
               <strong>MABOTE</strong>
               <small>GROUP</small>

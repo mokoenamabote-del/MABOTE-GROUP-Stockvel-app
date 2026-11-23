@@ -38,13 +38,8 @@
 .grocery-brand-mark {
   width: 42px;
   height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(180deg, #d7aa3c 0%, #bf8f1b 100%);
-  color: #fff;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .grocery-brand-copy {
@@ -192,13 +187,7 @@
 .grocery-hero-card .card-mark {
   width: 68px;
   height: 68px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(180deg, #d7aa3c 0%, #bf8f1b 100%);
-  font-weight: 900;
-  font-size: 1.25rem;
-  letter-spacing: 0.08em;
+  object-fit: contain;
   margin-bottom: 18px;
 }
 

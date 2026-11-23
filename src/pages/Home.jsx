@@ -14,6 +14,7 @@ export default function Home() {
         <div className="home-container header-inner">
 
           <Link to="/" className="brand">
+            <img className="brand-emblem" src="/mabote-logo.png" alt="" />
             <span className="brand-name">MABOTE</span>
             <span className="brand-group">GROUP</span>
           </Link>
@@ -120,17 +121,13 @@ export default function Home() {
                     </strong>
                   </div>
 
-                  <div className="hero-card-mark">
-                    MG
-                  </div>
+                  <img className="hero-card-mark" src="/mabote-logo.png" alt="" />
                 </div>
 
                 <div className="hero-card-content">
 
                   <div className="premium-circle">
-                    <div className="circle-inner">
-                      MG
-                    </div>
+                    <img className="circle-inner" src="/mabote-logo.png" alt="" />
                   </div>
 
                   <span className="card-eyebrow">
@@ -1041,6 +1038,7 @@ export default function Home() {
           <div className="footer-brand">
 
             <Link to="/" className="brand">
+              <img className="brand-emblem" src="/mabote-logo.png" alt="" />
               <span className="brand-name">MABOTE</span>
               <span className="brand-group">GROUP</span>
             </Link>

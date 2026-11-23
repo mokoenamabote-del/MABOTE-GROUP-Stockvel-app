@@ -191,24 +191,31 @@ export default function AdminDashboard() {
           flexWrap: "wrap",
         }}
       >
-        <div>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "30px",
-            }}
-          >
-            MABOTE GROUP HOLDINGS
-          </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <img
+            src="/mabote-logo.png"
+            alt=""
+            style={{ width: "64px", height: "64px", objectFit: "contain" }}
+          />
+          <div>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "30px",
+              }}
+            >
+              MABOTE GROUP HOLDINGS
+            </h1>
 
-          <p
-            style={{
-              margin: "8px 0 0",
-              opacity: 0.9,
-            }}
-          >
-            Admin Dashboard
-          </p>
+            <p
+              style={{
+                margin: "8px 0 0",
+                opacity: 0.9,
+              }}
+            >
+              Admin Dashboard
+            </p>
+          </div>
         </div>
 
         <button

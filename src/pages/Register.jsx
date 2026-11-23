@@ -94,6 +94,11 @@ export default function Register() {
             textAlign: "center",
           }}
         >
+          <img
+            src="/mabote-logo.png"
+            alt="MABOTE GROUP"
+            style={{ width: "72px", height: "72px", objectFit: "contain", margin: "0 auto" }}
+          />
           <div style={{ fontSize: "12px", letterSpacing: "2px", color: "#d9b553", fontWeight: 800 }}>MABOTE GROUP HOLDINGS</div>
           <h1 style={{ margin: "12px 0 0", fontSize: "2.2rem", letterSpacing: "-1px" }}>Create Your Account</h1>
         </div>
