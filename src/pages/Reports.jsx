@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PrintableBrand from "../components/PrintableBrand";
 
 export default function Reports() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -103,6 +104,18 @@ export default function Reports() {
           flexWrap: "wrap",
         }}
       >
+        <img
+          src="/mabote-logo.svg"
+          alt="MABOTE GROUP PTY(LTD)"
+          style={{
+            width: "210px",
+            height: "auto",
+            background: "#ffffff",
+            borderRadius: "6px",
+            padding: "4px",
+            flexShrink: 0,
+          }}
+        />
         <div>
           <h2
             style={{

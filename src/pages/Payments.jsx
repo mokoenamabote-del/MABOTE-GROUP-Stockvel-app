@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import bankingDetails from "../lib/bankingDetails";
+import PrintableBrand from "../components/PrintableBrand";
+import { apiRequest } from "../lib/api";
 import "./Payments.css";
 
 const whatsappLink = "https://wa.me/27663331151";
@@ -7,6 +10,53 @@ const contactEmail = "info@mabote-group.co.za";
 
 export default function Payments() {
   const printDebitOrderForm = () => window.print();
+  const [paymentConfig, setPaymentConfig] = useState({ configured: false });
+  const [checkout, setCheckout] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState("");
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentForm, setPaymentForm] = useState({
+    name: "",
+    email: "",
+    purpose: "Registration fee",
+    amount: 80,
+  });
+
+  useEffect(() => {
+    apiRequest("/api/payments/config")
+      .then(setPaymentConfig)
+      .catch(() => setPaymentConfig({ configured: false }));
+
+    const payment = new URLSearchParams(window.location.search).get("payment");
+    if (payment === "success") setPaymentStatus("Payment submitted successfully. Confirmation will be recorded after PayFast verifies it.");
+    if (payment === "cancelled") setPaymentStatus("Payment was cancelled.");
+  }, []);
+
+  const startOnlinePayment = async (event) => {
+    event.preventDefault();
+    setPaymentError("");
+    setCheckout(null);
+
+    try {
+      const created = await apiRequest("/api/payments/checkout", {
+        method: "POST",
+        body: JSON.stringify(paymentForm),
+      });
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = created.redirectUrl;
+      Object.entries(created.fields).forEach(([name, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
+    } catch (error) {
+      setPaymentError(error.message);
+    }
+  };
 
   return (
     <div className="payments-page">
@@ -27,7 +77,7 @@ export default function Payments() {
         <section className="payments-intro screen-payment-only">
           <p className="payments-eyebrow">MEMBERSHIP PAYMENTS</p>
           <h1>Choose how you would like to pay.</h1>
-          <p>Use EFT instructions for a bank transfer, request a debit order mandate, or contact us while online payments are being set up.</p>
+          <p>Use EFT instructions for a bank transfer, request a debit order mandate, or pay securely online.</p>
         </section>
 
         <section className="payment-grid screen-payment-only">
@@ -57,13 +107,61 @@ export default function Payments() {
           <article className="payment-panel online-panel">
             <span className="payment-number">03</span>
             <h2>Pay online</h2>
-            <p>Secure online EFT, card and debit-order checkout will be available after our payment provider account is activated.</p>
-            <button type="button" className="payment-action disabled-payment" disabled>Pay online - coming soon</button>
+            {paymentStatus && <p className="payment-status">{paymentStatus}</p>}
+            {paymentConfig.configured ? (
+              <>
+                {!checkout ? (
+                  <form className="online-payment-form" onSubmit={startOnlinePayment}>
+                    <label>Full name
+                      <input
+                        required
+                        value={paymentForm.name}
+                        onChange={(event) => setPaymentForm((current) => ({ ...current, name: event.target.value }))}
+                      />
+                    </label>
+                    <label>Email
+                      <input
+                        required
+                        type="email"
+                        value={paymentForm.email}
+                        onChange={(event) => setPaymentForm((current) => ({ ...current, email: event.target.value }))}
+                      />
+                    </label>
+                    <label>Payment
+                      <select
+                        value={`${paymentForm.purpose}|${paymentForm.amount}`}
+                        onChange={(event) => {
+                          const [purpose, amount] = event.target.value.split("|");
+                          setPaymentForm((current) => ({ ...current, purpose, amount: Number(amount) }));
+                        }}
+                      >
+                        <option value="Registration fee|80">Registration fee - R80</option>
+                        <option value="Plan A contribution|300">Plan A - R300</option>
+                        <option value="Plan B contribution|350">Plan B - R350</option>
+                        <option value="Plan C contribution|450">Plan C - R450</option>
+                      </select>
+                    </label>
+                    {paymentError && <p className="payment-error">{paymentError}</p>}
+                    <button type="submit" className="payment-action">Continue to secure payment</button>
+                  </form>
+                ) : (
+                  <div className="payfast-payment-widget">
+                    <p>Redirecting securely to PayFast...</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <p>Secure online EFT, card and debit-order checkout is being prepared.</p>
+                <button type="button" className="payment-action disabled-payment" disabled>Online payments unavailable</button>
+              </>
+            )}
             <a href={whatsappLink} target="_blank" rel="noreferrer" className="payment-contact">Ask on WhatsApp: 0663331151</a>
           </article>
         </section>
 
         <section className="debit-order-document printable-payment-document">
+          <PrintableBrand compact subtitle="Debit order mandate" />
           <div className="debit-order-heading">
             <div>
               <p className="payments-eyebrow">MABOTE GROUP PTY(LTD)</p>

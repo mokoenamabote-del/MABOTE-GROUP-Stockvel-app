@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import PrintableBrand from "../components/PrintableBrand";
 import "./AdminPrintables.css";
 
 const whatsappNumber = "0663331151";
@@ -55,6 +56,7 @@ export default function StaffRecruitment() {
 
       <main>
         <section className="printable-document recruitment-document active-document">
+          <PrintableBrand compact subtitle="Human resources recruitment" />
           <div className="document-heading">
             <div>
               <p className="brand-kicker">MABOTE GROUP PTY(LTD)</p>

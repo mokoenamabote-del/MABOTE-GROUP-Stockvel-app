@@ -1,6 +1,6 @@
 ﻿
 import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { apiRequest } from "./lib/api";
 
 import Home from "./pages/Home";
@@ -8,7 +8,6 @@ import AboutUs from "./pages/AboutUs";
 import HowItWorks from "./pages/HowItWorks";
 import Membership from "./pages/Membership";
 import Login from "./pages/Login";
-import PasswordReset from "./pages/PasswordReset";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import GroceryPackages from "./pages/GroceryPackages";
@@ -31,6 +30,7 @@ function ProtectedRoute({
   children,
   allowedRoles = ["Admin", "Management", "Support Staff"],
 }) {
+  const location = useLocation();
   const [status, setStatus] = useState("checking");
   const [role, setRole] = useState(null);
 
@@ -82,7 +82,7 @@ function ProtectedRoute({
   }
 
   if (status === "unauthenticated") {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!allowedRoles.includes(role)) {
@@ -110,7 +110,7 @@ export default function App() {
         <Route path="/membership" element={<Membership />} />
         <Route path="/packages" element={<GroceryPackages />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<PasswordReset />} />
+        <Route path="/reset-password" element={<Navigate to="/login" replace />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/payments" element={<Payments />} />
@@ -149,7 +149,7 @@ export default function App() {
         <Route
           path="/member-registration"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["Management", "Member"]}>
               <MemberRegistration />
             </ProtectedRoute>
           }

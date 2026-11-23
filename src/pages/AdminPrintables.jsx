@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import PrintableBrand from "../components/PrintableBrand";
 import "./AdminPrintables.css";
 
 const whatsappNumber = "0663331151";
@@ -128,6 +129,7 @@ export default function AdminPrintables() {
 
       <main>
         <section className={`printable-document application-document ${activeDocument === "application" ? "active-document" : ""}`}>
+          <PrintableBrand compact subtitle="Membership application" />
           <div className="document-heading">
             <div>
               <p className="brand-kicker">MABOTE GROUP PTY(LTD)</p>
@@ -196,6 +198,7 @@ export default function AdminPrintables() {
         </section>
 
         <section className={`printable-document claim-document ${activeDocument === "claim" ? "active-document" : ""}`}>
+          <PrintableBrand compact subtitle="Claim form" />
           <div className="document-heading">
             <div>
               <p className="brand-kicker">MABOTE GROUP PTY(LTD)</p>
@@ -266,7 +269,7 @@ export default function AdminPrintables() {
         </section>
 
         <section className={`printable-document flyer-document ${activeDocument === "flyer" ? "active-document" : ""}`}>
-          <div className="flyer-topline">MABOTE GROUP PTY(LTD)</div>
+          <PrintableBrand compact className="flyer-brand" />
           <div className="flyer-content">
             <p className="flyer-label">BUILD TOGETHER. PROTECT EACH OTHER.</p>
             <h2>Stronger together,<br /><span>prepared for tomorrow.</span></h2>

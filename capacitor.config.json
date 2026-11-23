@@ -1,0 +1,8 @@
+{
+  "appId": "za.co.mabotegroup.stockvel",
+  "appName": "MABOTE GROUP Stockvel",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

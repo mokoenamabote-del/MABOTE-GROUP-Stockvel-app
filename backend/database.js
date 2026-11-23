@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+
 const databasePath =
   process.env.DATABASE_PATH || path.join(currentDirectory, "mabote.sqlite");
 
@@ -49,16 +50,55 @@ database.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS password_reset_tokens (
-    token_hash TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id INTEGER NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
     expires_at TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
-  CREATE INDEX IF NOT EXISTS password_reset_tokens_account_id
-    ON password_reset_tokens(account_id);
+  CREATE INDEX IF NOT EXISTS idx_reset_account
+  ON password_reset_tokens(account_id);
+
+  CREATE INDEX IF NOT EXISTS idx_reset_expiry
+  ON password_reset_tokens(expires_at);
+
+  CREATE TABLE IF NOT EXISTS payment_transactions (
+    reference TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    amount_cents INTEGER NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'Pending',
+    request_trace TEXT,
+    payment_method TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    paid_at TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_payment_email
+  ON payment_transactions(email);
+
+  CREATE INDEX IF NOT EXISTS idx_payment_status
+  ON payment_transactions(status);
 `);
+
+function mapPaymentRow(row) {
+  if (!row) return null;
+
+  return {
+    reference: row.reference,
+    email: row.email,
+    amount: row.amount_cents / 100,
+    description: row.description,
+    status: row.status,
+    requestTrace: row.request_trace,
+    paymentMethod: row.payment_method,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    paidAt: row.paid_at,
+  };
+}
 
 export function findAccountByEmail(email) {
   return database
@@ -97,58 +137,6 @@ export function createAccount({
     .get(result.lastInsertRowid);
 }
 
-export function createPasswordResetToken(accountId, tokenHash, expiresAt) {
-  const insertToken = database.transaction(() => {
-    database
-      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
-      .run(accountId);
-
-    database
-      .prepare(`
-        INSERT INTO password_reset_tokens
-          (token_hash, account_id, expires_at, created_at)
-        VALUES (?, ?, ?, ?)
-      `)
-      .run(tokenHash, accountId, expiresAt, new Date().toISOString());
-  });
-
-  insertToken();
-}
-
-export function consumePasswordResetToken(tokenHash, passwordHash, now) {
-  const resetPassword = database.transaction(() => {
-    const token = database
-      .prepare(`
-        SELECT account_id
-        FROM password_reset_tokens
-        WHERE token_hash = ? AND expires_at > ?
-      `)
-      .get(tokenHash, now);
-
-    if (!token) return false;
-
-    const result = database
-      .prepare("UPDATE accounts SET password_hash = ? WHERE id = ?")
-      .run(passwordHash, token.account_id);
-
-    if (result.changes === 0) return false;
-
-    database
-      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
-      .run(token.account_id);
-
-    return true;
-  });
-
-  return resetPassword();
-}
-
-export function deletePasswordResetToken(tokenHash) {
-  database
-    .prepare("DELETE FROM password_reset_tokens WHERE token_hash = ?")
-    .run(tokenHash);
-}
-
 export function setAccountRole(email, role) {
   const result = database
     .prepare("UPDATE accounts SET role = ? WHERE email = ?")
@@ -166,21 +154,11 @@ export function setAccountPassword(email, passwordHash) {
 }
 
 export function changeAccountPassword(accountId, passwordHash) {
-  const updatePassword = database.transaction(() => {
-    const result = database
-      .prepare("UPDATE accounts SET password_hash = ? WHERE id = ?")
-      .run(passwordHash, accountId);
+  const result = database
+    .prepare("UPDATE accounts SET password_hash = ? WHERE id = ?")
+    .run(passwordHash, accountId);
 
-    if (result.changes === 0) return false;
-
-    database
-      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
-      .run(accountId);
-
-    return true;
-  });
-
-  return updatePassword();
+  return result.changes > 0;
 }
 
 export function updateAccountEmail(currentEmail, newEmail) {
@@ -190,6 +168,95 @@ export function updateAccountEmail(currentEmail, newEmail) {
 
   return result.changes > 0;
 }
+
+// PASSWORD RECOVERY FUNCTIONS
+
+export function createPasswordResetToken(accountId, tokenHash, expiresAt) {
+  const create = database.transaction(() => {
+    database
+      .prepare("DELETE FROM password_reset_tokens WHERE account_id = ?")
+      .run(accountId);
+
+    database
+      .prepare(`
+        INSERT INTO password_reset_tokens
+          (account_id, token_hash, expires_at, created_at)
+        VALUES (?, ?, ?, ?)
+      `)
+      .run(accountId, tokenHash, expiresAt, new Date().toISOString());
+  });
+
+  create();
+
+  return true;
+}
+
+export function deletePasswordResetToken(tokenHash) {
+  const result = database
+    .prepare("DELETE FROM password_reset_tokens WHERE token_hash = ?")
+    .run(tokenHash);
+
+  return result.changes > 0;
+}
+
+export function consumePasswordResetToken(
+  tokenHash,
+  passwordHash,
+  currentTime
+) {
+  const consume = database.transaction(() => {
+    const token = database
+      .prepare(`
+        SELECT account_id
+        FROM password_reset_tokens
+        WHERE token_hash = ?
+          AND expires_at > ?
+      `)
+      .get(tokenHash, currentTime);
+
+    if (!token) {
+      return false;
+    }
+
+    const updated = database
+      .prepare(`
+        UPDATE accounts
+        SET password_hash = ?
+        WHERE id = ?
+      `)
+      .run(passwordHash, token.account_id);
+
+    if (updated.changes !== 1) {
+      return false;
+    }
+
+    database
+      .prepare(`
+        DELETE FROM password_reset_tokens
+        WHERE token_hash = ?
+      `)
+      .run(tokenHash);
+
+    return true;
+  });
+
+  return consume();
+}
+
+export function cleanExpiredPasswordResetTokens(
+  currentTime = new Date().toISOString()
+) {
+  const result = database
+    .prepare(`
+      DELETE FROM password_reset_tokens
+      WHERE expires_at <= ?
+    `)
+    .run(currentTime);
+
+  return result.changes;
+}
+
+// APPLICATION FUNCTIONS
 
 export function createApplication(application) {
   const now = new Date().toISOString();
@@ -268,6 +335,8 @@ export function updateApplication(applicationNumber, changes) {
   return application;
 }
 
+// CONTRIBUTION FUNCTIONS
+
 export function saveContribution(contribution) {
   const now = new Date().toISOString();
 
@@ -315,6 +384,8 @@ export function listContributionsForEmail(email) {
     .map((row) => JSON.parse(row.contribution_json));
 }
 
+// CLAIM FUNCTIONS
+
 export function saveClaim(claim) {
   const now = new Date().toISOString();
 
@@ -360,6 +431,194 @@ export function listClaimsForEmail(email) {
     `)
     .all(String(email || "").trim().toLowerCase())
     .map((row) => JSON.parse(row.claim_json));
+}
+
+// NETCASH PAYMENT FUNCTIONS
+
+export function createPaymentTransaction({
+  reference,
+  email,
+  amount,
+  description = "",
+}) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const amountNumber = Number(amount);
+
+  if (!reference || !normalizedEmail) {
+    throw new Error("A payment reference and customer email are required.");
+  }
+
+  if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
+    throw new Error("A valid payment amount is required.");
+  }
+
+  const amountCents = Math.round(amountNumber * 100);
+  const now = new Date().toISOString();
+
+  database
+    .prepare(`
+      INSERT INTO payment_transactions
+        (reference, email, amount_cents, description, status, created_at, updated_at)
+      VALUES (?, ?, ?, ?, 'Pending', ?, ?)
+    `)
+    .run(
+      String(reference),
+      normalizedEmail,
+      amountCents,
+      String(description).slice(0, 50),
+      now,
+      now
+    );
+
+  return getPaymentTransactionByReference(reference);
+}
+
+export function getPaymentTransactionByReference(reference) {
+  const row = database
+    .prepare(`
+      SELECT *
+      FROM payment_transactions
+      WHERE reference = ?
+    `)
+    .get(String(reference || ""));
+
+  return mapPaymentRow(row);
+}
+
+export function completePaymentTransaction({
+  reference,
+  requestTrace,
+  paymentMethod = "",
+}) {
+  const complete = database.transaction(() => {
+    const row = database
+      .prepare(`
+        SELECT *
+        FROM payment_transactions
+        WHERE reference = ?
+      `)
+      .get(String(reference || ""));
+
+    if (!row) {
+      return { success: false, reason: "Payment reference not found." };
+    }
+
+    if (row.status === "Paid") {
+      return {
+        success: true,
+        alreadyPaid: true,
+        payment: mapPaymentRow(row),
+      };
+    }
+
+    if (row.status !== "Pending") {
+      return {
+        success: false,
+        reason: "Payment is not pending.",
+      };
+    }
+
+    const now = new Date().toISOString();
+
+    database
+      .prepare(`
+        UPDATE payment_transactions
+        SET status = 'Paid',
+            request_trace = ?,
+            payment_method = ?,
+            updated_at = ?,
+            paid_at = ?
+        WHERE reference = ?
+          AND status = 'Pending'
+      `)
+      .run(
+        String(requestTrace || ""),
+        String(paymentMethod || ""),
+        now,
+        now,
+        String(reference)
+      );
+
+    // Create one contribution record only after payment verification.
+    const contribution = {
+      email: row.email,
+      amount: row.amount_cents / 100,
+      description: row.description,
+      status: "Paid",
+      paymentMethod: String(paymentMethod || ""),
+      paymentReference: row.reference,
+      createdAt: now,
+      paidAt: now,
+    };
+
+    const insertResult = database
+      .prepare(`
+        INSERT INTO contributions
+          (email, contribution_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?)
+      `)
+      .run(
+        row.email,
+        JSON.stringify(contribution),
+        now,
+        now
+      );
+
+    contribution.id = Number(insertResult.lastInsertRowid);
+
+    database
+      .prepare(`
+        UPDATE contributions
+        SET contribution_json = ?
+        WHERE id = ?
+      `)
+      .run(JSON.stringify(contribution), contribution.id);
+
+    const updatedRow = database
+      .prepare(`
+        SELECT *
+        FROM payment_transactions
+        WHERE reference = ?
+      `)
+      .get(String(reference));
+
+    return {
+      success: true,
+      alreadyPaid: false,
+      payment: mapPaymentRow(updatedRow),
+      contribution,
+    };
+  });
+
+  return complete();
+}
+
+export function failPaymentTransaction(reference) {
+  const now = new Date().toISOString();
+
+  const result = database
+    .prepare(`
+      UPDATE payment_transactions
+      SET status = 'Failed',
+          updated_at = ?
+      WHERE reference = ?
+        AND status = 'Pending'
+    `)
+    .run(now, String(reference || ""));
+
+  return result.changes > 0;
+}
+
+export function listPaymentTransactionsForEmail(email) {
+  return database
+    .prepare(`
+      SELECT *
+      FROM payment_transactions
+      WHERE email = ?
+      ORDER BY created_at DESC
+    `)
+    .all(String(email || "").trim().toLowerCase())
+    .map(mapPaymentRow);
 }
 
 export function closeDatabase() {

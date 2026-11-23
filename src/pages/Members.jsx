@@ -51,14 +51,10 @@ export default function Members() {
   };
 
   const updateApplication = async (applicationNumber, changes) => {
-    try {
-      await apiRequest(`/api/applications/${applicationNumber}`, {
-        method: "PATCH",
-        body: JSON.stringify(changes),
-      });
-    } catch (error) {
-      console.error("Unable to update application on the server:", error);
-    }
+    await apiRequest(`/api/applications/${applicationNumber}`, {
+      method: "PATCH",
+      body: JSON.stringify(changes),
+    });
 
     const updated = applications.map((application) =>
       application.applicationNumber === applicationNumber
@@ -84,6 +80,8 @@ export default function Members() {
 
     const fullName =
       `${member.fullName || ""} ${member.surname || ""}`.trim();
+    let approvedMemberNumber = "";
+    let approvedDate = "";
 
     /*
      * APPROVE MEMBER
@@ -109,16 +107,19 @@ export default function Members() {
           member.applicationNumber
       );
 
+      approvedMemberNumber =
+        existingMember?.memberNumber ||
+        `MAB-M-${Date.now().toString().slice(-6)}`;
+      approvedDate =
+        existingMember?.approvedDate ||
+        new Date().toISOString();
+
       const approvedMember = {
         ...member,
         status: "Approved",
         policyStatus: member.policyStatus || "Active",
-        memberNumber:
-          existingMember?.memberNumber ||
-          `MAB-M-${Date.now().toString().slice(-6)}`,
-        approvedDate:
-          existingMember?.approvedDate ||
-          new Date().toISOString(),
+        memberNumber: approvedMemberNumber,
+        approvedDate,
       };
 
       let updatedMembers;
@@ -180,6 +181,8 @@ export default function Members() {
     if (newStatus === "Approved") {
       changes.policyStatus =
         member.policyStatus || "Active";
+      changes.memberNumber = approvedMemberNumber;
+      changes.approvedDate = approvedDate;
     }
 
     if (newStatus === "Rejected") {

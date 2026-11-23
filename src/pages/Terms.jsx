@@ -310,6 +310,7 @@ export default function Terms() {
           <span>MEMBERSHIP DOCUMENT</span>
           <button type="button" onClick={() => window.print()}>Print terms</button>
         </div>
+        <img className="terms-print-logo" src="/mabote-logo.svg" alt="MABOTE GROUP PTY(LTD)" />
         <pre>{termsText}</pre>
       </article>
     </main>

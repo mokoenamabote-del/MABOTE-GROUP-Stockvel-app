@@ -205,7 +205,7 @@ export default function GroceryPackages() {
             </p>
 
             <div className="grocery-hero-actions">
-              <Link to="/register" className="grocery-cta">Apply Now</Link>
+              <Link to="/member-registration" className="grocery-cta">Apply Now</Link>
               <Link to="/membership" className="grocery-login">View Membership</Link>
             </div>
           </div>
@@ -274,7 +274,7 @@ export default function GroceryPackages() {
                 <button type="button" className="grocery-view" onClick={() => setSelectedPackage(pkg)}>
                   View Details
                 </button>
-                <Link to="/register" className="grocery-apply">Apply</Link>
+                <Link to="/member-registration" className="grocery-apply">Apply</Link>
               </div>
             </article>
           ))}
@@ -323,7 +323,7 @@ export default function GroceryPackages() {
 
               <div className="grocery-modal-footer">
                 <button type="button" className="grocery-view" onClick={closePackage}>Close</button>
-                <Link to="/register" className="grocery-apply" onClick={closePackage}>Apply Now</Link>
+                <Link to="/member-registration" className="grocery-apply" onClick={closePackage}>Apply Now</Link>
               </div>
             </div>
           </div>

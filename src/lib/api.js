@@ -1,5 +1,8 @@
 const configuredApiUrl =
-  import.meta.env.VITE_API_URL || "https://mabote-group-api.onrender.com";
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:5000"
+    : "https://mabote-group-api.onrender.com");
 const API_URL = configuredApiUrl.replace(
   "https://mabote-group-api-backend.onrender.com",
   "https://mabote-group-api.onrender.com"

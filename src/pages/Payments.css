@@ -21,6 +21,12 @@
 .eft-details div { display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid #edf0f3; font-size: 12px; }
 .eft-details span { color: #69778a; }.eft-details strong { text-align: right; }
 .payment-note { font-size: 12px; }.payment-action { display: inline-block; margin-top: 16px; }.disabled-payment { background: #aeb8c4; cursor: not-allowed; }.payment-contact { display: block; color: #092d68; font-size: 13px; font-weight: 800; margin-top: 22px; }
+.online-payment-form { display: grid; gap: 12px; margin-top: 16px; }
+.online-payment-form label { color: #4b5969; display: grid; gap: 6px; font-size: 12px; font-weight: 800; }
+.online-payment-form input, .online-payment-form select { width: 100%; box-sizing: border-box; border: 1px solid #cbd3df; border-radius: 5px; padding: 11px; font: 14px "Trebuchet MS", "Segoe UI", sans-serif; }
+.payment-status { color: #155c38 !important; background: #edf7f1; border-radius: 5px; padding: 10px; }
+.payment-error { color: #9d2a2a !important; font-size: 12px; }
+.payfast-payment-widget { margin-top: 16px; }
 .debit-order-document { max-width: 900px; margin: 0 auto 60px; padding: 50px 58px; background: white; box-shadow: 0 4px 20px rgba(16, 35, 63, .12); box-sizing: border-box; }
 .debit-order-heading { display: flex; justify-content: space-between; gap: 24px; border-bottom: 4px solid #b58a24; padding-bottom: 22px; }.debit-order-heading h2 { color: #102f57; font: 30px Georgia, serif; margin: 5px 0; }.debit-order-heading p:last-child { color: #69778a; margin: 0; }
 .mandate-reference { border: 1px solid #c8d0d9; padding: 12px; font: 12px Arial, sans-serif; }.mandate-reference span { display: block; width: 150px; height: 22px; border-bottom: 1px solid #7d8792; margin-top: 6px; }

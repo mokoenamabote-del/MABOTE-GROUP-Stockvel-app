@@ -1,0 +1,45 @@
+.printable-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 3px solid #c59a3d;
+  page-break-inside: avoid;
+}
+
+.printable-brand > img {
+  width: 230px;
+  max-width: 46%;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.printable-brand-copy {
+  margin-left: auto;
+  text-align: right;
+}
+
+.printable-brand-copy h2 {
+  margin: 0 0 4px;
+  color: #102f57;
+  font-size: 20px;
+}
+
+.printable-brand-copy p {
+  margin: 0;
+  color: #647083;
+  font: 700 11px Arial, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.printable-brand--compact > img {
+  width: 180px;
+}
+
+@media print {
+  .printable-brand {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

@@ -12,15 +12,31 @@ export default function Login() {
     password: "",
   });
 
+  const [resetData, setResetData] = useState({
+    email: "",
+    code: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showReset, setShowReset] = useState(false);
+  const [resetCodeSent, setResetCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
+    setMessage("");
+  };
+
+  const handleResetChange = (e) => {
+    const { name, value } = e.target;
+    setResetData((prev) => ({ ...prev, [name]: value }));
     setError("");
     setMessage("");
   };
@@ -79,20 +95,107 @@ export default function Login() {
 
   const openPasswordReset = () => {
     setShowReset(true);
+    setResetCodeSent(false);
+    setResetData({
+      email: formData.email,
+      code: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
     setError("");
     setMessage("");
   };
 
   const closePasswordReset = () => {
     setShowReset(false);
+    setResetCodeSent(false);
     setError("");
     setMessage("");
+  };
+
+  const handleRequestResetCode = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    setResetLoading(true);
+
+    try {
+      const response = await apiRequest(
+        "/api/auth/password-reset-requests",
+        {
+          method: "POST",
+          body: JSON.stringify({ email: resetData.email }),
+        }
+      );
+
+      setResetCodeSent(true);
+      setMessage(
+        response.message ||
+          "If an account exists for that email, a verification code will be sent."
+      );
+    } catch (requestError) {
+      setError(requestError.message || "Unable to request a reset code.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (
+      !resetData.email ||
+      !resetData.code ||
+      !resetData.newPassword ||
+      !resetData.confirmPassword
+    ) {
+      setError("Please complete all fields.");
+      return;
+    }
+
+    if (resetData.newPassword.length < 8) {
+      setError("Your new password must contain at least 8 characters.");
+      return;
+    }
+
+    if (resetData.newPassword !== resetData.confirmPassword) {
+      setError("The passwords do not match.");
+      return;
+    }
+
+    setResetLoading(true);
+
+    try {
+      const response = await apiRequest(
+        "/api/auth/reset-password",
+        {
+          method: "POST",
+          body: JSON.stringify(resetData),
+        }
+      );
+
+      setMessage(response.message || "Password changed successfully.");
+      setResetData({
+        email: resetData.email,
+        code: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setResetCodeSent(false);
+      setShowReset(false);
+    } catch (requestError) {
+      setError(requestError.message || "Unable to reset your password.");
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
-
         <h1>MABOTE GROUP</h1>
 
         <h2>{showReset ? "FORGOT PASSWORD" : "MEMBER LOGIN"}</h2>
@@ -171,16 +274,115 @@ export default function Login() {
             </button>
           </>
         ) : (
-          <div>
-            <p>
-              Password recovery is temporarily unavailable.
-              Please contact MABOTE GROUP administration for assistance.
-            </p>
+          <>
+            <form
+              onSubmit={
+                resetCodeSent
+                  ? handleResetSubmit
+                  : handleRequestResetCode
+              }
+            >
+              <label htmlFor="resetEmail">Registered Email Address</label>
 
-            <button type="button" onClick={closePasswordReset}>
+              <input
+                id="resetEmail"
+                name="email"
+                type="email"
+                required
+                value={resetData.email}
+                onChange={handleResetChange}
+                placeholder="Enter your registered email"
+                autoComplete="username"
+                disabled={resetLoading || resetCodeSent}
+              />
+
+              {resetCodeSent && (
+                <>
+                  <label htmlFor="resetCode">Email verification code</label>
+                  <input
+                    id="resetCode"
+                    name="code"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    required
+                    value={resetData.code}
+                    onChange={handleResetChange}
+                    placeholder="Enter the 6-digit code"
+                    autoComplete="one-time-code"
+                    disabled={resetLoading}
+                  />
+
+                  <label htmlFor="newPassword">Create New Password</label>
+                  <input
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    required
+                    minLength={8}
+                    value={resetData.newPassword}
+                    onChange={handleResetChange}
+                    placeholder="Create a new password"
+                    autoComplete="new-password"
+                    disabled={resetLoading}
+                  />
+
+                  <label htmlFor="confirmPassword">Confirm New Password</label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    minLength={8}
+                    value={resetData.confirmPassword}
+                    onChange={handleResetChange}
+                    placeholder="Confirm your new password"
+                    autoComplete="new-password"
+                    disabled={resetLoading}
+                  />
+                </>
+              )}
+
+              <button type="submit" disabled={resetLoading}>
+                {resetLoading
+                  ? resetCodeSent
+                    ? "SAVING PASSWORD..."
+                    : "SENDING CODE..."
+                  : resetCodeSent
+                    ? "RESET PASSWORD"
+                    : "SEND VERIFICATION CODE"}
+              </button>
+            </form>
+
+            {resetCodeSent && (
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  setResetCodeSent(false);
+                  setResetData((previous) => ({
+                    ...previous,
+                    code: "",
+                  }));
+                  setMessage("");
+                  setError("");
+                }}
+                disabled={resetLoading}
+              >
+                USE A DIFFERENT EMAIL
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={closePasswordReset}
+              disabled={resetLoading}
+            >
               BACK TO LOGIN
             </button>
-          </div>
+          </>
         )}
 
         <p>
@@ -193,7 +395,6 @@ export default function Login() {
         <p className="login-help-message">
           Prepare Today. Support Tomorrow.
         </p>
-
       </div>
     </div>
   );

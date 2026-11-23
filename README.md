@@ -24,6 +24,14 @@ MABOTE GROUP Stockvel App is a digital platform designed to help communities man
 - Debit Order: Automated debit order contributions
 - Custom: Tailored payment schedule for your community
 
+## Install on a phone
+The website can be installed as a Progressive Web App (PWA) on Android and iPhone. Deploy it over HTTPS first.
+
+- **Android:** Open the website in Chrome, then choose **Install app** or **Add to Home screen** from the browser menu.
+- **iPhone:** Open the website in Safari, tap **Share**, then choose **Add to Home Screen**.
+
+The app shell can open offline after it has loaded once, but sign-in, member information, and other server features still require an internet connection.
+
 ## Pricing policy
 The current policy defines three stokvel pricing plans:
 - **Plan A**: Full Grocery, designed for essential funeral grocery and catering support.

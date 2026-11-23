@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PrintableBrand from "../components/PrintableBrand";
 
 const defaultPayroll = {
   methods: ["EFT / direct deposit"],
@@ -212,6 +213,7 @@ export default function HRManagement() {
         </form>
 
         <div className="agent-contract-document">
+          <PrintableBrand compact title="Temporary Agent Agreement" subtitle="Official company document" />
           <p className="contract-draft-label">DRAFT FOR LEGAL REVIEW</p>
           <h4>TEMPORARY COMMISSION-BASED AGENT AGREEMENT</h4>
           <p>This Temporary Commission-Based Agent Agreement (the “Agreement”) is made between MABOTE GROUP PTY(LTD) (the “Company”) and {agentContract.agentName || "[Agent full name]"} (the “Agent”), with an intended start date of {agentContract.startDate || "[Start date]"}.</p>

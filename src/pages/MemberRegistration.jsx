@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiRequest } from "../lib/api";
+import PrintableBrand from "../components/PrintableBrand";
 
 const createEmptyBeneficiary = () => ({
   fullName: "",
@@ -61,6 +62,7 @@ export default function MemberRegistration() {
     useState("");
   const [policyNumber, setPolicyNumber] =
     useState("");
+  const [accountRole, setAccountRole] = useState("");
 
   useEffect(() => {
     try {
@@ -70,6 +72,7 @@ export default function MemberRegistration() {
         return;
       }
 
+      setAccountRole(account.role || "");
       setFormData((previous) => ({
         ...previous,
         fullName: previous.fullName || account.fullName || "",
@@ -580,6 +583,7 @@ export default function MemberRegistration() {
                     handleChange
                   }
                   required
+                  readOnly={accountRole === "Member"}
                 />
               </div>
 
@@ -1324,6 +1328,10 @@ export default function MemberRegistration() {
                   "#fff",
               }}
             >
+              <PrintableBrand
+                title="MEMBERSHIP APPLICATION AGREEMENT"
+                subtitle="Stockvel & funeral grocery scheme"
+              />
               <h2
                 style={{
                   textAlign:

@@ -63,6 +63,8 @@
 .claim-document { padding: 46px 54px; }
 
 .flyer-document { display: flex; flex-direction: column; min-height: 1120px; background: #102f57; color: white; overflow: hidden; }
+.flyer-brand { padding: 18px 54px; background: #fff; border-bottom: 4px solid #b58a24; }
+.flyer-brand .printable-brand-copy { display: none; }
 .flyer-topline, .flyer-bottomline { padding: 24px 54px; background: #b58a24; color: #102f57; font: 700 14px Arial, sans-serif; letter-spacing: 3px; }
 .flyer-bottomline { margin-top: auto; text-align: right; }
 .flyer-content { padding: 100px 90px 60px; background: linear-gradient(145deg, #102f57 0%, #173f6d 58%, #285873 100%); flex: 1; }

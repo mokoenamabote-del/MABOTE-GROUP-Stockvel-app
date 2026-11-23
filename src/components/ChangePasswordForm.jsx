@@ -3,7 +3,6 @@ import { apiRequest } from "../lib/api";
 import "./ChangePasswordForm.css";
 
 export default function ChangePasswordForm() {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -26,13 +25,11 @@ export default function ChangePasswordForm() {
       const result = await apiRequest("/api/auth/change-password", {
         method: "POST",
         body: JSON.stringify({
-          currentPassword,
           newPassword,
           confirmPassword,
         }),
       });
 
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setMessage(result.message || "Password changed successfully.");
@@ -46,18 +43,8 @@ export default function ChangePasswordForm() {
   return (
     <div className="change-password">
       <h3>Change your password</h3>
-      <p>Enter your current password to choose a new one.</p>
+      <p>Your signed-in session verifies your account. Choose a new password below.</p>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="current-password">Current password</label>
-        <input
-          id="current-password"
-          type="password"
-          autoComplete="current-password"
-          value={currentPassword}
-          onChange={(event) => setCurrentPassword(event.target.value)}
-          required
-        />
-
         <label htmlFor="new-password">New password</label>
         <input
           id="new-password"
