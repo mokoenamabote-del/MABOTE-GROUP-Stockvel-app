@@ -6,7 +6,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
 import nodemailer from "nodemailer";
-import { createHash, randomInt } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+  randomInt,
+} from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,7 +30,9 @@ import {
   createPasswordResetToken,
   deletePasswordResetToken,
   findAccountByEmail,
+  findClaimById,
   listClaims,
+  listClaimDocuments,
   listClaimsForEmail,
   listContributions,
   listContributionsForEmail,
@@ -32,6 +40,7 @@ import {
   listApplicationsForEmail,
   saveContribution,
   saveClaim,
+  saveClaimWithDocuments,
   setAccountPassword,
   setAccountRole,
   updateApplication,
@@ -197,7 +206,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: false }));
 
 // ==========================================
@@ -762,33 +771,206 @@ app.get("/api/contributions", requireAuth, (req, res) => {
 // CLAIMS
 // ==========================================
 
-app.post("/api/claims", requireAuth, (req, res) => {
-  const claim = {
-    ...req.body,
-    email: String(
-      req.body.email || req.account.email
-    )
-      .trim()
-      .toLowerCase(),
-  };
+const claimStaffRoles = ["Admin", "Management", "Support Staff"];
+const requiredClaimDocumentTypes = new Set([
+  "deathCertificate",
+  "claimantId",
+  "deceasedId",
+  "doctorConfirmation",
+]);
+const maximumClaimDocumentBytes = 3 * 1024 * 1024;
+const claimDocumentEncryptionKey = createHash("sha256")
+  .update(`mabote-claim-documents:${JWT_SECRET}`)
+  .digest();
 
-  if (!claim.id) {
-    return res.status(400).json({
-      error: "Claim id is required",
-    });
+const isClaimStaff = (account) => claimStaffRoles.includes(account.role);
+
+const encryptClaimDocument = (document, claimId) => {
+  const fileName = String(document.name || "document")
+    .replace(/[^\w.-]/g, "_")
+    .slice(0, 100);
+  const mimeType = String(document.mimeType || "");
+  const data = String(document.data || "");
+
+  if (
+    !fileName ||
+    !["application/pdf", "image/jpeg", "image/png"].includes(mimeType) ||
+    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(data)
+  ) {
+    throw new Error("A claim document has an unsupported file format.");
   }
 
+  const fileBuffer = Buffer.from(data, "base64");
+  if (
+    !fileBuffer.length ||
+    fileBuffer.length > maximumClaimDocumentBytes ||
+    fileBuffer.toString("base64") !== data
+  ) {
+    throw new Error("Each claim document must be no larger than 3 MB.");
+  }
+
+  const hasValidSignature =
+    (mimeType === "application/pdf" &&
+      fileBuffer.subarray(0, 5).toString() === "%PDF-") ||
+    (mimeType === "image/jpeg" &&
+      fileBuffer[0] === 0xff &&
+      fileBuffer[1] === 0xd8 &&
+      fileBuffer[2] === 0xff) ||
+    (mimeType === "image/png" &&
+      fileBuffer.subarray(0, 8).equals(
+        Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+      ));
+
+  if (!hasValidSignature) {
+    throw new Error("A claim document does not match its file type.");
+  }
+
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", claimDocumentEncryptionKey, iv);
+  cipher.setAAD(Buffer.from(`${claimId}:${document.type}`));
+  const encryptedData = Buffer.concat([
+    cipher.update(fileBuffer),
+    cipher.final(),
+  ]);
+
+  return {
+    type: document.type,
+    name: fileName,
+    mimeType,
+    size: fileBuffer.length,
+    encryptedData: encryptedData.toString("base64"),
+    iv: iv.toString("base64"),
+    authTag: cipher.getAuthTag().toString("base64"),
+  };
+};
+
+const decryptClaimDocument = (claimId, document) => {
+  const decipher = createDecipheriv(
+    "aes-256-gcm",
+    claimDocumentEncryptionKey,
+    Buffer.from(document.iv, "base64")
+  );
+  decipher.setAAD(Buffer.from(`${claimId}:${document.document_type}`));
+  decipher.setAuthTag(Buffer.from(document.auth_tag, "base64"));
+  const data = Buffer.concat([
+    decipher.update(Buffer.from(document.encrypted_data, "base64")),
+    decipher.final(),
+  ]);
+
+  return {
+    type: document.document_type,
+    name: document.file_name,
+    mimeType: document.mime_type,
+    size: document.file_size,
+    data: data.toString("base64"),
+  };
+};
+
+app.post("/api/claims", requireAuth, (req, res) => {
+  const isStaff = isClaimStaff(req.account);
+  const claimId = Number(req.body.id);
+
+  if (!Number.isSafeInteger(claimId) || claimId <= 0) {
+    return res.status(400).json({ error: "A valid claim id is required" });
+  }
+
+  if (!isStaff && findClaimById(claimId)) {
+    return res.status(409).json({ error: "Claim already exists" });
+  }
+
+  let encryptedDocuments;
+  if (!isStaff) {
+    const documents = req.body.documents;
+    if (
+      !Array.isArray(documents) ||
+      documents.length !== requiredClaimDocumentTypes.size ||
+      documents.some(
+        (document) =>
+          !document ||
+          typeof document.type !== "string" ||
+          !requiredClaimDocumentTypes.has(document.type)
+      ) ||
+      new Set(documents.map((document) => document.type)).size !==
+        requiredClaimDocumentTypes.size
+    ) {
+      return res.status(400).json({
+        error: "All four required claim documents must be uploaded.",
+      });
+    }
+
+    if (
+      !String(req.body.member || "").trim() ||
+      !String(req.body.membershipNumber || "").trim() ||
+      !String(req.body.claimantName || "").trim() ||
+      !String(req.body.deceasedName || "").trim() ||
+      !String(req.body.date || "").trim() ||
+      !String(req.body.reason || "").trim()
+    ) {
+      return res.status(400).json({
+        error: "Complete all required claim information.",
+      });
+    }
+
+    try {
+      encryptedDocuments = documents.map((document) =>
+        encryptClaimDocument(document, claimId)
+      );
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  }
+
+  const claimDocuments = encryptedDocuments?.map((document) => ({
+    type: document.type,
+    name: document.name,
+    mimeType: document.mimeType,
+    size: document.size,
+  }));
+  const claim = {
+    ...req.body,
+    id: claimId,
+    ...(claimDocuments ? { documents: claimDocuments } : {}),
+    email: isStaff
+      ? String(req.body.email || req.account.email).trim().toLowerCase()
+      : String(req.account.email).trim().toLowerCase(),
+    ...(!isStaff ? { status: "Pending" } : {}),
+  };
+
   res.status(201).json({
-    claim: saveClaim(claim),
+    claim: encryptedDocuments
+      ? saveClaimWithDocuments(claim, encryptedDocuments)
+      : saveClaim(claim),
   });
 });
 
+app.get(
+  "/api/claims/:id/documents/:documentType",
+  requireAuth,
+  (req, res) => {
+    if (!isClaimStaff(req.account)) {
+      return res.status(403).json({
+        error: "Only management and staff can access claim documents.",
+      });
+    }
+
+    const claimId = Number(req.params.id);
+    if (!Number.isSafeInteger(claimId) || claimId <= 0) {
+      return res.status(400).json({ error: "A valid claim id is required" });
+    }
+
+    const document = listClaimDocuments(claimId).find(
+      (item) => item.document_type === req.params.documentType
+    );
+    if (!document) {
+      return res.status(404).json({ error: "Claim document not found." });
+    }
+
+    res.json({ document: decryptClaimDocument(claimId, document) });
+  }
+);
+
 app.get("/api/claims", requireAuth, (req, res) => {
-  const isStaff = [
-    "Admin",
-    "Management",
-    "Support Staff",
-  ].includes(req.account.role);
+  const isStaff = isClaimStaff(req.account);
 
   const claims = isStaff
     ? listClaims()

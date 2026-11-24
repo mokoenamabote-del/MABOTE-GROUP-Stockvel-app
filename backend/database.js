@@ -49,6 +49,20 @@ database.exec(`
     updated_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS claim_documents (
+    claim_id INTEGER NOT NULL,
+    document_type TEXT NOT NULL,
+    file_name TEXT NOT NULL,
+    mime_type TEXT NOT NULL,
+    file_size INTEGER NOT NULL,
+    encrypted_data TEXT NOT NULL,
+    iv TEXT NOT NULL,
+    auth_tag TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (claim_id, document_type),
+    FOREIGN KEY (claim_id) REFERENCES claims(id) ON DELETE CASCADE
+  );
+
   CREATE TABLE IF NOT EXISTS password_reset_tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id INTEGER NOT NULL,
@@ -408,6 +422,73 @@ export function saveClaim(claim) {
     );
 
   return claim;
+}
+
+export function saveClaimWithDocuments(claim, documents) {
+  const now = new Date().toISOString();
+  const save = database.transaction(() => {
+    database
+      .prepare(`
+        INSERT INTO claims
+          (id, email, claim_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          email = excluded.email,
+          claim_json = excluded.claim_json,
+          updated_at = excluded.updated_at
+      `)
+      .run(
+        claim.id,
+        String(claim.email || "").trim().toLowerCase(),
+        JSON.stringify(claim),
+        now,
+        now
+      );
+
+    const insertDocument = database.prepare(`
+      INSERT INTO claim_documents
+        (claim_id, document_type, file_name, mime_type, file_size,
+         encrypted_data, iv, auth_tag, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    documents.forEach((document) => {
+      insertDocument.run(
+        claim.id,
+        document.type,
+        document.name,
+        document.mimeType,
+        document.size,
+        document.encryptedData,
+        document.iv,
+        document.authTag,
+        now
+      );
+    });
+  });
+
+  save();
+  return claim;
+}
+
+export function findClaimById(id) {
+  const row = database
+    .prepare("SELECT claim_json FROM claims WHERE id = ?")
+    .get(id);
+
+  return row ? JSON.parse(row.claim_json) : null;
+}
+
+export function listClaimDocuments(claimId) {
+  return database
+    .prepare(`
+      SELECT document_type, file_name, mime_type, file_size,
+             encrypted_data, iv, auth_tag
+      FROM claim_documents
+      WHERE claim_id = ?
+      ORDER BY document_type
+    `)
+    .all(claimId);
 }
 
 export function listClaims() {

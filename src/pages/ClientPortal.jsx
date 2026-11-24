@@ -30,6 +30,21 @@ const formatDate = (date) => {
   });
 };
 
+const claimDocumentFields = [
+  { key: "deathCertificate", label: "Death certificate" },
+  { key: "claimantId", label: "Claimant's ID copy" },
+  { key: "deceasedId", label: "Deceased's ID copy" },
+  { key: "doctorConfirmation", label: "Doctor's confirmation for the deceased" },
+];
+
+const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1]);
+    reader.onerror = () => reject(new Error(`Unable to read ${file.name}.`));
+    reader.readAsDataURL(file);
+  });
+
 export default function ClientPortal() {
   const navigate = useNavigate();
 
@@ -66,6 +81,22 @@ export default function ClientPortal() {
   );
 
   const memberNumber = member?.memberNumber || application?.memberNumber;
+  const fullName = `${account?.fullName || application?.fullName || "Member"} ${
+    account?.surname || application?.surname || ""
+  }`.trim();
+
+  const [claimForm, setClaimForm] = useState({
+    claimantName: fullName,
+    claimantRelationship: "",
+    deceasedName: "",
+    claimType: "Funeral Grocery Support",
+    amount: "",
+    date: "",
+    reason: "",
+  });
+  const [claimDocuments, setClaimDocuments] = useState({});
+  const [claimSubmitting, setClaimSubmitting] = useState(false);
+  const [claimMessage, setClaimMessage] = useState("");
 
   const memberCollections = collections
     .filter(
@@ -112,10 +143,6 @@ export default function ClientPortal() {
       });
   }, []);
 
-  const fullName = `${account?.fullName || application?.fullName || "Member"} ${
-    account?.surname || application?.surname || ""
-  }`.trim();
-
   const plan = member?.plan || application?.plan || "Awaiting plan selection";
 
   const monthlyContribution =
@@ -153,6 +180,106 @@ export default function ClientPortal() {
     localStorage.removeItem("maboteAccount");
 
     navigate("/login");
+  };
+
+  const handleClaimFormChange = (event) => {
+    const { name, value } = event.target;
+    setClaimForm((previous) => ({ ...previous, [name]: value }));
+  };
+
+  const handleClaimDocumentChange = (type) => (event) => {
+    const file = event.target.files?.[0];
+    setClaimDocuments((previous) => ({ ...previous, [type]: file || null }));
+    setClaimMessage("");
+
+    if (file && file.size > 3 * 1024 * 1024) {
+      setClaimMessage("Each supporting document must be no larger than 3 MB.");
+      event.target.value = "";
+      setClaimDocuments((previous) => ({ ...previous, [type]: null }));
+    }
+  };
+
+  const submitClaim = async (event) => {
+    event.preventDefault();
+    const formElement = event.currentTarget;
+    setClaimMessage("");
+
+    const missingDocument = claimDocumentFields.find(
+      ({ key }) => !claimDocuments[key]
+    );
+    if (missingDocument) {
+      setClaimMessage(`Please upload ${missingDocument.label.toLowerCase()}.`);
+      return;
+    }
+
+    if (!memberNumber) {
+      setClaimMessage(
+        "A membership number is required before a claim can be submitted. Please contact membership support."
+      );
+      return;
+    }
+
+    setClaimSubmitting(true);
+    try {
+      const documents = await Promise.all(
+        claimDocumentFields.map(async ({ key }) => {
+          const file = claimDocuments[key];
+          if (!["application/pdf", "image/jpeg", "image/png"].includes(file.type)) {
+            throw new Error(
+              "Supporting documents must be PDF, JPG, or PNG files."
+            );
+          }
+
+          return {
+            type: key,
+            name: file.name,
+            mimeType: file.type,
+            data: await fileToBase64(file),
+          };
+        })
+      );
+
+      const claimToSubmit = {
+        id: Date.now(),
+        member: fullName,
+        membershipNumber: String(memberNumber),
+        plan,
+        claimType: claimForm.claimType,
+        amount: claimForm.amount.trim(),
+        status: "Pending",
+        reason: claimForm.reason.trim(),
+        date: claimForm.date,
+        claimantName: claimForm.claimantName.trim(),
+        claimantRelationship: claimForm.claimantRelationship.trim(),
+        deceasedName: claimForm.deceasedName.trim(),
+        email,
+        documents,
+      };
+
+      const result = await apiRequest("/api/claims", {
+        method: "POST",
+        body: JSON.stringify(claimToSubmit),
+      });
+
+      setClaims((previous) => [result.claim, ...previous]);
+      setClaimDocuments({});
+      setClaimForm((previous) => ({
+        ...previous,
+        claimantRelationship: "",
+        deceasedName: "",
+        amount: "",
+        date: "",
+        reason: "",
+      }));
+      formElement.reset();
+      setClaimMessage(
+        "Your claim and supporting documents were sent to management for review."
+      );
+    } catch (error) {
+      setClaimMessage(error.message);
+    } finally {
+      setClaimSubmitting(false);
+    }
   };
 
   return (
@@ -371,6 +498,122 @@ export default function ClientPortal() {
                 {memberClaims.length}
               </span>
             </div>
+
+            <details className="portal-claim-form">
+              <summary>Submit an online claim</summary>
+              <p>
+                Complete the claim details and upload all four supporting
+                documents. Management will review your submission.
+              </p>
+
+              <form onSubmit={submitClaim}>
+                <div className="portal-claim-form-grid">
+                  <label>
+                    Claimant full name
+                    <input
+                      name="claimantName"
+                      value={claimForm.claimantName}
+                      onChange={handleClaimFormChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Relationship to deceased
+                    <input
+                      name="claimantRelationship"
+                      value={claimForm.claimantRelationship}
+                      onChange={handleClaimFormChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Deceased full name
+                    <input
+                      name="deceasedName"
+                      value={claimForm.deceasedName}
+                      onChange={handleClaimFormChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Claim type
+                    <select
+                      name="claimType"
+                      value={claimForm.claimType}
+                      onChange={handleClaimFormChange}
+                    >
+                      <option>Funeral Grocery Support</option>
+                      <option>Funeral Support</option>
+                      <option>Other</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Date of death
+                    <input
+                      name="date"
+                      type="date"
+                      value={claimForm.date}
+                      onChange={handleClaimFormChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Claim amount (optional)
+                    <input
+                      name="amount"
+                      value={claimForm.amount}
+                      onChange={handleClaimFormChange}
+                      placeholder="e.g. R2,500"
+                    />
+                  </label>
+                </div>
+
+                <label className="portal-claim-reason">
+                  Claim details
+                  <textarea
+                    name="reason"
+                    value={claimForm.reason}
+                    onChange={handleClaimFormChange}
+                    rows="3"
+                    required
+                  />
+                </label>
+
+                <fieldset className="portal-claim-documents">
+                  <legend>Required supporting documents</legend>
+                  {claimDocumentFields.map(({ key, label }) => (
+                    <label key={key}>
+                      {label}
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                        onChange={handleClaimDocumentChange(key)}
+                        required
+                      />
+                      <small>PDF, JPG or PNG; maximum 3 MB.</small>
+                    </label>
+                  ))}
+                </fieldset>
+
+                <button
+                  className="portal-primary-action"
+                  type="submit"
+                  disabled={claimSubmitting}
+                >
+                  {claimSubmitting ? "Submitting claim…" : "Submit claim"}
+                </button>
+                {claimMessage && (
+                  <p className="portal-claim-message" role="status">
+                    {claimMessage}
+                  </p>
+                )}
+              </form>
+            </details>
 
             {memberClaims.length ? (
               <div className="portal-activity-list">

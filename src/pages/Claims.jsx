@@ -48,6 +48,13 @@ const emptyClaim = {
   date: "",
 };
 
+const claimDocumentLabels = {
+  deathCertificate: "Death certificate",
+  claimantId: "Claimant's ID copy",
+  deceasedId: "Deceased's ID copy",
+  doctorConfirmation: "Doctor's confirmation",
+};
+
 export default function Claims() {
   const navigate = useNavigate();
 
@@ -59,6 +66,9 @@ export default function Claims() {
 
   const [selectedClaim, setSelectedClaim] =
     useState(null);
+
+  const [downloadingDocument, setDownloadingDocument] =
+    useState("");
 
   useEffect(() => {
     apiRequest("/api/claims")
@@ -112,6 +122,34 @@ export default function Claims() {
       status: "Pending",
       reason: newClaim.reason.trim(),
       date: newClaim.date,
+    };
+
+    const downloadClaimDocument = async (claimId, documentType) => {
+      setDownloadingDocument(`${claimId}:${documentType}`);
+
+      try {
+        const { document } = await apiRequest(
+          `/api/claims/${claimId}/documents/${documentType}`
+        );
+        const binary = window.atob(document.data);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) {
+          bytes[index] = binary.charCodeAt(index);
+        }
+
+        const fileUrl = URL.createObjectURL(
+          new Blob([bytes], { type: document.mimeType })
+        );
+        const link = window.document.createElement("a");
+        link.href = fileUrl;
+        link.download = document.name;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        setDownloadingDocument("");
+      }
     };
 
     try {
@@ -843,6 +881,56 @@ export default function Claims() {
               </strong>{" "}
               {selectedClaim.reason}
             </p>
+
+            {selectedClaim.claimantName && (
+              <p>
+                <strong>Claimant:</strong> {selectedClaim.claimantName}
+                {selectedClaim.claimantRelationship
+                  ? ` (${selectedClaim.claimantRelationship})`
+                  : ""}
+              </p>
+            )}
+
+            {selectedClaim.deceasedName && (
+              <p>
+                <strong>Deceased:</strong> {selectedClaim.deceasedName}
+              </p>
+            )}
+
+            {Array.isArray(selectedClaim.documents) && (
+              <section aria-label="Supporting documents">
+                <h3>Supporting documents</h3>
+                {selectedClaim.documents.length ? (
+                  selectedClaim.documents.map((document) => (
+                    <p key={document.type}>
+                      <strong>
+                        {claimDocumentLabels[document.type] || document.name}
+                      </strong>{" "}
+                      <button
+                        type="button"
+                        disabled={
+                          downloadingDocument ===
+                          `${selectedClaim.id}:${document.type}`
+                        }
+                        onClick={() =>
+                          downloadClaimDocument(
+                            selectedClaim.id,
+                            document.type
+                          )
+                        }
+                      >
+                        {downloadingDocument ===
+                        `${selectedClaim.id}:${document.type}`
+                          ? "Loading…"
+                          : "Download"}
+                      </button>
+                    </p>
+                  ))
+                ) : (
+                  <p>No supporting documents were attached.</p>
+                )}
+              </section>
+            )}
 
             <p>
               <strong>

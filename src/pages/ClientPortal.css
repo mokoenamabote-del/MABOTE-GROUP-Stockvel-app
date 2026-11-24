@@ -136,6 +136,23 @@
 .portal-empty-state { min-height: 92px; display: flex; align-items: center; margin: 22px 0 0 !important; padding: 0 8px; border-top: 1px solid #e1dbd0; border-bottom: 1px solid #e1dbd0; }
 .portal-text-action { display: inline-block; margin-top: 18px; color: #102f57; font: 700 12px Arial, sans-serif; }
 .portal-text-action span { color: #c59a3d; }
+.portal-claim-form { margin-top: 20px; border-top: 1px solid #e1dbd0; border-bottom: 1px solid #e1dbd0; }
+.portal-claim-form summary { padding: 16px 0; color: #102f57; cursor: pointer; font: 700 13px Arial, sans-serif; }
+.portal-claim-form > p { margin: 0 0 18px !important; }
+.portal-claim-form form { padding-bottom: 18px; }
+.portal-claim-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.portal-claim-form label { display: flex; flex-direction: column; gap: 7px; color: #33465a; font: 700 12px Arial, sans-serif; }
+.portal-claim-form input,
+.portal-claim-form select,
+.portal-claim-form textarea { width: 100%; min-width: 0; padding: 10px; border: 1px solid #cbd2d9; border-radius: 3px; color: #26374a; background: #fff; font: 13px Arial, sans-serif; }
+.portal-claim-form input[type="file"] { padding: 8px; font-size: 11px; }
+.portal-claim-reason { margin-top: 14px; }
+.portal-claim-documents { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 18px 0; padding: 14px; border: 1px solid #d9d2c3; }
+.portal-claim-documents legend { padding: 0 5px; color: #102f57; font: 700 12px Arial, sans-serif; }
+.portal-claim-documents small { color: #7b838b; font: 10px Arial, sans-serif; }
+.portal-claim-form button { border: 0; cursor: pointer; }
+.portal-claim-form button:disabled { opacity: .65; cursor: wait; }
+.portal-claim-message { margin: 12px 0 0 !important; color: #26374a !important; font-weight: 700 !important; }
 .portal-footer-actions { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #d9d2c3; }
 .portal-footer-actions a { color: #526173; font: 700 12px Arial, sans-serif; }
 .portal-footer-actions a:hover,
@@ -148,10 +165,14 @@
   .portal-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .portal-content-grid,
   .portal-lower-grid { grid-template-columns: 1fr; }
+  .portal-claim-form-grid,
+  .portal-claim-documents { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
   .portal-status-grid { grid-template-columns: 1fr; }
   .portal-detail-list { grid-template-columns: 1fr; }
+  .portal-claim-form-grid,
+  .portal-claim-documents { grid-template-columns: 1fr; }
   .portal-panel { padding: 21px; }
 }

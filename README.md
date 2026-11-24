@@ -12,7 +12,16 @@ MABOTE GROUP Stockvel App is a digital platform designed to help communities man
 - Funeral grocery plans
 - Payment records
 - Member notifications
+- Online funeral claims with required supporting documents and management review
 - Admin dashboard
+
+## Online claims
+Members can submit a claim from the client portal with a death certificate,
+the claimant's ID, the deceased's ID, and a doctor's confirmation for the
+deceased. PDF, JPG, and PNG files up to 3 MB each are accepted. Management
+reviews submissions and can download the supporting documents from Claims.
+Claim documents are encrypted in the backend database using the configured
+`JWT_SECRET`; keep that secret unchanged to retain access to existing uploads.
 
 ## Plans
 - Plan A: Full Grocery — R300 per member per month
