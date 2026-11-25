@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 
 const initialClaims = [
@@ -8,6 +8,7 @@ const initialClaims = [
     member: "Nomsa Khumalo",
     membershipNumber: "M-001",
     plan: "Plan A",
+    policyNumber: "",
     claimType: "Funeral Grocery Support",
     amount: "R1,200",
     status: "Approved",
@@ -69,6 +70,7 @@ export default function Claims() {
 
   const [downloadingDocument, setDownloadingDocument] =
     useState("");
+  const [deletingClaimId, setDeletingClaimId] = useState(null);
 
   useEffect(() => {
     apiRequest("/api/claims")
@@ -117,6 +119,7 @@ export default function Claims() {
       membershipNumber:
         newClaim.membershipNumber.trim(),
       plan: newClaim.plan,
+      policyNumber: newClaim.policyNumber.trim(),
       claimType: newClaim.claimType,
       amount: newClaim.amount.trim(),
       status: "Pending",
@@ -208,6 +211,27 @@ export default function Claims() {
           }
         : previous
     );
+  };
+
+  const deleteClaim = async (claim) => {
+    if (!window.confirm(`Delete claim #${claim.id}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingClaimId(claim.id);
+    try {
+      await apiRequest(`/api/claims/${claim.id}`, { method: "DELETE" });
+      setClaims((previous) =>
+        previous.filter((item) => item.id !== claim.id)
+      );
+      setSelectedClaim((previous) =>
+        previous?.id === claim.id ? null : previous
+      );
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setDeletingClaimId(null);
+    }
   };
 
   const getStatusStyle = (status) => {
@@ -463,6 +487,16 @@ export default function Claims() {
               </label>
 
               <label>
+                Policy Number
+                <input
+                  type="text"
+                  value={newClaim.policyNumber}
+                  onChange={handleChange("policyNumber")}
+                  placeholder="e.g. POL-001"
+                />
+              </label>
+
+              <label>
                 Membership Plan
                 <select
                   value={newClaim.plan}
@@ -686,6 +720,17 @@ export default function Claims() {
               </p>
 
               <p>
+                <strong>Policy Number:</strong>{" "}
+                {claim.policyNumber ? (
+                  <Link to={`/members?search=${encodeURIComponent(claim.policyNumber)}`}>
+                    {claim.policyNumber}
+                  </Link>
+                ) : (
+                  "Not linked"
+                )}
+              </p>
+
+              <p>
                 <strong>
                   Plan:
                 </strong>{" "}
@@ -732,6 +777,14 @@ export default function Claims() {
                 }}
               >
                 VIEW CLAIM
+              </button>
+              <button
+                type="button"
+                disabled={deletingClaimId === claim.id}
+                onClick={() => deleteClaim(claim)}
+                style={{ marginTop: "10px", marginLeft: "8px" }}
+              >
+                {deletingClaimId === claim.id ? "DELETING…" : "DELETE CLAIM"}
               </button>
 
             </article>
@@ -845,6 +898,17 @@ export default function Claims() {
                 Membership Number:
               </strong>{" "}
               {selectedClaim.membershipNumber}
+            </p>
+
+            <p>
+              <strong>Policy Number:</strong>{" "}
+              {selectedClaim.policyNumber ? (
+                <Link to={`/members?search=${encodeURIComponent(selectedClaim.policyNumber)}`}>
+                  {selectedClaim.policyNumber}
+                </Link>
+              ) : (
+                "Not linked"
+              )}
             </p>
 
             <p>
@@ -996,6 +1060,15 @@ export default function Claims() {
 
               </div>
             )}
+
+            <button
+              type="button"
+              disabled={deletingClaimId === selectedClaim.id}
+              onClick={() => deleteClaim(selectedClaim)}
+              style={{ marginTop: "15px", marginRight: "8px" }}
+            >
+              {deletingClaimId === selectedClaim.id ? "DELETING…" : "DELETE CLAIM"}
+            </button>
 
             <button
               type="button"

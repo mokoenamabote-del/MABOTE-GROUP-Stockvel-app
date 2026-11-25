@@ -97,6 +97,8 @@ export default function ClientPortal() {
   const [claimDocuments, setClaimDocuments] = useState({});
   const [claimSubmitting, setClaimSubmitting] = useState(false);
   const [claimMessage, setClaimMessage] = useState("");
+  const [claimActionMessage, setClaimActionMessage] = useState("");
+  const [deletingClaimId, setDeletingClaimId] = useState(null);
 
   const memberCollections = collections
     .filter(
@@ -243,6 +245,9 @@ export default function ClientPortal() {
         id: Date.now(),
         member: fullName,
         membershipNumber: String(memberNumber),
+        policyNumber: String(
+          member?.policyNumber || application?.policyNumber || ""
+        ).trim(),
         plan,
         claimType: claimForm.claimType,
         amount: claimForm.amount.trim(),
@@ -279,6 +284,26 @@ export default function ClientPortal() {
       setClaimMessage(error.message);
     } finally {
       setClaimSubmitting(false);
+    }
+  };
+
+  const deleteClaim = async (claim) => {
+    if (!window.confirm("Are you sure you want to delete this claim?")) {
+      return;
+    }
+
+    setDeletingClaimId(claim.id);
+    setClaimActionMessage("");
+    try {
+      await apiRequest(`/api/claims/${claim.id}`, { method: "DELETE" });
+      setClaims((previous) =>
+        previous.filter((item) => item.id !== claim.id)
+      );
+      setClaimActionMessage("Claim deleted.");
+    } catch (error) {
+      setClaimActionMessage(error.message);
+    } finally {
+      setDeletingClaimId(null);
     }
   };
 
@@ -625,6 +650,9 @@ export default function ClientPortal() {
                     <div>
                       <strong>{claim.claimType || "Member claim"}</strong>
                       <span>{formatDate(claim.date)}</span>
+                      <span>
+                        Policy number: {claim.policyNumber || member?.policyNumber || application?.policyNumber || "Not recorded"}
+                      </span>
                     </div>
 
                     <div className="portal-activity-amount">
@@ -632,6 +660,14 @@ export default function ClientPortal() {
                         {claim.amount || "Amount pending"}
                       </strong>
                       <span>{claim.status || "Pending"}</span>
+                      <button
+                        className="portal-delete-action"
+                        type="button"
+                        disabled={deletingClaimId === claim.id}
+                        onClick={() => deleteClaim(claim)}
+                      >
+                        {deletingClaimId === claim.id ? "Deleting…" : "Delete"}
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -639,6 +675,11 @@ export default function ClientPortal() {
             ) : (
               <p className="portal-empty-state">
                 No claims are currently linked to your membership.
+              </p>
+            )}
+            {claimActionMessage && (
+              <p className="portal-claim-message" role="status">
+                {claimActionMessage}
               </p>
             )}
 

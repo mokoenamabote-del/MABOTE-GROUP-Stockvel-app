@@ -133,6 +133,8 @@
 .portal-activity-row span { margin-top: 5px; color: #7b838b; font: 11px Arial, sans-serif; }
 .portal-activity-amount { text-align: right; }
 .portal-activity-amount span { color: #3d8b63; }
+.portal-delete-action { margin-top: 8px; padding: 6px 9px; border: 1px solid #b84c4c; border-radius: 3px; color: #9e3434; background: #fff; cursor: pointer; font: 700 11px Arial, sans-serif; }
+.portal-delete-action:disabled { opacity: .65; cursor: wait; }
 .portal-empty-state { min-height: 92px; display: flex; align-items: center; margin: 22px 0 0 !important; padding: 0 8px; border-top: 1px solid #e1dbd0; border-bottom: 1px solid #e1dbd0; }
 .portal-text-action { display: inline-block; margin-top: 18px; color: #102f57; font: 700 12px Arial, sans-serif; }
 .portal-text-action span { color: #c59a3d; }

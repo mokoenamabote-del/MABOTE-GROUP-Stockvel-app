@@ -9,7 +9,9 @@ const LIGHT = "#F5F7FB";
 export default function Members() {
   const [applications, setApplications] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(
+    () => new URLSearchParams(window.location.search).get("search") || ""
+  );
   const [responseMessage, setResponseMessage] = useState("");
 
   useEffect(() => {

@@ -31,6 +31,7 @@ import {
   deletePasswordResetToken,
   findAccountByEmail,
   findClaimById,
+  deleteClaim,
   listClaims,
   listClaimDocuments,
   listClaimsForEmail,
@@ -977,6 +978,30 @@ app.get("/api/claims", requireAuth, (req, res) => {
     : listClaimsForEmail(req.account.email);
 
   res.json({ claims });
+});
+
+app.delete("/api/claims/:id", requireAuth, (req, res) => {
+  const claimId = Number(req.params.id);
+  if (!Number.isSafeInteger(claimId) || claimId <= 0) {
+    return res.status(400).json({ error: "A valid claim id is required" });
+  }
+
+  const claim = findClaimById(claimId);
+  if (!claim) {
+    return res.status(404).json({ error: "Claim not found." });
+  }
+
+  if (!isClaimStaff(req.account) && claim.email !== req.account.email) {
+    return res.status(403).json({
+      error: "You can only delete claims submitted from your account.",
+    });
+  }
+
+  if (!deleteClaim(claimId)) {
+    return res.status(404).json({ error: "Claim not found." });
+  }
+
+  res.json({ success: true });
 });
 
 // ==========================================

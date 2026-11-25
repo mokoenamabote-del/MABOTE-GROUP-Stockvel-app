@@ -479,6 +479,19 @@ export function findClaimById(id) {
   return row ? JSON.parse(row.claim_json) : null;
 }
 
+export function deleteClaim(id) {
+  const remove = database.transaction(() => {
+    database
+      .prepare("DELETE FROM claim_documents WHERE claim_id = ?")
+      .run(id);
+    return database
+      .prepare("DELETE FROM claims WHERE id = ?")
+      .run(id).changes > 0;
+  });
+
+  return remove();
+}
+
 export function listClaimDocuments(claimId) {
   return database
     .prepare(`
